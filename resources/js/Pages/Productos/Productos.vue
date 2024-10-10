@@ -1,5 +1,7 @@
 <script setup>
 import { ref, reactive, onMounted, watch, nextTick } from "vue";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 import axios from "axios";
 import AppLayout from "@/Layouts/AppLayout.vue";
 
@@ -138,7 +140,19 @@ const registrarTodosLosProductos = async () => {
         );
         registeredProductIds.value = response.data.product_ids;
         showLinksModal.value = true;
-        alert("Productos registrados con éxito: " + response.data.message);
+        for (const producto of productos.value) {
+            await eliminarProducto(producto.id);
+        }
+
+        productos.value = [];
+        toast.success("Productos registrados con éxito", {
+            autoClose: 3000,
+            position: "bottom-right",
+            style: {
+                width: "400px",
+            },
+            className: "border-l-4 border-green-500 p-4",
+        });
     } catch (error) {
         console.error("Error registrando todos los productos:", error);
         alert(
@@ -1317,12 +1331,6 @@ window.addEventListener("keydown", handleKeyDown);
                                     </ul>
                                 </div>
                                 <div class="mt-4 flex justify-end">
-                                    <button
-                                        @click="createOrder"
-                                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                                    >
-                                        Crear Orden de Compra
-                                    </button>
                                     <button
                                         @click="showLinksModal = false"
                                         class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded ml-2"
