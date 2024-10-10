@@ -44,7 +44,9 @@ const productosRegistrados = ref([]); // Arreglo que almacenará las concatenaci
 // Función para generar una cadena con los valores de los atributos
 const getAttributeValuesString = (attributes) => {
     return attributes
-        .map((attr) => attr.value_ids.map((id) => getValueAttributeName(id)).join(", "))
+        .map((attr) =>
+            attr.value_ids.map((id) => getValueAttributeName(id)).join(", ")
+        )
         .join(" ");
 };
 
@@ -129,9 +131,11 @@ const registrarProducto = async () => {
             productos.value.push(response.data);
         }
 
-        const nombreFormateado = `[${productPayload.default_code}] ${productPayload.name} (${getAttributeValuesString(productPayload.attributes)})`;
+        const nombreFormateado = `[${productPayload.default_code}] ${
+            productPayload.name
+        } (${getAttributeValuesString(productPayload.attributes)})`;
         productosRegistrados.value.push(nombreFormateado);
-        
+
         resetProducto();
         showModal.value = false;
     } catch (error) {
@@ -580,7 +584,17 @@ onMounted(async () => {
 const watchCategoryChange = (getter, level) => {
     watch(getter, (newVal, oldVal) => {
         if (newVal && newVal !== oldVal) {
-            fetchSubcategories(newVal, level);
+            fetchSubcategories(newVal, level).then(() => {
+                for (let i = level + 1; i <= 4; i++) {
+                    subcategories[i] = [];
+                    producto[`subcateg${i}_id`] = null;
+                }
+            });
+        } else if (!newVal) {
+            for (let i = level; i <= 4; i++) {
+                subcategories[i] = [];
+                producto[`subcateg${i}_id`] = null;
+            }
         }
     });
 };
