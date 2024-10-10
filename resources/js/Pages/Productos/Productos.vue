@@ -802,13 +802,13 @@ window.addEventListener("keydown", handleKeyDown);
                             </thead>
                             <tbody>
                                 <tr
-                                    v-for="producto in productos"
+                                    v-for="(producto, index) in productos"
                                     :key="producto.id"
                                 >
                                     <td
                                         class="px-6 py-4 border-b border-gray-300"
                                     >
-                                        {{ producto.id }}
+                                        {{ index + 1 }}
                                     </td>
                                     <td
                                         class="px-6 py-4 border-b border-gray-300"
