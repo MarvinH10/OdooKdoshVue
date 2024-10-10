@@ -39,6 +39,14 @@ const registeredProductIds = ref([]);
 
 const allAttributes = ref([]);
 const attributeInputs = ref([]);
+const productosRegistrados = ref([]); // Arreglo que almacenará las concatenaciones
+
+// Función para generar una cadena con los valores de los atributos
+const getAttributeValuesString = (attributes) => {
+    return attributes
+        .map((attr) => attr.value_ids.map((id) => getValueAttributeName(id)).join(", "))
+        .join(" ");
+};
 
 axios.defaults.withCredentials = true;
 
@@ -120,6 +128,10 @@ const registrarProducto = async () => {
             );
             productos.value.push(response.data);
         }
+
+        const nombreFormateado = `[${productPayload.default_code}] ${productPayload.name} (${getAttributeValuesString(productPayload.attributes)})`;
+        productosRegistrados.value.push(nombreFormateado);
+        
         resetProducto();
         showModal.value = false;
     } catch (error) {

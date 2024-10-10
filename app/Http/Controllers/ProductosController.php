@@ -38,6 +38,13 @@ class ProductosController extends Controller
         ]);
     }
 
+    public function indexForms()
+    {
+        return Inertia::render('Formula/Formula', [
+            'productos' => $this->readProductsFromFile(),
+        ]);
+    }
+
     public function traer()
     {
         return response()->json($this->readProductsFromFile());
