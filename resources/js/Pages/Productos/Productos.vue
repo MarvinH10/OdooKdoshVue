@@ -1308,7 +1308,7 @@ window.addEventListener("keydown", handleKeyDown);
                                             :key="productId"
                                         >
                                             <a
-                                                :href="`https://duplicadosackdosh.odoo.com/odoo/action-610/${productId}?debug=1&cids=1-2`"
+                                                :href="`https://pruebasackdosh.odoo.com/odoo/action-610/${productId}?debug=1&cids=1-2`"
                                                 target="_blank"
                                             >
                                                 Ver Producto {{ productId }}
