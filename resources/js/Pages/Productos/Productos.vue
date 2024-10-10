@@ -156,6 +156,7 @@ const registrarTodosLosProductos = async () => {
         );
         registeredProductIds.value = response.data.product_ids;
         showLinksModal.value = true;
+
         for (const producto of productos.value) {
             await eliminarProducto(producto.id);
         }
@@ -553,9 +554,15 @@ const openModalForNewProduct = () => {
 
 onMounted(async () => {
     try {
-        const response = await axios.get("/productos/traer");
-        // console.log("Received product data:", response.data);
-        productos.value = response.data;
+        const storedProducts = localStorage.getItem("productos");
+        if (storedProducts) {
+            productos.value = JSON.parse(storedProducts);
+        } else {
+            const response = await axios.get("/productos/traer");
+            productos.value = response.data;
+
+            localStorage.setItem("productos", JSON.stringify(productos.value));
+        }
 
         const uniqueIds = new Set();
         productos.value.forEach((product) => {
@@ -589,12 +596,16 @@ const watchCategoryChange = (getter, level) => {
                     subcategories[i] = [];
                     producto[`subcateg${i}_id`] = null;
                 }
+
+                localStorage.setItem("subcategories", JSON.stringify(subcategories));
             });
         } else if (!newVal) {
             for (let i = level; i <= 4; i++) {
                 subcategories[i] = [];
                 producto[`subcateg${i}_id`] = null;
             }
+
+            localStorage.setItem("subcategories", JSON.stringify(subcategories));
         }
     });
 };
@@ -791,13 +802,13 @@ window.addEventListener("keydown", handleKeyDown);
                             </thead>
                             <tbody>
                                 <tr
-                                    v-for="producto in productos"
+                                    v-for="(producto, index) in productos"
                                     :key="producto.id"
                                 >
                                     <td
                                         class="px-6 py-4 border-b border-gray-300"
                                     >
-                                        {{ producto.id }}
+                                        {{ index + 1 }}
                                     </td>
                                     <td
                                         class="px-6 py-4 border-b border-gray-300"
