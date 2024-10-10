@@ -1,1 +1,1 @@
-[]
+[{"name":"cxvxcvxc","default_code":"cxvxcvx","categ_id":7,"subcateg1_id":8,"subcateg2_id":9,"list_price":0,"attributes":[{"attribute_id":10,"value_ids":[6,7,8],"extra_references":["cxvxcvx","cxvxcvx","cxvxcvx"],"extra_prices":[23,25,26]}],"id":1},{"name":"sadadasdafa","default_code":"cxvxcv","categ_id":10,"subcateg1_id":11,"subcateg2_id":12,"subcateg3_id":13,"list_price":0,"attributes":[{"attribute_id":10,"value_ids":[6,7],"extra_references":["cxvxcv","cxvxcv"],"extra_prices":[23,24]}],"id":2}]

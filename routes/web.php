@@ -25,10 +25,4 @@ Route::middleware([
     })->name('dashboard');
 });
 
-Route::get('/productos', [ProductosController::class, 'index']);
-Route::post('/productos', [ProductosController::class, 'store']);
-Route::delete('/productos/{id}', [ProductosController::class, 'destroy']);
-Route::get('/odoo/categories', [ProductosController::class, 'getCategories']);
-Route::get('/odoo/categories/{parentId}', [ProductosController::class, 'getSubcategories']);
-
 require __DIR__ . '/admin.php';

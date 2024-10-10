@@ -7,6 +7,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::controller(ProductosController::class)->group(function () {
         Route::get('/productos', 'index')->name('productos');
+        Route::get('/formulas', 'indexForms')->name('formulas');
         Route::get('/productos/traer', 'traer');
         Route::post('/productos/almacenar', 'almacenar');
         Route::put('/productos/actualizar/{id}', 'actualizar');
