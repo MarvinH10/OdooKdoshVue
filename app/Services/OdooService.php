@@ -92,6 +92,57 @@ class OdooService
             array('fields' => array('id', 'name'))
         );
     }
+
+    public function getFavoriteData()
+    {
+        try {
+            // Traer productos favoritos
+            $products = $this->models->execute_kw(
+                $this->db,
+                $this->uid,
+                $this->password,
+                'product.product',
+                'search_read',
+                [
+                    [['is_favorite', '=', true]],
+                ],
+                [
+                    'fields' => ['id', 'default_code', 'name', 'product_tmpl_id', 'product_template_attribute_value_ids'],
+                ]
+            );
+
+            foreach ($products as &$product) {
+                // Obtener los valores de atributo asociados a la variante del producto
+                if (!empty($product['product_template_attribute_value_ids'])) {
+                    $attributeValues = $this->models->execute_kw(
+                        $this->db,
+                        $this->uid,
+                        $this->password,
+                        'product.template.attribute.value',
+                        'search_read',
+                        [
+                            [['id', 'in', $product['product_template_attribute_value_ids']]],
+                        ],
+                        ['fields' => ['id', 'name']]
+                    );
+
+                    // Asociamos los valores de atributo con el producto
+                    $product['attribute_values'] = array_map(function ($attributeValue) {
+                        return $attributeValue['name'];
+                    }, $attributeValues);
+                } else {
+                    $product['attribute_values'] = ['No Attribute Values'];
+                }
+            }
+
+            return $products;
+
+        } catch (\Exception $e) {
+            Log::error('Error fetching product references:', ['message' => $e->getMessage()]);
+            return null;
+        }
+    }
+
     /*********************GUARDAR DATOS DE ODOO 17 PARA PRODUCTOS*********************/
     public function createProduct($data)
     {
@@ -179,6 +230,37 @@ class OdooService
         } catch (\Exception $e) {
             Log::error('Error creando productos en batch en Odoo:', ['message' => $e->getMessage(), 'data' => $bulkProductData]);
             return [];
+        }
+    }
+
+    public function convertirFavoritosANoFavoritos()
+    {
+        try {
+            $favoritos = $this->getFavoriteData();
+
+            if ($favoritos) {
+                $productoIds = array_column($favoritos, 'id');
+
+                $this->models->execute_kw(
+                    $this->db,
+                    $this->uid,
+                    $this->password,
+                    'product.product',
+                    'write',
+                    [
+                        $productoIds,
+                        ['is_favorite' => false],
+                    ]
+                );
+
+                Log::info('Productos favoritos actualizados a no favoritos');
+                return $productoIds;
+            }
+
+            return [];
+        } catch (\Exception $e) {
+            Log::error('Error updating favorite products to non-favorites:', ['message' => $e->getMessage()]);
+            return null;
         }
     }
 

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\FormulariosController;
 use App\Http\Controllers\ProductosController;
 use Illuminate\Support\Facades\Route;
 
@@ -7,7 +8,6 @@ Route::middleware(['auth'])->group(function () {
 
     Route::controller(ProductosController::class)->group(function () {
         Route::get('/productos', 'index')->name('productos');
-        Route::get('/formulas', 'indexForms')->name('formulas');
         Route::get('/productos/traer', 'traer');
         Route::post('/productos/almacenar', 'almacenar');
         Route::put('/productos/actualizar/{id}', 'actualizar');
@@ -18,5 +18,11 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/atributos/traer', 'traerAtributos');
         Route::get('/valores_atributos/traer/{id}', 'traerValoresAtributos');
         Route::post('/productos/registrar_todo', 'registrarProductos');
+    });
+
+    Route::controller(FormulariosController::class)->group(function () {
+        Route::get('/formulas', 'index')->name('formulas');
+        Route::get('/formulas/data_favorite/traer', 'traerDatosFavoritos');
+        Route::post('/formulas/data_favorite/convertir_no_favoritos', 'convertirFavoritosANoFavoritos');
     });
 });
