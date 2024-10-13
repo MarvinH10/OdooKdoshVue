@@ -16,10 +16,10 @@ class OdooService
 
     public function __construct()
     {
-        $this->url = 'https://pruebasackdosh.odoo.com';
-        $this->db = 'pruebasackdosh';
+        $this->url = 'https://extremeduplicate.odoo.com';
+        $this->db = 'extremeduplicate';
         $this->username = 'marvinhectorcamposdeza@gmail.com';
-        $this->password = '78d3724c11aaae00801b0179cf3f38b1675fd0cc';
+        $this->password = '45953698c0da8ca97bd0f5ae0224c994ff11a8b9';
 
         $common = Ripcord::client("$this->url/xmlrpc/2/common");
         $this->uid = $common->authenticate($this->db, $this->username, $this->password, array());
