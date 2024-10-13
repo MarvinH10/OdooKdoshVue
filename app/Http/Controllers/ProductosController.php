@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\OdooService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
@@ -183,13 +184,15 @@ class ProductosController extends Controller
     public function registrarProductos(Request $request)
     {
         try {
-            $productos = $request->all();
-            $uids = $this->odooService->authenticate();
+            $user = Auth::user();
 
-            if (!$uids) {
-                return response()->json(['error' => 'Autenticación fallida'], 401);
+            $odooUid = $user->odoo_uid;
+
+            if (!$odooUid) {
+                return response()->json(['error' => 'El usuario no tiene un UID de Odoo asociado'], 403);
             }
 
+            $productos = $request->all();
             $productIds = [];
             $bulkProductData = [];
 
@@ -200,12 +203,13 @@ class ProductosController extends Controller
 
                 $productData = [
                     'is_favorite' => true,
-                    //'available_in_pos' => true,
+                    'available_in_pos' => true,
                     'name' => $producto['name'],
                     'categ_id' => $producto['categ_id'],
                     'default_code' => $producto['default_code'],
                     'list_price' => $producto['list_price'],
                     'type' => 'consu',
+                    'create_uid' => $odooUid,
                     'taxes_id' => [(int) 5],
                 ];
 

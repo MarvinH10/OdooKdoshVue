@@ -1,7 +1,5 @@
 <?php
 
-use App\Http\Controllers\OdooController;
-use App\Http\Controllers\ProductosController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;

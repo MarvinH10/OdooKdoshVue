@@ -597,7 +597,10 @@ const watchCategoryChange = (getter, level) => {
                     producto[`subcateg${i}_id`] = null;
                 }
 
-                localStorage.setItem("subcategories", JSON.stringify(subcategories));
+                localStorage.setItem(
+                    "subcategories",
+                    JSON.stringify(subcategories)
+                );
             });
         } else if (!newVal) {
             for (let i = level; i <= 4; i++) {
@@ -605,7 +608,10 @@ const watchCategoryChange = (getter, level) => {
                 producto[`subcateg${i}_id`] = null;
             }
 
-            localStorage.setItem("subcategories", JSON.stringify(subcategories));
+            localStorage.setItem(
+                "subcategories",
+                JSON.stringify(subcategories)
+            );
         }
     });
 };
@@ -956,7 +962,7 @@ window.addEventListener("keydown", handleKeyDown);
                 ></span
                 >&#8203;
                 <div
-                    class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl w-full max-w-6xl"
+                    class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full w-full max-w-md sm:max-w-xl md:max-w-2xl lg:max-w-4xl xl:max-w-6xl 2xl:max-w-7xl"
                 >
                     <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                         <div class="sm:flex sm:items-start">
@@ -1359,7 +1365,7 @@ window.addEventListener("keydown", handleKeyDown);
                                             :key="productId"
                                         >
                                             <a
-                                                :href="`https://pruebasackdosh.odoo.com/odoo/action-610/${productId}?debug=1&cids=1-2`"
+                                                :href="`https://administratingprove.odoo.com//odoo/action-610/${productId}?debug=1&cids=1-2`"
                                                 target="_blank"
                                             >
                                                 Ver Producto {{ productId }}

@@ -45,15 +45,15 @@ const fetchProductosFavoritos = async () => {
 };
 
 const copyToClipboard = () => {
-    const formattedText = productosConcatenados.value.join('\n');
-    const textArea = document.createElement('textarea');
+    const formattedText = productosConcatenados.value.join("\n");
+    const textArea = document.createElement("textarea");
     textArea.value = formattedText;
     document.body.appendChild(textArea);
     textArea.select();
-    document.execCommand('copy');
+    document.execCommand("copy");
     document.body.removeChild(textArea);
 
-    alert('Datos copiados al portapapeles');
+    alert("Datos copiados al portapapeles");
 };
 
 onMounted(() => {
@@ -76,14 +76,16 @@ onMounted(() => {
                 >
                     <button
                         @click="convertirFavoritosANoFavoritos"
-                        class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mb-4"
+                        class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mb-4 mr-3"
                     >
+                        <i class="fas fa-heart-broken mr-2"></i>
                         Convertir a No Favoritos
                     </button>
                     <button
                         @click="copyToClipboard"
                         class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4"
                     >
+                        <i class="fas fa-copy mr-2"></i>
                         Copiar al portapapeles
                     </button>
                     <ul>
