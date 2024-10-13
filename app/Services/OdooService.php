@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Ripcord\Ripcord;
 
@@ -16,31 +17,35 @@ class OdooService
 
     public function __construct()
     {
-        $this->url = 'https://extremeduplicate.odoo.com';
-        $this->db = 'extremeduplicate';
-        $this->username = 'marvinhectorcamposdeza@gmail.com';
-        $this->password = '45953698c0da8ca97bd0f5ae0224c994ff11a8b9';
-
-        $common = Ripcord::client("$this->url/xmlrpc/2/common");
-        $this->uid = $common->authenticate($this->db, $this->username, $this->password, array());
-
+        $this->url = 'https://administratingprove.odoo.com';
+        $this->db = 'administratingprove';
         $this->models = Ripcord::client("$this->url/xmlrpc/2/object");
     }
 
     public function authenticate()
     {
-        try {
-            $common = Ripcord::client("$this->url/xmlrpc/2/common");
-            return $common->authenticate($this->db, $this->username, $this->password, array());
-        } catch (\Exception $e) {
-            Log::error('Error authenticating with Odoo:', ['message' => $e->getMessage()]);
-            return null;
+        $user = Auth::user();
+
+        if (!$user) {
+            throw new \Exception('Usuario no autenticado');
         }
+
+        $common = Ripcord::client("$this->url/xmlrpc/2/common");
+        $this->username = $user->email;
+        $this->password = $user->token;
+        $this->uid = $common->authenticate($this->db, $this->username, $this->password, array());
+
+        if (!$this->uid) {
+            throw new \Exception('Error de autenticación con Odoo');
+        }
+        return $this->uid;
     }
 
     /*********************TRAER DATOS DE ODOO 17 PARA PRODUCTOS*********************/
     public function getProductFavorites()
     {
+        $this->authenticate();
+
         return $this->models->execute_kw(
             $this->db,
             $this->uid,
@@ -58,6 +63,8 @@ class OdooService
 
     public function getCategorias()
     {
+        $this->authenticate();
+
         return $this->models->execute_kw($this->db, $this->uid, $this->password,
             'product.category', 'search_read',
             array(array(array('parent_id', '=', false))),
@@ -67,6 +74,8 @@ class OdooService
 
     public function getSubcategories($id)
     {
+        $this->authenticate();
+
         $parentId = (int) $id;
         return $this->models->execute_kw($this->db, $this->uid, $this->password,
             'product.category', 'search_read',
@@ -77,6 +86,8 @@ class OdooService
 
     public function getAttributos()
     {
+        $this->authenticate();
+
         return $this->models->execute_kw($this->db, $this->uid, $this->password,
             'product.attribute', 'search_read',
             array(),
@@ -86,6 +97,8 @@ class OdooService
 
     public function getValueAttributos($id)
     {
+        $this->authenticate();
+
         return $this->models->execute_kw($this->db, $this->uid, $this->password,
             'product.attribute.value', 'search_read',
             array(array(array('attribute_id', '=', (int) $id))),
@@ -93,8 +106,10 @@ class OdooService
         );
     }
 
-    public function getFavoriteData()
+    public function getFavoriteData($userId)
     {
+        $this->authenticate();
+
         try {
             // Traer productos favoritos
             $products = $this->models->execute_kw(
@@ -104,10 +119,10 @@ class OdooService
                 'product.product',
                 'search_read',
                 [
-                    [['is_favorite', '=', true]],
+                    [['is_favorite', '=', true], ['create_uid', '=', $userId]],
                 ],
                 [
-                    'fields' => ['id', 'default_code', 'name', 'product_tmpl_id', 'product_template_attribute_value_ids'],
+                    'fields' => ['id', 'default_code', 'name', 'product_tmpl_id', 'product_template_attribute_value_ids', 'create_uid'],
                 ]
             );
 
@@ -146,6 +161,8 @@ class OdooService
     /*********************GUARDAR DATOS DE ODOO 17 PARA PRODUCTOS*********************/
     public function createProduct($data)
     {
+        $this->authenticate();
+
         try {
             Log::info('Enviando datos para crear producto en Odoo', ['data' => $data]);
             $productId = $this->models->execute_kw($this->db, $this->uid, $this->password,
@@ -160,6 +177,8 @@ class OdooService
 
     public function createVariant($productId, $attributes)
     {
+        $this->authenticate();
+
         try {
             Log::info('Creando variantes para el producto en Odoo', ['productId' => $productId]);
 
@@ -221,10 +240,19 @@ class OdooService
 
     public function createProductsBatch($bulkProductData)
     {
+        $this->authenticate();
+
         try {
             Log::info('Enviando datos en batch para crear productos en Odoo', ['data' => $bulkProductData]);
-            $createdProductIds = $this->models->execute_kw($this->db, $this->uid, $this->password,
-                'product.template', 'create', [$bulkProductData]); // <-- Changed to array
+            $createdProductIds = $this->models->execute_kw(
+                $this->db,
+                $this->uid,
+                $this->password,
+                'product.template',
+                'create',
+                [$bulkProductData]
+            );
+
             Log::info('Productos creados en Odoo', ['productIds' => $createdProductIds]);
             return $createdProductIds;
         } catch (\Exception $e) {
@@ -233,10 +261,12 @@ class OdooService
         }
     }
 
-    public function convertirFavoritosANoFavoritos()
+    public function convertirFavoritosANoFavoritos($userId)
     {
+        $this->authenticate();
+
         try {
-            $favoritos = $this->getFavoriteData();
+            $favoritos = $this->getFavoriteData($userId);
 
             if ($favoritos) {
                 $productoIds = array_column($favoritos, 'id');
@@ -267,6 +297,8 @@ class OdooService
     //EN BASE DE DATOS ALMACENANDO
     public function traerProductosConsumibles()
     {
+        $this->authenticate();
+
         return $this->models->execute_kw(
             $this->db,
             $this->uid,
@@ -284,6 +316,8 @@ class OdooService
 
     public function traerCategorias()
     {
+        $this->authenticate();
+
         return $this->models->execute_kw($this->db, $this->uid, $this->password,
             'product.category', 'search_read',
             array(),
@@ -293,6 +327,8 @@ class OdooService
 
     public function traerSubcategorias($id)
     {
+        $this->authenticate();
+
         return $this->models->execute_kw($this->db, $this->uid, $this->password,
             'product.category', 'search_read',
             array(array(array('parent_id', '=', $id))),
@@ -302,6 +338,8 @@ class OdooService
 
     public function traerAtributos()
     {
+        $this->authenticate();
+
         return $this->models->execute_kw($this->db, $this->uid, $this->password,
             'product.attribute', 'search_read',
             array(),
@@ -311,6 +349,8 @@ class OdooService
 
     public function traerValoresAtributos($id)
     {
+        $this->authenticate();
+
         return $this->models->execute_kw($this->db, $this->uid, $this->password,
             'product.attribute.value', 'search_read',
             array(array(array('attribute_id', '=', (int) $id))),

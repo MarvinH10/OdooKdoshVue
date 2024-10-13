@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\OdooService;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
@@ -24,11 +25,6 @@ class FormulariosController extends Controller
         return [];
     }
 
-    private function writeProductsToFile(array $productos)
-    {
-        file_put_contents($this->productsFile, json_encode($productos));
-    }
-
     public function index()
     {
         return Inertia::render('Formula/Formula', [
@@ -40,7 +36,19 @@ class FormulariosController extends Controller
     public function traerDatosFavoritos()
     {
         try {
-            $dataFavorite = $this->odooService->getFavoriteData();
+            $user = Auth::user();
+
+            if (!$user) {
+                return response()->json(['error' => 'Usuario no autenticado en Laravel'], 401);
+            }
+
+            $userId = $this->odooService->authenticate();
+
+            if (!$userId) {
+                return response()->json(['error' => 'Usuario no autenticado en Odoo'], 401);
+            }
+
+            $dataFavorite = $this->odooService->getFavoriteData($userId);
             return response()->json($dataFavorite);
         } catch (\Exception $e) {
             Log::error('Error fetching favorite data:', ['message' => $e->getMessage()]);
@@ -49,10 +57,16 @@ class FormulariosController extends Controller
     }
 
     /********************CONVERTIR PRODUCTOS FAVORITOS A NO FAVORITOS********************/
-    public function convertirFavoritosANoFavoritos()
+    public function convertirFavoritosANoFavoritos($userId)
     {
         try {
-            $result = $this->odooService->convertirFavoritosANoFavoritos();
+            $userId = $this->odooService->authenticate();
+
+            if (!$userId) {
+                return response()->json(['error' => 'Usuario no autenticado en Odoo'], 401);
+            }
+
+            $result = $this->odooService->convertirFavoritosANoFavoritos($userId);
             return response()->json(['message' => 'Productos actualizados a no favoritos', 'result' => $result]);
         } catch (\Exception $e) {
             Log::error('Error al convertir productos a no favoritos:', ['message' => $e->getMessage()]);
