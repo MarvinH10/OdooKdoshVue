@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Producto;
 use App\Services\OdooService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class ProductosController extends Controller
 {
-    private $productsFile = 'productos.json';
     protected $odooService;
 
     public function __construct(OdooService $odooService)
@@ -20,28 +21,28 @@ class ProductosController extends Controller
 
     private function readProductsFromFile()
     {
-        if (file_exists($this->productsFile)) {
-            return json_decode(file_get_contents($this->productsFile), true);
+        if (Storage::exists('productos.json')) {
+            return json_decode(Storage::get('productos.json'), true);
         }
         return [];
     }
 
     private function writeProductsToFile(array $productos)
     {
-        file_put_contents($this->productsFile, json_encode($productos));
+        Storage::put('productos.json', json_encode($productos));
     }
 
     /********************LO QUE RESPECTA A ARREGLOS********************/
     public function index()
     {
         return Inertia::render('Productos/Productos', [
-            'productos' => $this->readProductsFromFile(),
+            'productos' => Producto::all(),
         ]);
     }
 
     public function traer()
     {
-        return response()->json($this->readProductsFromFile());
+        return response()->json(Producto::all());
     }
 
     public function almacenar(Request $request)

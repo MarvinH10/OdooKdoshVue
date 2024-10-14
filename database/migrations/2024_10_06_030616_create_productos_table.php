@@ -13,7 +13,15 @@ return new class extends Migration
     {
         Schema::create('productos', function (Blueprint $table) {
             $table->id();
-            $table->string('pro_nombre')->nullable();
+            $table->string('name');
+            $table->string('default_code')->nullable();
+            $table->unsignedBigInteger('categ_id');
+            $table->unsignedBigInteger('subcateg1_id')->nullable();
+            $table->unsignedBigInteger('subcateg2_id')->nullable();
+            $table->unsignedBigInteger('subcateg3_id')->nullable();
+            $table->unsignedBigInteger('subcateg4_id')->nullable();
+            $table->decimal('list_price', 8, 2)->nullable();
+            $table->json('attributes')->nullable();
             $table->timestamps();
         });
     }
