@@ -558,15 +558,7 @@ const openModalForNewProduct = () => {
 
 onMounted(async () => {
     try {
-        const storedProducts = localStorage.getItem("productos");
-        if (storedProducts) {
-            productos.value = JSON.parse(storedProducts);
-        } else {
-            const response = await axios.get("/productos/traer");
-            productos.value = response.data;
-
-            localStorage.setItem("productos", JSON.stringify(productos.value));
-        }
+        await recuperarProductos();
 
         const uniqueIds = new Set();
         productos.value.forEach((product) => {
