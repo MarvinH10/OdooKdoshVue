@@ -27,8 +27,11 @@ class FormulariosController extends Controller
 
     public function index()
     {
+        $user = Auth::user();
+
         return Inertia::render('Formula/Formula', [
             'productos' => $this->readProductsFromFile(),
+            'userOdooId' => $user->odoo_uid,
         ]);
     }
 
@@ -57,16 +60,22 @@ class FormulariosController extends Controller
     }
 
     /********************CONVERTIR PRODUCTOS FAVORITOS A NO FAVORITOS********************/
-    public function convertirFavoritosANoFavoritos($userId)
+    public function convertirFavoritosANoFavoritos()
     {
         try {
-            $userId = $this->odooService->authenticate();
+            $user = Auth::user();
 
-            if (!$userId) {
+            if (!$user) {
+                return response()->json(['error' => 'Usuario no autenticado en Laravel'], 401);
+            }
+
+            $odooUserId = $user->odoo_uid;
+
+            if (!$odooUserId) {
                 return response()->json(['error' => 'Usuario no autenticado en Odoo'], 401);
             }
 
-            $result = $this->odooService->convertirFavoritosANoFavoritos($userId);
+            $result = $this->odooService->convertirFavoritosANoFavoritos($odooUserId);
             return response()->json(['message' => 'Productos actualizados a no favoritos', 'result' => $result]);
         } catch (\Exception $e) {
             Log::error('Error al convertir productos a no favoritos:', ['message' => $e->getMessage()]);

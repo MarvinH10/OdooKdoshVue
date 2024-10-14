@@ -23,7 +23,7 @@ class UsuariosSeeder extends Seeder
 
         User::create([
             'name' => 'Jhamil Crispin',
-            'odoo_uid' => 3,
+            'odoo_uid' => 6,
             'email' => 'j99crispin@gmail.com',
             'token' => '735b4c65a109cf5a36d121854f4dc74aba2ca5b6',
             'password' => Hash::make('987654321'),

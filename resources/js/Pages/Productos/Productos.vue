@@ -9,6 +9,7 @@ const subcategoryCache = new Map();
 const fetchedIds = new Set();
 
 const productos = ref([]);
+const isUploading = ref(false);
 const producto = reactive({
     id: null,
     name: "",
@@ -149,7 +150,8 @@ const registrarProducto = async () => {
 
 const registrarTodosLosProductos = async () => {
     try {
-        console.log("Registrando todos los productos:", productos.value);
+        isUploading.value = true;
+        // console.log("Registrando todos los productos:", productos.value);
         const response = await axios.post(
             "/productos/registrar_todo",
             productos.value
@@ -176,6 +178,8 @@ const registrarTodosLosProductos = async () => {
             "Error registrando todos los productos: " +
                 (error.response?.data?.error || error.message)
         );
+    } finally {
+        isUploading.value = false;
     }
 };
 
@@ -736,16 +740,9 @@ window.addEventListener("keydown", handleKeyDown);
                     >
                         <i class="fas fa-circle-plus"></i> Agregar
                     </button>
-                    <div
-                        v-if="loading"
-                        class="flex justify-center items-center"
-                    >
-                        <div
-                            class="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full"
-                            role="status"
-                        >
-                            <span class="visually-hidden">•</span>
-                        </div>
+                    <div v-if="loading" class="text-center my-4">
+                        <i class="fas fa-spinner fa-spin mr-2"></i> Cargando
+                        productos...
                     </div>
                     <div v-else class="overflow-x-auto">
                         <table
@@ -942,11 +939,17 @@ window.addEventListener("keydown", handleKeyDown);
                 </div>
                 <div class="flex justify-end mt-4">
                     <button
+                        v-if="!isUploading"
                         @click="registrarTodosLosProductos"
                         class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                     >
                         <i class="fas fa-save"></i> Crear Productos en Odoo
                     </button>
+
+                    <div v-else class="text-center text-blue-500 font-bold">
+                        <i class="fas fa-spinner fa-spin mr-2"></i> Subiendo
+                        productos...
+                    </div>
                 </div>
             </div>
         </div>
