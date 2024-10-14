@@ -9,12 +9,13 @@ class Producto extends Model
 {
     use HasFactory;
 
+    protected $table = 'productos';
+
     protected $fillable = [
-        'pro_nombre'
+        'name', 'default_code', 'categ_id', 'subcateg1_id', 'subcateg2_id', 'subcateg3_id', 'subcateg4_id', 'list_price', 'attributes',
     ];
 
-    public function attributes()
-    {
-        return $this->hasMany(ProductAttribute::class);
-    }
+    protected $casts = [
+        'attributes' => 'array',
+    ];
 }
