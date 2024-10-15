@@ -111,7 +111,6 @@ class OdooService
         $this->authenticate();
 
         try {
-            // Traer productos favoritos
             $products = $this->models->execute_kw(
                 $this->db,
                 $this->uid,
@@ -127,7 +126,6 @@ class OdooService
             );
 
             foreach ($products as &$product) {
-                // Obtener los valores de atributo asociados a la variante del producto
                 if (!empty($product['product_template_attribute_value_ids'])) {
                     $attributeValues = $this->models->execute_kw(
                         $this->db,
@@ -141,12 +139,60 @@ class OdooService
                         ['fields' => ['id', 'name']]
                     );
 
-                    // Asociamos los valores de atributo con el producto
                     $product['attribute_values'] = array_map(function ($attributeValue) {
                         return $attributeValue['name'];
                     }, $attributeValues);
                 } else {
                     $product['attribute_values'] = ['No Attribute Values'];
+                }
+            }
+
+            return $products;
+
+        } catch (\Exception $e) {
+            Log::error('Error fetching product references:', ['message' => $e->getMessage()]);
+            return null;
+        }
+    }
+
+    public function getDataRepo()
+    {
+        $this->authenticate();
+
+        try {
+            $products = $this->models->execute_kw(
+                $this->db,
+                $this->uid,
+                $this->password,
+                'product.product',
+                'search_read',
+                [
+                    [['type', '=', 'consu']],
+                ],
+                [
+                    'fields' => ['id', 'name', 'default_code', 'product_tmpl_id', 'product_template_attribute_value_ids'],
+                ]
+            );
+
+            foreach ($products as &$product) {
+                if (!empty($product['product_template_attribute_value_ids']) && is_array($product['product_template_attribute_value_ids'])) {
+                    $attributeValues = $this->models->execute_kw(
+                        $this->db,
+                        $this->uid,
+                        $this->password,
+                        'product.template.attribute.value',
+                        'search_read',
+                        [
+                            [['id', 'in', $product['product_template_attribute_value_ids']]],
+                        ],
+                        ['fields' => ['id', 'name']]
+                    );
+
+                    if (!empty($attributeValues)) {
+                        $product['attribute_values'] = array_map(function ($attributeValue) {
+                            return $attributeValue['name'];
+                        }, $attributeValues);
+                    }
                 }
             }
 

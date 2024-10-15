@@ -371,12 +371,11 @@ const duplicarProducto = async (producto) => {
     }
 
     try {
-        // Almacenar el producto duplicado
         const response = await axios.post(
             "/productos/almacenar",
             duplicatedProducto
         );
-        productos.value.push(response.data); // Añadir el producto duplicado a la lista de productos
+        productos.value.push(response.data);
 
         console.log(
             `Producto duplicado y almacenado con ID ${newId}:`,
@@ -725,10 +724,9 @@ window.addEventListener("keydown", handleKeyDown);
                 <div
                     class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6"
                 >
-                    <h1>Productos</h1>
                     <button
                         @click="openModalForNewProduct"
-                        class="mt-4 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                        class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
                     >
                         <i class="fas fa-circle-plus"></i> Agregar
                     </button>
