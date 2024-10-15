@@ -72,6 +72,12 @@ const logout = () => {
                                 >
                                     Formulas
                                 </NavLink>
+                                <NavLink
+                                    :href="route('reposicion')"
+                                    :active="route().current('reposicion')"
+                                >
+                                    Reposición
+                                </NavLink>
                             </div>
                         </div>
 
@@ -360,6 +366,24 @@ const logout = () => {
                             :active="route().current('dashboard')"
                         >
                             Dashboard
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            :href="route('productos')"
+                            :active="route().current('productos')"
+                        >
+                            Productos
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            :href="route('formulas')"
+                            :active="route().current('formulas')"
+                        >
+                            Formulas
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            :href="route('reposicion')"
+                            :active="route().current('reposicion')"
+                        >
+                            Reposición
                         </ResponsiveNavLink>
                     </div>
 
