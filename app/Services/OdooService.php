@@ -143,7 +143,7 @@ class OdooService
                         return $attributeValue['name'];
                     }, $attributeValues);
                 } else {
-                    $product['attribute_values'] = ['No Attribute Values'];
+                    $product['attribute_values'] = "";
                 }
             }
 
