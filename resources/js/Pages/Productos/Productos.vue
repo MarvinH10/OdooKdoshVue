@@ -1286,9 +1286,12 @@ window.addEventListener("keydown", handleKeyDown);
                                                                 ]
                                                             "
                                                             :placeholder="`Referencia para ${
-                                                                input.values[
-                                                                    refIndex
-                                                                ]?.name || ''
+                                                                getValueAttributeName(
+                                                                    input
+                                                                        .selectedAttributeValues[
+                                                                        refIndex
+                                                                    ]
+                                                                ) || ''
                                                             }`"
                                                             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-2 extra-reference-input"
                                                         />
@@ -1317,9 +1320,12 @@ window.addEventListener("keydown", handleKeyDown);
                                                             ]
                                                         "
                                                         :placeholder="`Precio para ${
-                                                            input.values[
-                                                                priceIndex
-                                                            ]?.name || ''
+                                                            getValueAttributeName(
+                                                                input
+                                                                    .selectedAttributeValues[
+                                                                    priceIndex
+                                                                ]
+                                                            ) || ''
                                                         }`"
                                                         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-2 extra-price-input"
                                                     />
