@@ -258,12 +258,12 @@ const fetchAttributeValues = async (id, index) => {
                     attributeInputs.value[index].selectedAttributeValues =
                         selectedValues;
 
-                    attributeInputs.value[index].extraReferences = new Array(
-                        selectedValues.length
-                    ).fill("");
-                    attributeInputs.value[index].extraPrices = new Array(
-                        selectedValues.length
-                    ).fill("");
+                    attributeInputs.value[index].extraReferences =
+                        selectedValues.map((valueId) => {
+                            const attributeName =
+                                getValueAttributeName(valueId);
+                            return `${attributeInputs.value[index].newField} | ${attributeName}`;
+                        });
                 });
         });
 
@@ -644,7 +644,7 @@ const getAttributeName = (attributeId) => {
 
 const getValueAttributeName = (valueId) => {
     for (const input of attributeInputs.value) {
-        const value = input.values.find((val) => val.id === valueId);
+        const value = input.values.find((val) => val.id === parseInt(valueId));
         if (value) {
             return value.name;
         }
@@ -652,7 +652,9 @@ const getValueAttributeName = (valueId) => {
 
     for (const attribute of allAttributes.value) {
         if (attribute.values) {
-            const value = attribute.values.find((val) => val.id === valueId);
+            const value = attribute.values.find(
+                (val) => val.id === parseInt(valueId)
+            );
             if (value) {
                 return value.name;
             }
@@ -661,6 +663,31 @@ const getValueAttributeName = (valueId) => {
 
     return "Valor Desconocido";
 };
+
+watch(
+    () => attributeInputs.value.map((input) => input.newField),
+    (newValues) => {
+        newValues.forEach((newFieldValue, index) => {
+            const selectedValues =
+                attributeInputs.value[index].selectedAttributeValues;
+
+            if (
+                newFieldValue &&
+                newFieldValue.trim() !== "" &&
+                selectedValues
+            ) {
+                attributeInputs.value[index].extraReferences =
+                    selectedValues.map((valueId) => {
+                        const attributeName = getValueAttributeName(valueId);
+                        return `${newFieldValue.trim()} | ${attributeName}`;
+                    });
+            } else {
+                attributeInputs.value[index].extraReferences = [];
+            }
+        });
+    },
+    { deep: true }
+);
 
 watch(
     () => attributeInputs.value.map((input) => input.extraReferences).flat(),
@@ -677,6 +704,19 @@ watch(
         }
     },
     { deep: true }
+);
+
+watch(
+    () => producto.default_code,
+    (newVal) => {
+        if (newVal) {
+            attributeInputs.value.forEach((input) => {
+                input.extraReferences = new Array(
+                    input.selectedAttributeValues.length
+                ).fill("");
+            });
+        }
+    }
 );
 
 const handleKeyDown = (event) => {
@@ -1150,8 +1190,9 @@ window.addEventListener("keydown", handleKeyDown);
                                                             'attribute' + index
                                                         "
                                                         class="block text-gray-700 text-sm font-bold mb-2"
-                                                        >Atributo:</label
                                                     >
+                                                        Atributo:
+                                                    </label>
                                                     <select
                                                         :id="
                                                             'attribute' + index
@@ -1178,6 +1219,7 @@ window.addEventListener("keydown", handleKeyDown);
                                                         </option>
                                                     </select>
                                                 </div>
+
                                                 <div class="flex-1">
                                                     <label
                                                         :for="
@@ -1185,9 +1227,9 @@ window.addEventListener("keydown", handleKeyDown);
                                                             index
                                                         "
                                                         class="block text-gray-700 text-sm font-bold mb-2"
-                                                        >Valores de
-                                                        Atributo:</label
                                                     >
+                                                        Valores de Atributo:
+                                                    </label>
                                                     <select
                                                         :id="
                                                             'attribute_values' +
@@ -1208,41 +1250,57 @@ window.addEventListener("keydown", handleKeyDown);
                                                         </option>
                                                     </select>
                                                 </div>
-                                                <div class="flex-1">
-                                                    <label
-                                                        class="block text-gray-700 text-sm font-bold mb-2"
-                                                        >Referencia
-                                                        Interna:</label
-                                                    >
+                                                <div class="flex-1 mt-0.5">
                                                     <input
                                                         type="text"
-                                                        v-for="(
-                                                            ref, refIndex
-                                                        ) in input.extraReferences"
-                                                        :key="
-                                                            'ref' +
-                                                            index +
-                                                            refIndex
-                                                        "
-                                                        v-model="
-                                                            input
-                                                                .extraReferences[
-                                                                refIndex
-                                                            ]
-                                                        "
-                                                        :placeholder="`Referencia para ${
-                                                            input.values[
-                                                                refIndex
-                                                            ]?.name || ''
-                                                        }`"
-                                                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-2 extra-reference-input"
+                                                        v-model="input.newField"
+                                                        placeholder="Escribe una referencia global aquí"
+                                                        class="shadow appearance-none border rounded w-full py-1 px-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                                     />
-                                                </div>
-                                                <div class="flex-1">
                                                     <label
                                                         class="block text-gray-700 text-sm font-bold mb-2"
-                                                        >Precio Extra:</label
                                                     >
+                                                        Referencia Interna:
+                                                    </label>
+                                                    <div
+                                                        v-if="
+                                                            input.newField &&
+                                                            input.newField.trim() !==
+                                                                ''
+                                                        "
+                                                    >
+                                                        <input
+                                                            type="text"
+                                                            v-for="(
+                                                                ref, refIndex
+                                                            ) in input.extraReferences"
+                                                            :key="
+                                                                'ref' +
+                                                                index +
+                                                                refIndex
+                                                            "
+                                                            v-model="
+                                                                input
+                                                                    .extraReferences[
+                                                                    refIndex
+                                                                ]
+                                                            "
+                                                            :placeholder="`Referencia para ${
+                                                                input.values[
+                                                                    refIndex
+                                                                ]?.name || ''
+                                                            }`"
+                                                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-2 extra-reference-input"
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                <div class="flex-1 mt-8">
+                                                    <label
+                                                        class="block text-gray-700 text-sm font-bold mb-2"
+                                                    >
+                                                        Precio Extra:
+                                                    </label>
                                                     <input
                                                         type="number"
                                                         v-for="(
@@ -1266,6 +1324,7 @@ window.addEventListener("keydown", handleKeyDown);
                                                         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-2 extra-price-input"
                                                     />
                                                 </div>
+
                                                 <button
                                                     type="button"
                                                     @click="
