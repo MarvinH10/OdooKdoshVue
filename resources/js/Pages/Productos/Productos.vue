@@ -201,13 +201,13 @@ const loadInitialData = async () => {
 
         allAttributes.value = attributesResponse.data;
         const attributePromises = allAttributes.value.map((attribute) =>
-            axios
-                .get(`/valores_atributos/traer/${attribute.id}`)
-                .then((valuesResponse) => {
-                    attribute.values = valuesResponse.data;
-                })
+           axios
+               .get(`/valores_atributos/traer/${attribute.id}`)
+               .then((valuesResponse) => {
+                   attribute.values = valuesResponse.data;
+               })
         );
-        await Promise.all(attributePromises);
+        await (attributePromises);
         // console.log("Categorías y atributos cargados exitosamente.");
     } catch (error) {
         console.error("Error cargando datos iniciales:", error);
@@ -1255,7 +1255,7 @@ window.addEventListener("keydown", handleKeyDown);
                                                         type="text"
                                                         v-model="input.newField"
                                                         placeholder="Escribe una referencia global aquí"
-                                                        class="shadow appearance-none border rounded w-full py-1 px-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                                        class="shadow appearance-none border rounded w-full py-1 px-2 text-sm text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                                     />
                                                     <label
                                                         class="block text-gray-700 text-sm font-bold mb-2"
