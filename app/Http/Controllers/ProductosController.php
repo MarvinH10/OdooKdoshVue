@@ -210,6 +210,7 @@ class ProductosController extends Controller
                     'default_code' => $producto['default_code'],
                     'list_price' => $producto['list_price'],
                     'type' => 'consu',
+                    'is_storable' => true,
                     'create_uid' => $odooUid,
                     'taxes_id' => [(int) 5],
                 ];
