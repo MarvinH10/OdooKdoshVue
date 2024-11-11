@@ -17,8 +17,8 @@ class OdooService
 
     public function __construct()
     {
-        $this->url = 'https://administratingprove.odoo.com';
-        $this->db = 'administratingprove';
+        $this->url = 'https://testing-for-api.odoo.com/';
+        $this->db = 'testing-for-api';
         $this->models = Ripcord::client("$this->url/xmlrpc/2/object");
     }
 
