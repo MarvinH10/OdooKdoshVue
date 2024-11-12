@@ -39,17 +39,21 @@ const fetchProductosFavoritos = async () => {
         productosConcatenados.value = [];
 
         productosFavoritos.value.forEach((producto) => {
-            const referencia = `[${producto.default_code}]`;
+            const referencia = producto.default_code ? `[${producto.default_code}] ` : "";
             const nombreProducto = producto.name;
 
             if (producto.attribute_values.length > 0) {
                 const valoresAtributos = producto.attribute_values.join(", ");
                 productosConcatenados.value.push(
-                    `${referencia} ${nombreProducto} (${valoresAtributos})`
+                    referencia
+                        ? `${referencia}${nombreProducto} (${valoresAtributos})`
+                        : `${nombreProducto} (${valoresAtributos})`
                 );
             } else {
                 productosConcatenados.value.push(
-                    `${referencia} ${nombreProducto}`
+                    referencia
+                        ? `${referencia}${nombreProducto}`
+                        : `${nombreProducto}`
                 );
             }
         });
@@ -98,35 +102,24 @@ onMounted(() => {
 
         <div class="py-12">
             <div class="max-w-12xl mx-auto sm:px-6 lg:px-1">
-                <div
-                    class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6"
-                >
-                    <button
-                        @click="convertirFavoritosANoFavoritos"
+                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
+                    <button @click="convertirFavoritosANoFavoritos"
                         class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mb-4 mr-3"
-                        :disabled="isConverting"
-                    >
+                        :disabled="isConverting">
                         <i class="fas fa-heart-broken mr-2"></i>
                         Convertir a No Favoritos
                     </button>
-                    <button
-                        @click="copyToClipboard"
-                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4"
-                    >
+                    <button @click="copyToClipboard"
+                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4">
                         <i class="fas fa-copy mr-2"></i>
                         Copiar al portapapeles
                     </button>
-                    <button
-                        @click="refreshPage"
-                        class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mb-4 float-right"
-                    >
+                    <button @click="refreshPage"
+                        class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mb-4 float-right">
                         <i class="fas fa-sync-alt mr-2"></i>
                         Actualizar
                     </button>
-                    <div
-                        v-if="isConverting"
-                        class="text-center my-4 text-green-600 font-bold"
-                    >
+                    <div v-if="isConverting" class="text-center my-4 text-green-600 font-bold">
                         <i class="fas fa-spinner fa-spin mr-2"></i> Convirtiendo
                         productos a no favoritos...
                     </div>
@@ -136,18 +129,12 @@ onMounted(() => {
                         productos favoritos...
                     </div>
 
-                    <p
-                        v-if="!isLoading && !productosFavoritos.length"
-                        class="mt-4 text-center text-gray-500"
-                    >
+                    <p v-if="!isLoading && !productosFavoritos.length" class="mt-4 text-center text-gray-500">
                         No hay productos favoritos por mostrar
                     </p>
 
                     <ul v-else>
-                        <li
-                            v-for="(producto, index) in productosConcatenados"
-                            :key="index"
-                        >
+                        <li v-for="(producto, index) in productosConcatenados" :key="index">
                             {{ producto }}
                         </li>
                     </ul>
