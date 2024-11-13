@@ -3,6 +3,7 @@
 use App\Http\Controllers\FormulariosController;
 use App\Http\Controllers\ProductosController;
 use App\Http\Controllers\ReposicionController;
+use App\Http\Controllers\BarcodeController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
@@ -30,5 +31,9 @@ Route::middleware(['auth'])->group(function () {
     Route::controller(ReposicionController::class)->group(function () {
         Route::get('/reposicion', 'index')->name('reposicion');
         Route::get('/reposicion/data_repo/traer', 'traerDatosRepo');
+    });
+
+    Route::controller(BarcodeController::class)->group(function () {
+        Route::get('/barcode', 'index')->name('barcode');
     });
 });
