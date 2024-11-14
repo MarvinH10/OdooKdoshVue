@@ -142,7 +142,7 @@ const closeModalCantidad = () => {
                             <div class="flex relative">
                                 <button v-for="(item, index) in imageItems" :key="index" @click="toggleSelection(index)"
                                     :class="[
-                                        'border border-dashed w-32 h-30 p-2 rounded',
+                                        'border border-dashed w-32 h-30 p-2 rounded bg-gray-100',
                                         selectedButtonIndex === index ? 'bg-[#8d99ae] border-gray-700' : 'hover:bg-[#8d99ae] hover:border-gray-700'
                                     ]">
                                     <div class="w-auto p-2 rounded">
