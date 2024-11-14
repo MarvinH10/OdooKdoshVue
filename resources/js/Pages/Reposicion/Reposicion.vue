@@ -18,10 +18,13 @@ const fetchProductosRepo = async () => {
         productosRepo.value = response.data;
 
         productosConcatenados.value = productosRepo.value.map((producto) => {
-            const referencia = `[${producto.default_code}]`;
+            const referencia = producto.default_code ? `[${producto.default_code}]` : "";
             const nombreProducto = producto.name;
 
-            if (
+            if (producto.referencia && producto.referencia.length > 0) {
+                return `${nombreProducto} (${valoresAtributos})`;
+            }
+            else if (
                 producto.attribute_values &&
                 producto.attribute_values.length > 0
             ) {
@@ -116,33 +119,21 @@ onMounted(() => {
 
         <div class="py-12">
             <div class="max-w-12xl mx-auto sm:px-6 lg:px-1">
-                <div
-                    class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6"
-                >
+                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
                     <div class="mb-4 relative">
-                        <i
-                            class="fas fa-search absolute left-3 top-3 text-gray-500"
-                        ></i>
-                        <input
-                            v-model="searchQuery"
-                            type="text"
-                            class="border p-2 pl-10 rounded-lg w-full"
-                            placeholder="Buscar producto por nombre o referencia interna..."
-                        />
+                        <i class="fas fa-search absolute left-3 top-3 text-gray-500"></i>
+                        <input v-model="searchQuery" type="text" class="border p-2 pl-10 rounded-lg w-full"
+                            placeholder="Buscar producto por nombre o referencia interna..." />
                     </div>
 
-                    <button
-                        @click="copyToClipboard"
-                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4"
-                    >
+                    <button @click="copyToClipboard"
+                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4">
                         <i class="fas fa-copy mr-2"></i>
                         Copiar al portapapeles
                     </button>
 
-                    <button
-                        @click="refreshPage"
-                        class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mb-4 float-right"
-                    >
+                    <button @click="refreshPage"
+                        class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mb-4 float-right">
                         <i class="fas fa-sync-alt mr-2"></i>
                         Actualizar
                     </button>
@@ -154,16 +145,11 @@ onMounted(() => {
 
                     <div v-else>
                         <ul v-if="filteredProductos.length > 0">
-                            <li
-                                v-for="(producto, index) in filteredProductos"
-                                :key="index"
-                                class="py-2 flex justify-between"
-                            >
+                            <li v-for="(producto, index) in filteredProductos" :key="index"
+                                class="py-2 flex justify-between">
                                 <span>{{ producto }}</span>
-                                <button
-                                    @click="seleccionarProducto(producto)"
-                                    class="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 rounded"
-                                >
+                                <button @click="seleccionarProducto(producto)"
+                                    class="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 rounded">
                                     Seleccionar
                                 </button>
                             </li>
@@ -186,24 +172,19 @@ onMounted(() => {
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr
-                                    v-for="(
+                                <tr v-for="(
                                         producto, index
-                                    ) in productosSeleccionados"
-                                    :key="index"
-                                >
+                                    ) in productosSeleccionados" :key="index">
                                     <td class="border px-4 py-2">
                                         {{ producto }}
                                     </td>
                                     <td class="border px-4 py-2">
-                                        <button
-                                            @click="
-                                                eliminarProductoSeleccionado(
-                                                    producto
-                                                )
+                                        <button @click="
+                                            eliminarProductoSeleccionado(
+                                                producto
+                                            )
                                             "
-                                            class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
-                                        >
+                                            class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </td>
@@ -211,10 +192,8 @@ onMounted(() => {
                             </tbody>
                         </table>
 
-                        <button
-                            @click="copyToClipboardTable"
-                            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4"
-                        >
+                        <button @click="copyToClipboardTable"
+                            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
                             <i class="fas fa-copy mr-2"></i>
                             Copiar seleccionados al portapapeles
                         </button>
