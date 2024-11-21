@@ -17,7 +17,7 @@ class UsuariosSeeder extends Seeder
             'name' => 'Marvin Campos',
             'odoo_uid' => 2,
             'email' => 'marvinhectorcamposdeza@gmail.com',
-            'token' => '828f81d9355df3c965fc439a5aba3c9112cf2107',
+            'token' => 'e19bd0cc3cc0aa47bc0a43e67e0d1a11a49b8fe3',
             // 'token-bdReal' => 'f5b1817e92ebe8aab90a94e1515ab2a8014e7982',
             'password' => Hash::make('987654321'),
         ]);
