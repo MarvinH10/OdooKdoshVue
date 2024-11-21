@@ -35,5 +35,6 @@ Route::middleware(['auth'])->group(function () {
 
     Route::controller(BarcodeController::class)->group(function () {
         Route::get('/barcode', 'index')->name('barcode');
+        Route::get('/barcode/traer/{productId}', 'traerProductosxId');
     });
 });

@@ -1423,7 +1423,7 @@ window.addEventListener("keydown", handleKeyDown);
                                             :key="productId"
                                         >
                                             <a
-                                                :href="`https://testing-for-api.odoo.com/odoo/action-610/${productId}?debug=1&cids=1-2`"
+                                                :href="`https://duplicateforkdosh.odoo.com/odoo/action-610/${productId}?debug=1&cids=1-2`"
                                                 target="_blank"
                                             >
                                                 Ver Producto {{ productId }}
