@@ -7,6 +7,7 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 
 const subcategoryCache = new Map();
 const fetchedIds = new Set();
+const baseUrl = "https://duplicateforkdosh.odoo.com";
 
 const productos = ref([]);
 const isUploading = ref(false);
@@ -106,7 +107,7 @@ const registrarProducto = async () => {
             productPayload.attributes = [];
         }
 
-        console.log("Sending product data:", productPayload);
+        // console.log("Sending product data:", productPayload);
 
         if (isEdit.value) {
             const updatePayload = {};
@@ -267,7 +268,7 @@ const fetchAttributeValues = async (id, index) => {
                 });
         });
 
-        console.log(`Valores de atributo cargados para atributo ${id}`);
+        // console.log(`Valores de atributo cargados para atributo ${id}`);
     } catch (error) {
         console.error(`Error cargando valores de atributo ${id}:`, error);
     }
@@ -1078,6 +1079,7 @@ window.addEventListener("keydown", handleKeyDown);
                                                     v-model="
                                                         producto.subcateg1_id
                                                     "
+                                                    :disabled="!subcategories[1] || subcategories[1].length === 0"
                                                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                                 >
                                                     <option
@@ -1100,6 +1102,7 @@ window.addEventListener("keydown", handleKeyDown);
                                                     v-model="
                                                         producto.subcateg2_id
                                                     "
+                                                    :disabled="!subcategories[2] || subcategories[2].length === 0"
                                                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                                 >
                                                     <option
@@ -1123,6 +1126,7 @@ window.addEventListener("keydown", handleKeyDown);
                                                     v-model="
                                                         producto.subcateg3_id
                                                     "
+                                                    :disabled="!subcategories[3] || subcategories[3].length === 0"
                                                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                                 >
                                                     <option
@@ -1145,6 +1149,7 @@ window.addEventListener("keydown", handleKeyDown);
                                                     v-model="
                                                         producto.subcateg4_id
                                                     "
+                                                    :disabled="!subcategories[4] || subcategories[4].length === 0"
                                                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                                 >
                                                     <option
@@ -1423,7 +1428,7 @@ window.addEventListener("keydown", handleKeyDown);
                                             :key="productId"
                                         >
                                             <a
-                                                :href="`https://duplicateforkdosh.odoo.com/odoo/action-610/${productId}?debug=1&cids=1-2`"
+                                                :href="`${baseUrl}/odoo/action-610/${productId}?debug=1&cids=1-2`"
                                                 target="_blank"
                                             >
                                                 Ver Producto {{ productId }}
