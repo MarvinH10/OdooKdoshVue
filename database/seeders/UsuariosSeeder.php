@@ -14,21 +14,19 @@ class UsuariosSeeder extends Seeder
     public function run(): void
     {
         User::create([
-            'name' => 'Marvin Campos',
-            'odoo_uid' => 2,
-            'email' => 'marvinhectorcamposdeza@gmail.com',
-            'token' => 'e19bd0cc3cc0aa47bc0a43e67e0d1a11a49b8fe3',
-            // 'token-bdReal' => 'f5b1817e92ebe8aab90a94e1515ab2a8014e7982',
-            'password' => Hash::make('987654321'),
+            'name' => env('USER1_NAME'),
+            'odoo_uid' => env('USER1_ODOO_UID'),
+            'email' => env('USER1_EMAIL'),
+            'token' => env('USER1_TOKEN'),
+            'password' => Hash::make(env('USER1_PASSWORD')),
         ]);
 
         User::create([
-            'name' => 'Jhamil Crispin',
-            'odoo_uid' => 6,
-            'email' => 'j99crispin@gmail.com',
-            'token' => 'b7946a934c26a7c939127b526096864e29b1dafa',
-            // 'token' => 'miss',
-            'password' => Hash::make('987654321'),
+            'name' => env('USER2_NAME'),
+            'odoo_uid' => env('USER2_ODOO_UID'),
+            'email' => env('USER2_EMAIL'),
+            'token' => env('USER2_TOKEN'),
+            'password' => Hash::make(env('USER2_PASSWORD')),
         ]);
     }
 }
