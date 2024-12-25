@@ -19,8 +19,8 @@ class ServicioOdoo
 
     public function __construct()
     {
-        $this->url = env('APP_ODOO_URL');
-        $this->base_datos = env('APP_ODOO_BASE_DATOS');
+        $this->url = env('VITE_APP_ODOO_URL');
+        $this->base_datos = env('VITE_APP_ODOO_BASE_DATOS');
         $this->modelos = Ripcord::client("$this->url/xmlrpc/2/object");
     }
 
