@@ -15,6 +15,7 @@
         "phpxmlrpc/polyfill-xmlrpc": "^1.0",
         "predis/predis": "^2.2",
         "spatie/laravel-permission": "^6.9",
+        "symfony/polyfill-php72": "^1.31",
         "tightenco/ziggy": "^2.0"
     },
     "require-dev": {

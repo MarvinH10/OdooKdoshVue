@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\FormulariosController;
 use App\Http\Controllers\ProductosController;
+use App\Http\Controllers\FormulariosController;
 use App\Http\Controllers\ReposicionController;
 use App\Http\Controllers\BarcodeController;
 use Illuminate\Support\Facades\Route;

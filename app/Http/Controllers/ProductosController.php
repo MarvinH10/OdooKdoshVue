@@ -2,24 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Producto;
-use App\Services\OdooService;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
+use App\Services\ServicioOdoo;
+use Illuminate\Http\Request;
+use App\Models\Producto;
 use Inertia\Inertia;
+use Exception;
 
 class ProductosController extends Controller
 {
-    protected $odooService;
+    protected $servicioOdoo;
 
-    public function __construct(OdooService $odooService)
+    public function __construct(ServicioOdoo $servicioOdoo)
     {
-        $this->odooService = $odooService;
+        $this->servicioOdoo = $servicioOdoo;
     }
 
-    private function readProductsFromFile()
+    private function leerProductosDeArchivo()
     {
         if (Storage::exists('productos.json')) {
             return json_decode(Storage::get('productos.json'), true);
@@ -27,17 +28,15 @@ class ProductosController extends Controller
         return [];
     }
 
-    private function writeProductsToFile(array $productos)
+    private function escribirProductosAlArchivo(array $productos)
     {
         Storage::put('productos.json', json_encode($productos));
     }
 
-    /********************LO QUE RESPECTA A ARREGLOS********************/
+    /*INICIO FUNCIONALIDADES EN VISTA*/
     public function index()
     {
-        return Inertia::render('Productos/Productos', [
-            'productos' => Producto::all(),
-        ]);
+        return Inertia::render('Productos/Productos');
     }
 
     public function traer()
@@ -48,9 +47,9 @@ class ProductosController extends Controller
     public function almacenar(Request $request)
     {
         try {
-            $productos = $this->readProductsFromFile();
+            $productos = $this->leerProductosDeArchivo();
 
-            $newProduct = $request->validate([
+            $nuevoProducto = $request->validate([
                 'name' => 'required|string|max:255',
                 'default_code' => 'nullable|string|max:255',
                 'categ_id' => 'required|integer',
@@ -69,60 +68,60 @@ class ProductosController extends Controller
                 'attributes.*.extra_prices.*' => 'nullable|numeric',
             ]);
 
-            $newProduct['id'] = !empty($productos) ? end($productos)['id'] + 1 : 1;
+            $nuevoProducto['id'] = !empty($productos) ? end($productos)['id'] + 1 : 1;
 
-            if (!empty($newProduct['attributes'])) {
-                $processedAttributes = [];
-                $attributesWithRefs = [];
+            if (!empty($nuevoProducto['attributes'])) {
+                $AtributosProcesados = [];
+                $AtributosReferenciados = [];
 
-                foreach ($newProduct['attributes'] as $attribute) {
-                    $hasRefs = false;
-                    if (!empty($attribute['extra_references'])) {
-                        foreach ($attribute['extra_references'] as $ref) {
+                foreach ($nuevoProducto['attributes'] as $atributo) {
+                    $tieneReferencias = false;
+                    if (!empty($atributo['extra_references'])) {
+                        foreach ($atributo['extra_references'] as $ref) {
                             if (!empty($ref)) {
-                                $hasRefs = true;
+                                $tieneReferencias = true;
                                 break;
                             }
                         }
                     }
 
-                    $processedAttribute = [
-                        'attribute_id' => $attribute['attribute_id'],
-                        'value_ids' => $attribute['value_ids'] ?? [],
-                        'extra_references' => $attribute['extra_references'] ?? [],
-                        'extra_prices' => $attribute['extra_prices'] ?? [],
+                    $AtributoProcesado = [
+                        'attribute_id' => $atributo['attribute_id'],
+                        'value_ids' => $atributo['value_ids'] ?? [],
+                        'extra_references' => $atributo['extra_references'] ?? [],
+                        'extra_prices' => $atributo['extra_prices'] ?? [],
                     ];
 
-                    if ($hasRefs) {
-                        $attributesWithRefs[] = $processedAttribute;
+                    if ($tieneReferencias) {
+                        $AtributosReferenciados[] = $AtributoProcesado;
                     } else {
-                        $processedAttributes[] = $processedAttribute;
+                        $AtributosProcesados[] = $AtributoProcesado;
                     }
                 }
 
-                $newProduct['attributes'] = array_merge($processedAttributes, $attributesWithRefs);
+                $nuevoProducto['attributes'] = array_merge($AtributosProcesados, $AtributosReferenciados);
             }
 
-            $productos[] = $newProduct;
-            $this->writeProductsToFile($productos);
+            $productos[] = $nuevoProducto;
+            $this->escribirProductosAlArchivo($productos);
 
-            return response()->json($newProduct);
-        } catch (\Exception $e) {
-            Log::error('Error storing product:', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
-            return response()->json(['error' => 'Error storing product: ' . $e->getMessage()], 500);
+            return response()->json($nuevoProducto);
+        } catch (Exception $e) {
+            Log::error('Error almacenando producto:', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            return response()->json(['error' => 'Error almacenando producto: ' . $e->getMessage()], 500);
         }
     }
 
     public function quitar($id)
     {
         try {
-            $productos = $this->readProductsFromFile();
+            $productos = $this->leerProductosDeArchivo();
             $productos = array_filter($productos, function ($producto) use ($id) {
                 return $producto['id'] != $id;
             });
-            $this->writeProductsToFile(array_values($productos));
+            $this->escribirProductosAlArchivo(array_values($productos));
             return response()->json(['message' => 'Producto eliminado']);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Error deleting product: ' . $e->getMessage());
             return response()->json(['error' => 'Error deleting product'], 500);
         }
@@ -131,7 +130,7 @@ class ProductosController extends Controller
     public function actualizar(Request $request, $id)
     {
         try {
-            $productos = $this->readProductsFromFile();
+            $productos = $this->leerProductosDeArchivo();
 
             $productoIndex = array_search($id, array_column($productos, 'id'));
 
@@ -141,68 +140,80 @@ class ProductosController extends Controller
 
             $productos[$productoIndex] = array_merge($productos[$productoIndex], $request->all());
 
-            $this->writeProductsToFile($productos);
+            $this->escribirProductosAlArchivo($productos);
 
             return response()->json($productos[$productoIndex]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Error actualizando producto: ' . $e->getMessage());
 
             return response()->json(['error' => 'Error actualizando producto'], 500);
         }
     }
+    /*FINAL FUNCIONALIDADES EN VISTA*/
 
-    /********************LO QUE RESPECTA A TRAER DATOS DE ODOO 17********************/
+    /*INICIO FUNCIONALIDADES EN ODOO API*/
     public function traerProductosFavoritos()
     {
-        $products_favorites = $this->odooService->getProductFavorites();
-        return response()->json($products_favorites);
+        $this->servicioOdoo->authenticate();
+
+        $productosFavoritos = $this->servicioOdoo->traerProductosFavoritos();
+        return response()->json($productosFavoritos);
     }
 
     public function traerCategorias()
     {
-        $categories = $this->odooService->getCategorias();
-        return response()->json($categories);
+        $this->servicioOdoo->authenticate();
+
+        $categorias = $this->servicioOdoo->traerCategorias();
+        return response()->json($categorias);
     }
 
     public function traerSubcategorias($id)
     {
-        $subcategories = $this->odooService->getSubcategories($id);
-        return response()->json($subcategories);
+        $this->servicioOdoo->authenticate();
+
+        $subCategorias = $this->servicioOdoo->traerSubcategorias($id);
+        return response()->json($subCategorias);
     }
 
     public function traerAtributos()
     {
-        $attributes = $this->odooService->getAttributos();
-        return response()->json($attributes);
+        $this->servicioOdoo->authenticate();
+
+        $atributos = $this->servicioOdoo->traerAtributos();
+        return response()->json($atributos);
     }
 
     public function traerValoresAtributos($id)
     {
-        $valueattributes = $this->odooService->getValueAttributos($id);
-        return response()->json($valueattributes);
+        $this->servicioOdoo->authenticate();
+
+        $valoresAtributos = $this->servicioOdoo->traerValoresAtributos($id);
+        return response()->json($valoresAtributos);
     }
 
     public function registrarProductos(Request $request)
     {
         try {
-            $user = Auth::user();
+            $this->servicioOdoo->authenticate();
 
-            $odooUid = $user->odoo_uid;
+            $usuario = Auth::user();
+
+            $odooUid = $usuario->odoo_uid;
 
             if (!$odooUid) {
                 return response()->json(['error' => 'El usuario no tiene un UID de Odoo asociado'], 403);
             }
 
             $productos = $request->all();
-            $productIds = [];
-            $bulkProductData = [];
+            $granearDatosProducto = [];
 
             foreach ($productos as $producto) {
                 if (!empty($producto['attributes'])) {
                     $producto['attributes'] = $this->ordenarAtributos($producto['attributes']);
                 }
 
-                $productData = [
+                $datosProducto = [
                     'is_favorite' => true,
                     'available_in_pos' => true,
                     'name' => $producto['name'],
@@ -217,23 +228,23 @@ class ProductosController extends Controller
 
                 foreach (['subcateg1_id', 'subcateg2_id', 'subcateg3_id', 'subcateg4_id'] as $subcateg) {
                     if (!empty($producto[$subcateg])) {
-                        $productData['categ_id'] = $producto[$subcateg];
+                        $datosProducto['categ_id'] = $producto[$subcateg];
                     }
                 }
 
-                $bulkProductData[] = $productData;
+                $granearDatosProducto[] = $datosProducto;
             }
 
-            $createdProductIds = $this->odooService->createProductsBatch($bulkProductData);
+            $crearIdsProducto = $this->servicioOdoo->createProductsBatch($granearDatosProducto);
 
             foreach ($productos as $index => $producto) {
                 if (!empty($producto['attributes'])) {
-                    $this->odooService->createVariant($createdProductIds[$index], $producto['attributes']);
+                    $this->servicioOdoo->createVariant($crearIdsProducto[$index], $producto['attributes']);
                 }
             }
 
-            return response()->json(['message' => 'Productos registrados con éxito', 'product_ids' => $createdProductIds]);
-        } catch (\Exception $e) {
+            return response()->json(['message' => 'Productos registrados con éxito', 'product_ids' => $crearIdsProducto]);
+        } catch (Exception $e) {
             Log::error('Error registrando productos:', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             return response()->json(['error' => 'Error registrando productos: ' . $e->getMessage()], 500);
         }
@@ -258,4 +269,5 @@ class ProductosController extends Controller
 
         return array_merge($sinReferencias, $conReferencias);
     }
+    /*FINAL FUNCIONALIDADES EN ODOO API*/
 }
