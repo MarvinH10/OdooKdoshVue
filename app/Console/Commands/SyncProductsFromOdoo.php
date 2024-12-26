@@ -6,19 +6,19 @@ use App\Models\Atributo;
 use App\Models\Categoria;
 use App\Models\Producto;
 use App\Models\ValorAtributo;
-use App\Services\OdooService;
+use App\Services\ServicioOdoo;
 use Illuminate\Console\Command;
 
 class SyncProductsFromOdoo extends Command
 {
     protected $signature = 'sync:productos-odoo';
     protected $description = 'Sync consumable products and concatenated categories from Odoo to the local database';
-    protected $odooService;
+    protected $servicioOdoo;
 
-    public function __construct(OdooService $odooService)
+    public function __construct(ServicioOdoo $servicioOdoo)
     {
         parent::__construct();
-        $this->odooService = $odooService;
+        $this->servicioOdoo = $servicioOdoo;
     }
 
     public function handle()
@@ -29,26 +29,26 @@ class SyncProductsFromOdoo extends Command
         $this->info('Sincronización de productos y categorías completada.');
     }
 
-    private function syncProductosConsumibles()
-    {
-        $productosOdoo = $this->odooService->traerProductosConsumibles();
+    // private function syncProductosConsumibles()
+    // {
+    //     $productosOdoo = $this->servicioOdoo->traerProductosConsumibles();
 
-        foreach ($productosOdoo as $productoOdoo) {
-            $producto = Producto::updateOrCreate(
-                ['id' => $productoOdoo['id']],
-                [
-                    'pro_nombre' => $productoOdoo['name'],
-                    'tipo' => $productoOdoo['type'],
-                ]
-            );
+    //     foreach ($productosOdoo as $productoOdoo) {
+    //         $producto = Producto::updateOrCreate(
+    //             ['id' => $productoOdoo['id']],
+    //             [
+    //                 'pro_nombre' => $productoOdoo['name'],
+    //                 'tipo' => $productoOdoo['type'],
+    //             ]
+    //         );
 
-            $this->info("Producto sincronizado: {$producto->pro_nombre}");
-        }
-    }
+    //         $this->info("Producto sincronizado: {$producto->pro_nombre}");
+    //     }
+    // }
 
     private function syncCategorias()
     {
-        $categoriasOdoo = $this->odooService->traerCategorias();
+        $categoriasOdoo = $this->servicioOdoo->traerCategorias();
 
         foreach ($categoriasOdoo as $categoriaOdoo) {
             $nombreCompleto = $this->concatenarCategorias($categoriaOdoo);
@@ -64,7 +64,7 @@ class SyncProductsFromOdoo extends Command
 
     private function concatenarCategorias($categoriaOdoo)
     {
-        $subcategoriasOdoo = $this->odooService->traerSubcategorias($categoriaOdoo['id']);
+        $subcategoriasOdoo = $this->servicioOdoo->traerSubcategorias($categoriaOdoo['id']);
 
         $nombres = [$categoriaOdoo['name']];
 
@@ -77,7 +77,7 @@ class SyncProductsFromOdoo extends Command
 
     private function syncAtributos()
     {
-        $atributosOdoo = $this->odooService->traerAtributos();
+        $atributosOdoo = $this->servicioOdoo->traerAtributos();
 
         foreach ($atributosOdoo as $atributoOdoo) {
             $atributo = Atributo::updateOrCreate(
@@ -93,7 +93,7 @@ class SyncProductsFromOdoo extends Command
 
     private function syncValoresAtributos($atributoOdooId, $atributoLocalId)
     {
-        $valoresAtributoOdoo = $this->odooService->traerValoresAtributos($atributoOdooId);
+        $valoresAtributoOdoo = $this->servicioOdoo->traerValoresAtributos($atributoOdooId);
 
         foreach ($valoresAtributoOdoo as $valorAtributoOdoo) {
             $valorAtributo = ValorAtributo::updateOrCreate(

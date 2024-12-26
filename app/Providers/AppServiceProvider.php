@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Services\OdooService;
+use App\Services\ServicioOdoo;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -12,8 +12,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->singleton(OdooService::class, function () {
-            return new OdooService();
+        $this->app->singleton(ServicioOdoo::class, function () {
+            return new ServicioOdoo();
         });
     }
 
