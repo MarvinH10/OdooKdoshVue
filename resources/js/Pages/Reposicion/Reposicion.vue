@@ -34,10 +34,36 @@ const fetchProductosRepo = async () => {
                 return `${referencia} ${nombreProducto}`;
             }
         });
+
+        localStorage.setItem("productosRepo", JSON.stringify(productosRepo.value));
     } catch (error) {
         console.error("Error al traer productos repo:", error);
     } finally {
         isLoading.value = false;
+    }
+};
+
+const loadProductosFromLocalStorage = () => {
+    const storedProductos = localStorage.getItem("productosRepo");
+    if (storedProductos) {
+        productosRepo.value = JSON.parse(storedProductos);
+
+        productosConcatenados.value = productosRepo.value.map((producto) => {
+            const referencia = producto.default_code ? `[${producto.default_code}]` : "";
+            const nombreProducto = producto.name;
+
+            if (producto.referencia && producto.referencia.length > 0) {
+                return `${nombreProducto} (${valoresAtributos})`;
+            } else if (
+                producto.attribute_values &&
+                producto.attribute_values.length > 0
+            ) {
+                const valoresAtributos = producto.attribute_values.join(", ");
+                return `${referencia} ${nombreProducto} (${valoresAtributos})`;
+            } else {
+                return `${referencia} ${nombreProducto}`;
+            }
+        });
     }
 };
 
@@ -105,7 +131,10 @@ const refreshPage = () => {
 };
 
 onMounted(() => {
-    fetchProductosRepo();
+    loadProductosFromLocalStorage();
+    if (!productosRepo.value.length) {
+        fetchProductosRepo();
+    }
 });
 </script>
 
@@ -120,7 +149,7 @@ onMounted(() => {
         <div class="py-12">
             <div class="max-w-12xl mx-auto sm:px-6 lg:px-1">
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
-                    <div class="mb-4 relative">
+                    <div class="mb-4 relative w-1/2 mx-auto">
                         <i class="fas fa-search absolute left-3 top-3 text-gray-500"></i>
                         <input v-model="searchQuery" type="text" class="border p-2 pl-10 rounded-lg w-full"
                             placeholder="Buscar producto por nombre o referencia interna..." />
@@ -140,7 +169,7 @@ onMounted(() => {
 
                     <div v-if="isLoading" class="text-center my-4">
                         <i class="fas fa-spinner fa-spin mr-2"></i>
-                        Cargando productos...
+                        Buscando más productos en reposición...
                     </div>
 
                     <div v-else>
@@ -178,7 +207,7 @@ onMounted(() => {
                                     <td class="border px-4 py-2">
                                         {{ producto }}
                                     </td>
-                                    <td class="border px-4 py-2">
+                                    <td class="border px-4 py-2 text-center">
                                         <button @click="
                                             eliminarProductoSeleccionado(
                                                 producto

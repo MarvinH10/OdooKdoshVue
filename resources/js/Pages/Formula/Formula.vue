@@ -10,6 +10,15 @@ const productosConcatenados = ref([]);
 const isLoading = ref(false);
 const isConverting = ref(false);
 
+const guardarALocalStorage = (data) => {
+    localStorage.setItem("productosFavoritos", JSON.stringify(data));
+};
+
+const cargarDeLocalStorage = () => {
+    const data = localStorage.getItem("productosFavoritos");
+    return data ? JSON.parse(data) : [];
+};
+
 const convertirFavoritosANoFavoritos = async () => {
     try {
         isConverting.value = true;
@@ -22,7 +31,7 @@ const convertirFavoritosANoFavoritos = async () => {
             },
             className: "border-l-4 border-green-500 p-4",
         });
-        fetchProductosFavoritos();
+        traerProductosFavoritos();
     } catch (error) {
         console.error("Error al convertir productos a no favoritos:", error);
     } finally {
@@ -30,7 +39,7 @@ const convertirFavoritosANoFavoritos = async () => {
     }
 };
 
-const fetchProductosFavoritos = async () => {
+const traerProductosFavoritos = async () => {
     try {
         isLoading.value = true;
         const response = await axios.get("/formulas/data_favorite/traer");
@@ -57,11 +66,32 @@ const fetchProductosFavoritos = async () => {
                 );
             }
         });
+
+        guardarALocalStorage(productosFavoritos.value);
     } catch (error) {
         console.error("Error al traer productos favoritos:", error);
     } finally {
         isLoading.value = false;
     }
+};
+
+const cargarProductosFavoritos = () => {
+    productosFavoritos.value = cargarDeLocalStorage();
+    productosConcatenados.value = productosFavoritos.value.map((producto) => {
+        const referencia = producto.default_code ? `[${producto.default_code}] ` : "";
+        const nombreProducto = producto.name;
+
+        if (producto.attribute_values.length > 0) {
+            const valoresAtributos = producto.attribute_values.join(", ");
+            return referencia
+                ? `${referencia}${nombreProducto} (${valoresAtributos})`
+                : `${nombreProducto} (${valoresAtributos})`;
+        } else {
+            return referencia
+                ? `${referencia}${nombreProducto}`
+                : `${nombreProducto}`;
+        }
+    });
 };
 
 const copyToClipboard = () => {
@@ -84,11 +114,11 @@ const copyToClipboard = () => {
 };
 
 const refreshPage = () => {
-    fetchProductosFavoritos();
+    traerProductosFavoritos();
 };
 
 onMounted(() => {
-    fetchProductosFavoritos();
+    cargarProductosFavoritos();
 });
 </script>
 
