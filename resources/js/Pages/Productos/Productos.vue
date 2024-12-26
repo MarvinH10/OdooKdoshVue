@@ -146,7 +146,7 @@ const registrarProducto = async () => {
 
         toast.error(
             "Error registrando producto: " +
-                (error.response?.data?.error || error.message),
+            (error.response?.data?.error || error.message),
             { autoClose: 4000, position: "bottom-right" }
         );
     }

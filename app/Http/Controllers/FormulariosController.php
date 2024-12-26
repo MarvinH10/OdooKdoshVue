@@ -2,19 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\OdooService;
+use App\Services\ServicioOdoo;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
+use Exception;
 
 class FormulariosController extends Controller
 {
     private $productsFile = 'productos.json';
-    protected $odooService;
+    protected $servicioOdoo;
 
-    public function __construct(OdooService $odooService)
+    public function __construct(ServicioOdoo $servicioOdoo)
     {
-        $this->odooService = $odooService;
+        $this->servicioOdoo = $servicioOdoo;
     }
 
     private function readProductsFromFile()
@@ -39,21 +40,23 @@ class FormulariosController extends Controller
     public function traerDatosFavoritos()
     {
         try {
+            $this->servicioOdoo->authenticate();
+
             $user = Auth::user();
 
             if (!$user) {
                 return response()->json(['error' => 'Usuario no autenticado en Laravel'], 401);
             }
 
-            $userId = $this->odooService->authenticate();
+            $usuarioId = $this->servicioOdoo->authenticate();
 
-            if (!$userId) {
+            if (!$usuarioId) {
                 return response()->json(['error' => 'Usuario no autenticado en Odoo'], 401);
             }
 
-            $dataFavorite = $this->odooService->getFavoriteData($userId);
+            $dataFavorite = $this->servicioOdoo->traerDatosFasvoritos($usuarioId);
             return response()->json($dataFavorite);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Error fetching favorite data:', ['message' => $e->getMessage()]);
             return response()->json(['error' => 'Error fetching favorite data'], 500);
         }
@@ -63,21 +66,23 @@ class FormulariosController extends Controller
     public function convertirFavoritosANoFavoritos()
     {
         try {
+            $this->servicioOdoo->authenticate();
+
             $user = Auth::user();
 
             if (!$user) {
                 return response()->json(['error' => 'Usuario no autenticado en Laravel'], 401);
             }
 
-            $odooUserId = $user->odoo_uid;
+            $odooUsuarioId = $user->odoo_uid;
 
-            if (!$odooUserId) {
+            if (!$odooUsuarioId) {
                 return response()->json(['error' => 'Usuario no autenticado en Odoo'], 401);
             }
 
-            $result = $this->odooService->convertirFavoritosANoFavoritos($odooUserId);
+            $result = $this->servicioOdoo->convertirFavoritosANoFavoritos($odooUsuarioId);
             return response()->json(['message' => 'Productos actualizados a no favoritos', 'result' => $result]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Error al convertir productos a no favoritos:', ['message' => $e->getMessage()]);
             return response()->json(['error' => 'Error al convertir productos a no favoritos'], 500);
         }

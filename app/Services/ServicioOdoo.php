@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Services\Producto\ProductoService;
+use App\Services\Formulario\FormularioService;
+use App\Services\Reposicion\ReposicionService;
 use Illuminate\Support\Facades\Auth;
 use Ripcord\Ripcord;
 use Exception;
@@ -16,6 +18,8 @@ class ServicioOdoo
     protected $uid;
     protected $modelos;
     public $productoService;
+    public $formularioService;
+    public $reposicionService;
 
     public function __construct()
     {
@@ -42,16 +46,13 @@ class ServicioOdoo
         }
 
         $this->productoService = new ProductoService($this->modelos, $this->base_datos, $this->uid, $this->contraseña);
+        $this->formularioService = new FormularioService($this->modelos, $this->base_datos, $this->uid, $this->contraseña);
+        $this->reposicionService = new ReposicionService($this->modelos, $this->base_datos, $this->uid, $this->contraseña);
 
         return $this->uid;
     }
 
     /*INICIO PRODUCTO SERVICIO*/
-    public function traerProductosFavoritos()
-    {
-        return $this->productoService->traerProductosFavoritos();
-    }
-
     public function traerCategorias()
     {
         return $this->productoService->traerCategorias();
@@ -82,4 +83,32 @@ class ServicioOdoo
         return $this->productoService->createVariant($productId, $attributes);
     }
     /*FIN PRODUCTO SERVICIO*/
+
+    /*INICIO FORMULARIO SERVICIO*/
+    public function traerProductosFavoritos()
+    {
+        return $this->formularioService->traerProductosFavoritos();
+    }
+
+    public function traerDatosFasvoritos($usuarioId)
+    {
+        return $this->formularioService->traerDatosFasvoritos($usuarioId);
+    }
+
+    public function convertirFavoritosANoFavoritos($usuarioId)
+    {
+        return $this->formularioService->convertirFavoritosANoFavoritos($usuarioId);
+    }
+    /*FIN FORMULARIO SERVICIO*/
+
+    /*INICIO REPOSICION SERVICIO*/
+    public function traerDatosReposicion()
+    {
+        return $this->reposicionService->traerDatosReposicion();
+    }
+    /*FIN REPOSICION SERVICIO*/
+
+    /*INICIO BARCODE SERVICIO*/
+
+    /*FIN BARCODE SERVICIO*/
 }
