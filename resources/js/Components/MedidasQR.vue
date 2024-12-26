@@ -44,16 +44,16 @@ const qrStyles = computed(() => {
         <!-- Button 2 -->
         <div v-else-if="selectedButtonIndex === 1 && selectedItem"
             :class="`bg-white ${qrStyles.width} ${qrStyles.height} text-center relative`">
-            <div :class="`${qrStyles.priceTextSize} font-bold mr-20`">S/ {{ selectedItem.price }}</div>
-            <div :class="`${qrStyles.descriptionTextSize} text-black text-[7.8px] ml-1 mr-[62px] leading-tight mb-1`">
+            <div :class="`${qrStyles.priceTextSize} font-bold mr-20 mt-3`">S/ {{ selectedItem.price }}</div>
+            <div :class="`${qrStyles.descriptionTextSize} text-black text-[7.4px] ml-1 mr-[62px] leading-tight mb-1`">
                 CABALLERO / ZAPATILLA / ADIDAS
             </div>
-            <div :class="`${qrStyles.descriptionTextSize} text-black text-[7.8px] ml-1 mr-[72px] leading-tight`">{{
+            <div :class="`${qrStyles.descriptionTextSize} text-black text-[7.4px] ml-1 mr-[72px] leading-tight`">{{
                 selectedItem.description }}</div>
             <div class="text-black text-[7.8px] ml-1 mr-[72px] leading-tight">
                 {{ selectedItem.attribute }}
             </div>
-            <div class="flex items-center left-[60px] -top-[67px] justify-center relative">
+            <div class="flex items-center left-[60px] -top-[70px] justify-center relative">
                 <img :src="qrCodeDataUrl" alt="QR Code" class="mx-4"
                     :style="{ width: qrStyles.qrCodeSize + 'px', height: qrStyles.qrCodeSize + 'px' }" />
                 <div
