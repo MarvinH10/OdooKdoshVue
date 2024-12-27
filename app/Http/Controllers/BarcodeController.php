@@ -22,9 +22,11 @@ class BarcodeController extends Controller
         return Inertia::render('Barcode/Barcode');
     }
 
-    // public function traerProductosById($productId)
-    // {
-    //     $products_Id = $this->servicioOdoo->traerProductosById($productId);
-    //     return response()->json($products_Id);
-    // }
+    public function traerProductosById($productId)
+    {
+        $this->servicioOdoo->authenticate();
+
+        $products_Id = $this->servicioOdoo->traerProductosById($productId);
+        return response()->json($products_Id);
+    }
 }

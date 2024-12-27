@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Services\Producto\ProductoService;
 use App\Services\Formulario\FormularioService;
 use App\Services\Reposicion\ReposicionService;
+use App\Services\Barcode\BarcodeService;
 use Illuminate\Support\Facades\Auth;
 use Ripcord\Ripcord;
 use Exception;
@@ -20,6 +21,7 @@ class ServicioOdoo
     public $productoService;
     public $formularioService;
     public $reposicionService;
+    public $barcodeService;
 
     public function __construct()
     {
@@ -48,6 +50,7 @@ class ServicioOdoo
         $this->productoService = new ProductoService($this->modelos, $this->base_datos, $this->uid, $this->contraseña);
         $this->formularioService = new FormularioService($this->modelos, $this->base_datos, $this->uid, $this->contraseña);
         $this->reposicionService = new ReposicionService($this->modelos, $this->base_datos, $this->uid, $this->contraseña);
+        $this->barcodeService = new BarcodeService($this->modelos, $this->base_datos, $this->uid, $this->contraseña);
 
         return $this->uid;
     }
@@ -109,6 +112,9 @@ class ServicioOdoo
     /*FIN REPOSICION SERVICIO*/
 
     /*INICIO BARCODE SERVICIO*/
-
+    public function traerProductosById($productId)
+    {
+        return $this->barcodeService->traerProductosById($productId);
+    }
     /*FIN BARCODE SERVICIO*/
 }

@@ -1,57 +1,80 @@
-// PENDIENTE
-    // public function getProductById($producto_Id)
-    // {
-    //     $this->authenticate();
+<?php
 
-    //     $producto = $this->models->execute_kw(
-    //         $this->db,
-    //         $this->uid,
-    //         $this->password,
-    //         'product.template',
-    //         'search_read',
-    //         [
-    //             [['id', '=', $producto_Id]]
-    //         ],
-    //         [
-    //             'fields' => ['id', 'name', 'list_price', 'categ_id', 'barcode', 'default_code', 'attribute_line_ids'],
-    //             'limit' => 1
-    //         ]
-    //     );
+namespace App\Services\Barcode;
 
-    //     if (!is_array($producto) || empty($producto)) {
-    //         return null;
-    //     }
+use Exception;
+use Illuminate\Support\Facades\Log;
 
-    //     $producto = $producto[0];
+class BarcodeService
+{
+    protected $modelos;
+    protected $base_datos;
+    protected $uid;
+    protected $contraseña;
 
-    //     $resultado = [
-    //         'id' => $producto['id'],
-    //         'name' => $producto['name'],
-    //         'list_price' => $producto['list_price'],
-    //         'categ_id' => is_array($producto['categ_id']) ? $producto['categ_id'][1] : $producto['categ_id'],
-    //         'barcode' => $producto['barcode'],
-    //         'default_code' => $producto['default_code'],
-    //         'attribute_line_ids' => $producto['attribute_line_ids'],
-    //         'variants' => []
-    //     ];
+    public function __construct($modelos, $base_datos, $uid, $contraseña)
+    {
+        $this->modelos = $modelos;
+        $this->base_datos = $base_datos;
+        $this->uid = $uid;
+        $this->contraseña = $contraseña;
+    }
 
-    //     if (!empty($producto['attribute_line_ids'])) {
-    //         $variantes = $this->models->execute_kw(
-    //             $this->db,
-    //             $this->uid,
-    //             $this->password,
-    //             'product.product',
-    //             'search_read',
-    //             [
-    //                 [['product_tmpl_id', '=', $producto_Id]]
-    //             ],
-    //             [
-    //                 'fields' => ['id', 'name', 'list_price', 'barcode', 'default_code']
-    //             ]
-    //         );
+    public function traerProductosById($producto_Id)
+    {
+        try {
+            $producto = $this->modelos->execute_kw(
+                $this->base_datos,
+                $this->uid,
+                $this->contraseña,
+                'product.template',
+                'search_read',
+                [
+                    [['id', '=', $producto_Id]]
+                ],
+                [
+                    'fields' => [
+                        'id',
+                        'name',
+                        'list_price',
+                        'categ_id',
+                        'barcode',
+                        'default_code',
+                        'product_variant_ids'
+                    ],
+                ]
+            );
 
-    //         $resultado['variants'] = $variantes;
-    //     }
+            if (!empty($producto) && !empty($producto[0]['product_variant_ids'])) {
+                $variantes = $this->modelos->execute_kw(
+                    $this->base_datos,
+                    $this->uid,
+                    $this->contraseña,
+                    'product.product',
+                    'search_read',
+                    [
+                        [['id', 'in', $producto[0]['product_variant_ids']]]
+                    ],
+                    [
+                        'fields' => [
+                            'id',
+                            'default_code',
+                            'barcode',
+                            'lst_price',
+                            'product_template_attribute_value_ids'
+                        ],
+                    ]
+                );
 
-    //     return $resultado;
-    // }
+                $producto[0]['variantes'] = $variantes;
+            } else {
+                unset($producto[0]['product_variant_ids']);
+            }
+
+            return $producto;
+        } catch (Exception $e) {
+            Log::error('Error al traer el producto:', ['message' => $e->getMessage()]);
+            return null;
+        }
+    }
+}
