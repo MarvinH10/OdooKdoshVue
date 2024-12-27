@@ -66,6 +66,30 @@ class BarcodeService
                     ]
                 );
 
+                foreach ($variantes as &$variante) {
+                    if (!empty($variante['product_template_attribute_value_ids'])) {
+                        $atributos = $this->modelos->execute_kw(
+                            $this->base_datos,
+                            $this->uid,
+                            $this->contraseña,
+                            'product.template.attribute.value',
+                            'search_read',
+                            [
+                                [['id', 'in', $variante['product_template_attribute_value_ids']]]
+                            ],
+                            [
+                                'fields' => ['id', 'name', 'attribute_id']
+                            ]
+                        );
+
+                        $variante['atributos'] = array_map(function ($atributo) {
+                            return $atributo['attribute_id'][1] . ': ' . $atributo['name'];
+                        }, $atributos);
+                    } else {
+                        $variante['atributos'] = [];
+                    }
+                }
+
                 $producto[0]['variantes'] = $variantes;
             } else {
                 unset($producto[0]['product_variant_ids']);
