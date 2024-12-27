@@ -1,6 +1,8 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import { ref, onMounted, computed, watch } from "vue";
+import { ref, onMounted, computed } from "vue";
+import { styles } from "@/stylesConfig";
+import { generateContent1 } from "@/generateContent1";
 import MobileBarcode from "@/Components/MobileBarcode.vue";
 import ModalCantidadBarcodes from "@/Components/ModalCantidadBarcodes.vue";
 import MedidasQR from "@/Components/MedidasQR.vue";
@@ -14,6 +16,10 @@ const buttonImages = [
     "/images/BarcodeMedidas/type1.jpg",
     "/images/BarcodeMedidas/type2.jpg",
     "/images/BarcodeMedidas/type7.png",
+];
+
+const contentGenerators = [
+    generateContent1,
 ];
 
 const isMobileTablet = ref(false);
@@ -62,16 +68,6 @@ const traerDatoProducto = async (id) => {
     }
 };
 
-const cargarDatosLocalmente = (id) => {
-    const storedData = localStorage.getItem(`producto_${id}`);
-    if (storedData) {
-        imageItems.value = JSON.parse(storedData);
-        // console.log("Datos cargados desde localStorage:", imageItems.value);
-    } else {
-        console.log("No se encontraron datos en localStorage para el ID:", id);
-    }
-};
-
 const filteredItems = computed(() => {
     return selectedButtonIndex.value !== null ? imageItems.value : [];
 });
@@ -87,51 +83,51 @@ const selectedItem = computed(() => {
 });
 
 const printSelectedContent = () => {
-    if (selectedItem.value) {
-        const printWindow = window.open("", "_blank");
-
-        const printContent = `
-            <html>
-                <head>
-                    <title>Barcode</title>
-                    <style>
-                        body { font-family: Arial, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-                        .print-content { width: 240px; text-align: center; padding: 10px; background-color: #fff; }
-                        .price { font-size: 24px; font-weight: bold; margin-bottom: 8px; }
-                        .category { font-size: 12px; color: gray; margin-bottom: 8px; }
-                        .qr-container { display: flex; align-items: center; justify-content: center; position: relative; }
-                        .attribute { position: absolute; left: 50px; top: 50%; transform: translateY(-50%) rotate(-90deg); font-size: 12px; font-weight: bold; }
-                        .qr-code { margin: 0 auto; }
-                        .code { font-size: 10px; font-family: monospace; margin-top: 8px; }
-                        .description { font-size: 10px; color: gray; margin-top: 4px; }
-                    </style>
-                </head>
-                <body>
-                    <div class="print-content">
-                        <div class="price">S/ 50</div>
-                        <div class="category">CABALLERO / ZAPATILLA / ADIDAS</div>
-                        <div class="qr-container">
-                            <div class="attribute">ROJO</div>
-                            <img src="${qrCodeDataUrl.value}" alt="QR Code" class="qr-code" width="100" height="100" />
-                        </div>
-                        <div class="code">201922836761</div>
-                        <div class="description">POLO</div>
-                    </div>
-                </body>
-            </html>
-        `;
-
-        printWindow.document.open();
-        printWindow.document.write(printContent);
-        printWindow.document.close();
-
-        printWindow.onload = () => {
-            printWindow.print();
-            printWindow.close();
-        };
-    } else {
-        alert("No hay contenido seleccionado para imprimir.");
+    if (selectedButtonIndex.value === null) {
+        alert("Por favor, selecciona un diseño antes de imprimir.");
+        return;
     }
+
+    const style = styles[selectedButtonIndex.value];
+    const selectedData = filteredItems.value;
+
+    if (!selectedData.length) {
+        alert("No hay elementos para imprimir.");
+        return;
+    }
+
+    const generateContent = contentGenerators[selectedButtonIndex.value];
+
+    if (!generateContent) {
+        alert("No se encontró un generador de contenido para este diseño.");
+        return;
+    }
+
+    const printWindow = window.open("", "_blank");
+    const printContent = selectedData.map((item) => generateContent(item, style)).join("");
+
+    printWindow.document.open();
+    printWindow.document.write(`
+        <html>
+            <head>
+                <title>Impresión</title>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        padding: 20px;
+                        background-color: #f9f9f9;
+                    }
+                </style>
+            </head>
+            <body>${printContent}</body>
+        </html>
+    `);
+    printWindow.document.close();
+
+    printWindow.onload = () => {
+        printWindow.print();
+        printWindow.close();
+    };
 };
 
 const openModalCantidad = () => {

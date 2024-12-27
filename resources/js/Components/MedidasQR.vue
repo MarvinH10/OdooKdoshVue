@@ -1,31 +1,33 @@
-<script setup>
+<script>
 import LogoKdosh from "@/Components/LogoKdosh.vue";
-import { computed } from "vue";
+import { styles } from "@/stylesConfig";
 
-const props = defineProps({
-    filteredItems: Array,
-    selectedButtonIndex: Number,
-});
-
-const styles = [
-    { width: 'w-60', height: 'h-60', priceTextSize: 'text-3xl', descriptionTextSize: 'text-xs', marginLeft: 'ml-6', priceFontSize: '24px', qrCodeSize: 100 },
-    { width: 'w-48', height: 'h-24', priceTextSize: 'text-xl', descriptionTextSize: 'text-[0.5rem]', marginLeft: 'ml-4', priceFontSize: '10px', qrCodeSize: 55 },
-    { width: 'w-48', height: 'h-24', priceTextSize: 'text-xs', marginLeft: 'ml-4', qrCodeSize: 50 },
-    { width: 'w-[400px]', height: 'h-[400px]', priceTextSize: 'text-4xl', descriptionTextSize: 'text-sm', marginLeft: 'ml-5', priceFontSize: '22px', qrCodeSize: 120 },
-    { width: 'w-52', height: 'h-60', priceTextSize: 'text-3xl', descriptionTextSize: 'text-xs', marginLeft: 'ml-6', priceFontSize: '24px', qrCodeSize: 100 },
-    { width: 'w-[230px]', height: 'h-20', priceTextSize: 'text-xl', descriptionTextSize: 'text-[0.5rem]', marginLeft: 'ml-4', priceFontSize: '10px', qrCodeSize: 55 },
-    { width: 'w-60', height: 'h-60', priceTextSize: 'text-3xl', descriptionTextSize: 'text-[7px]', marginLeft: 'ml-6', priceFontSize: '24px', qrCodeSize: 100 },
-];
-
-const qrStyles = computed(() => {
-    return styles[props.selectedButtonIndex] || styles[0];
-});
+export default {
+    name: "MedidasQR",
+    components: { LogoKdosh },
+    props: {
+        filteredItems: {
+            type: Array,
+            required: true,
+        },
+        selectedButtonIndex: {
+            type: [Number, null],
+            required: false,
+            default: null,
+        },
+    },
+    computed: {
+        qrStyles() {
+            return styles[this.selectedButtonIndex] || styles[0];
+        },
+    },
+};
 </script>
 
 <template>
     <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6" :class="qrStyles.marginLeft">
         <!-- Button 1 -->
-        <div v-for="(item, index) in filteredItems" v-if="selectedButtonIndex === 0 && filteredItems"
+        <div v-for="(item) in filteredItems" v-if="selectedButtonIndex === 0 && filteredItems"
             :class="`bg-white p-1 ${qrStyles.width} ${qrStyles.height} text-center relative`">
             <div :class="`${qrStyles.priceTextSize} font-bold mb-2`">S/ {{ item.price }}</div>
             <div :class="`${qrStyles.descriptionTextSize} text-black mb-4`">{{ item.categ_id }}</div>
@@ -41,7 +43,7 @@ const qrStyles = computed(() => {
         </div>
 
         <!-- Button 2 -->
-        <div v-for="(item, index) in filteredItems" v-else-if="selectedButtonIndex === 1 && filteredItems"
+        <div v-for="(item) in filteredItems" v-else-if="selectedButtonIndex === 1 && filteredItems"
             :class="`bg-white ${qrStyles.width} ${qrStyles.height} text-center relative`">
             <div :class="`${qrStyles.priceTextSize} font-bold mr-20 mt-3`">S/ {{ item.price }}</div>
             <div :class="`${qrStyles.descriptionTextSize} text-black ml-1 mr-[62px] leading-tight mb-1`">
@@ -62,7 +64,7 @@ const qrStyles = computed(() => {
         </div>
 
         <!-- Button 3 -->
-        <div v-for="(item, index) in filteredItems" v-else-if="selectedButtonIndex === 2 && filteredItems"
+        <div v-for="(item) in filteredItems" v-else-if="selectedButtonIndex === 2 && filteredItems"
             :class="`bg-white ${qrStyles.width} ${qrStyles.height} text-center relative`">
             <div class="flex items-center left-[-60px] -top-[-19px] justify-center relative">
                 <div :class="`${qrStyles.priceTextSize} absolute left-[68px] top-[-15px]`">S/ {{ item.price }}
@@ -76,7 +78,7 @@ const qrStyles = computed(() => {
         </div>
 
         <!-- Button 4 -->
-        <div v-for="(item, index) in filteredItems" v-else-if="selectedButtonIndex === 3 && filteredItems"
+        <div v-for="(item) in filteredItems" v-else-if="selectedButtonIndex === 3 && filteredItems"
             :class="`bg-white p-1 ${qrStyles.width} ${qrStyles.height} text-center relative`">
             <LogoKdosh class="justify-center flex" />
             <div :class="`${qrStyles.priceTextSize} mb-2`">S/ {{ item.price }}</div>
@@ -95,7 +97,7 @@ const qrStyles = computed(() => {
         </div>
 
         <!-- Button 5 -->
-        <div v-for="(item, index) in filteredItems" v-else-if="selectedButtonIndex === 4 && filteredItems"
+        <div v-for="(item) in filteredItems" v-else-if="selectedButtonIndex === 4 && filteredItems"
             :class="`bg-white p-1 ${qrStyles.width} ${qrStyles.height} text-center relative`">
             <div :class="`${qrStyles.priceTextSize} font-bold mb-1`">S/ {{ item.price }}</div>
             <div :class="`${qrStyles.descriptionTextSize} text-black mb-1`">{{ item.categ_id }}</div>
@@ -111,7 +113,7 @@ const qrStyles = computed(() => {
         </div>
 
         <!-- Button 6 -->
-        <div v-for="(item, index) in filteredItems" v-else-if="selectedButtonIndex === 5 && filteredItems"
+        <div v-for="(item) in filteredItems" v-else-if="selectedButtonIndex === 5 && filteredItems"
             :class="`bg-white ${qrStyles.width} ${qrStyles.height} text-center relative`">
             <div :class="`${qrStyles.priceTextSize} font-bold mr-20`">S/ {{ item.price }}</div>
             <div :class="`${qrStyles.descriptionTextSize} text-black ml-1 mr-[62px] leading-tight mb-2`">
@@ -132,7 +134,7 @@ const qrStyles = computed(() => {
         </div>
 
         <!-- Button 7 -->
-        <div v-for="(item, index) in filteredItems" v-else-if="selectedButtonIndex === 6 && filteredItems"
+        <div v-for="(item) in filteredItems" v-else-if="selectedButtonIndex === 6 && filteredItems"
             :class="`bg-white p-1 ${qrStyles.width} ${qrStyles.height} text-center relative`"
             :style="{ borderRadius: '50%' }">
             <div :class="`${qrStyles.priceTextSize} font-bold mt-3 mb-1`">S/ {{ item.price }}</div>
