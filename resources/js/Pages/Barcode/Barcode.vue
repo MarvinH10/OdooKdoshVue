@@ -3,7 +3,6 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import { ref, onMounted, computed } from "vue";
 import { styles } from "@/stylesConfig";
 import { generateContent1 } from "@/generateContent1";
-import MobileBarcode from "@/Components/MobileBarcode.vue";
 import ModalCantidadBarcodes from "@/Components/ModalCantidadBarcodes.vue";
 import MedidasQR from "@/Components/MedidasQR.vue";
 import QRCode from "qrcode";
@@ -22,14 +21,9 @@ const contentGenerators = [
     generateContent1,
 ];
 
-const isMobileTablet = ref(false);
 const selectedButtonIndex = ref(null);
 const showModalCantidad = ref(false);
 const imageItems = ref([]);
-
-const revisarIsMobileTablet = () => {
-    isMobileTablet.value = window.innerWidth <= 980;
-};
 
 const traerDatoProducto = async (id) => {
     try {
@@ -75,12 +69,6 @@ const filteredItems = computed(() => {
 const toggleSelection = (index) => {
     selectedButtonIndex.value = selectedButtonIndex.value === index ? null : index;
 };
-
-const selectedItem = computed(() => {
-    return selectedButtonIndex.value !== null
-        ? imageItems.value[selectedButtonIndex.value]
-        : null;
-});
 
 const printSelectedContent = () => {
     if (selectedButtonIndex.value === null) {
@@ -139,9 +127,6 @@ const closeModalCantidad = () => {
 }
 
 onMounted(() => {
-    revisarIsMobileTablet();
-    window.addEventListener("resize", revisarIsMobileTablet);
-
     traerDatoProducto(72);
 });
 </script>
@@ -154,13 +139,7 @@ onMounted(() => {
             </h2>
         </template>
 
-        <div v-if="isMobileTablet">
-            <MobileBarcode :selectedButtonIndex="selectedButtonIndex" :toggleSelection="toggleSelection"
-                :selectedItem="selectedItem" :imageItems="imageItems" @print-selected="printSelectedContent"
-                @open-cantidades-modal="openModalCantidad" />
-        </div>
-
-        <div v-else class="py-12">
+        <div class="py-12">
             <div class="max-w-12xl mx-auto sm:px-6 lg:px-1">
                 <div class="bg-white overflow-hidden p-6">
                     <div class="flex flex-wrap">
