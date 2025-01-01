@@ -1,7 +1,7 @@
 export const generateContent1 = (item, style) => `
     <div style="
-        width: ${style.width};
-        height: ${style.height};
+        width: 15rem;
+        height: 15 rem;
         margin-bottom: 20px;
         padding: 10px;
         text-align: center;
