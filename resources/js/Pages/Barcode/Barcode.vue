@@ -2,7 +2,8 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import { ref, onMounted, computed } from "vue";
 import { styles } from "@/stylesConfig";
-import { generateContent1 } from "@/generateContent1";
+import { generateContent1 } from "@/generateContent1.js";
+import { generateContent2 } from "@/generateContent2.js";
 import ModalCantidadBarcodes from "@/Components/ModalCantidadBarcodes.vue";
 import MedidasQR from "@/Components/MedidasQR.vue";
 import QRCode from "qrcode";
@@ -19,6 +20,7 @@ const buttonImages = [
 
 const contentGenerators = [
     generateContent1,
+    generateContent2,
 ];
 
 const selectedButtonIndex = ref(null);
