@@ -5,6 +5,7 @@ import { styles } from "@/stylesConfig";
 import { generateContent1 } from "@/generateContent1.js";
 import { generateContent2 } from "@/generateContent2.js";
 import { generateContent3 } from "@/generateContent3.js";
+import { generateContent4 } from "@/generateContent4.js";
 import ModalCantidadBarcodes from "@/Components/ModalCantidadBarcodes.vue";
 import MedidasQR from "@/Components/MedidasQR.vue";
 import QRCode from "qrcode";
@@ -23,6 +24,7 @@ const contentGenerators = [
     generateContent1,
     generateContent2,
     generateContent3,
+    generateContent4,
 ];
 
 const selectedButtonIndex = ref(null);
