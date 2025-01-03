@@ -8,6 +8,7 @@ import { generateContent3 } from "@/generateContent3.js";
 import { generateContent4 } from "@/generateContent4.js";
 import { generateContent5 } from "@/generateContent5.js";
 import { generateContent6 } from "@/generateContent6.js";
+import { generateContent7 } from "@/generateContent7.js";
 import ModalCantidadBarcodes from "@/Components/ModalCantidadBarcodes.vue";
 import MedidasQR from "@/Components/MedidasQR.vue";
 import QRCode from "qrcode";
@@ -29,6 +30,7 @@ const contentGenerators = [
     generateContent4,
     generateContent5,
     generateContent6,
+    generateContent7,
 ];
 
 const selectedButtonIndex = ref(null);
@@ -116,7 +118,7 @@ const printSelectedContent = () => {
         printWindow.document.write(`
             <html>
                 <head>
-                    <title>Impresión</title>
+                    <title>Barcode QR</title>
                     <style>
                         body {
                             font-family: Arial, sans-serif;
@@ -159,7 +161,7 @@ const printSelectedContent = () => {
     printWindow.document.write(`
         <html>
             <head>
-                <title>Impresión</title>
+                <title>Barcode QR</title>
                 <style>
                     body {
                         font-family: Arial, sans-serif;
