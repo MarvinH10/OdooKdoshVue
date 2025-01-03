@@ -41,13 +41,16 @@ const traerDatoProducto = async (id) => {
     try {
         const storedData = localStorage.getItem(`producto_${id}`);
         if (storedData) {
-            imageItems.value = JSON.parse(storedData);
-            // console.log("Datos cargados desde localStorage:", imageItems.value);
+            imageItems.value = JSON.parse(storedData).map(item => ({
+                ...item,
+                status: "activo",
+                quantity: item.quantity || 1,
+            }));
             return;
         }
 
         const response = await axios.get(`/barcode/traer/${id}`);
-        if (response.data && response.data.length > 0) {
+        if (response.data && response.data.length >= 0) {
             const producto = response.data[0];
 
             const promises = producto.variantes.map(async (item) => {
@@ -57,15 +60,18 @@ const traerDatoProducto = async (id) => {
                     code: item.barcode || "",
                     description: `${item.default_code || ""}`,
                     price: item.lst_price ? item.lst_price.toFixed(2) : "",
-                    attribute: item.atributos ? item.atributos.join(", ") : "",
+                    attribute: item.atributos
+                        ? item.atributos.map(attr => attr.split(":")[1]?.trim() || attr).join(", ")
+                        : "",
                     qrCode,
+                    status: "activo",
+                    quantity: 1,
                 };
             });
 
             imageItems.value = await Promise.all(promises);
 
             localStorage.setItem(`producto_${id}`, JSON.stringify(imageItems.value));
-            // console.log("Datos con QR Codes generados y almacenados:", imageItems.value);
         } else {
             console.error("La respuesta no contiene 'variantes'.", response.data);
         }
@@ -75,16 +81,19 @@ const traerDatoProducto = async (id) => {
 };
 
 const filteredItems = computed(() => {
-    return selectedButtonIndex.value !== null ? imageItems.value : [];
+    return selectedButtonIndex.value !== null
+        ? imageItems.value.filter(item => item.status === "activo")
+        : [];
 });
 
 const filteredItemsFor3 = computed(() => {
     if (selectedButtonIndex.value === null) return [];
 
     const itemsPerGroup = 3;
+    const activeItems = imageItems.value.filter(item => item.status === "activo");
     const groupedItems = [];
-    for (let i = 0; i < imageItems.value.length; i += itemsPerGroup) {
-        groupedItems.push(imageItems.value.slice(i, i + itemsPerGroup));
+    for (let i = 0; i < activeItems.length; i += itemsPerGroup) {
+        groupedItems.push(activeItems.slice(i, i + itemsPerGroup));
     }
     return groupedItems;
 });
@@ -189,6 +198,37 @@ const closeModalCantidad = () => {
     showModalCantidad.value = false;
 }
 
+const updateItemQuantities = (updatedItems) => {
+    if (!Array.isArray(updatedItems)) {
+        console.error("updatedItems no es un array válido.");
+        return;
+    }
+
+    updatedItems.forEach((updatedItem) => {
+        const existingItem = imageItems.value.find((item) => item.code === updatedItem.code);
+
+        if (existingItem) {
+            existingItem.quantity = updatedItem.quantity;
+            existingItem.status = updatedItem.status;
+        } else {
+            imageItems.push(updatedItem);
+        }
+    });
+
+    imageItems.value = updatedItems.flatMap((updatedItem) => {
+        if (updatedItem.quantity === 0) {
+            return { ...updatedItem, status: "inactivo" };
+        }
+
+        return Array.from({ length: updatedItem.quantity }, () => ({
+            ...updatedItem,
+            status: "activo",
+        }));
+    });
+
+    console.log("Quantities updated in imageItems:", imageItems.value);
+};
+
 onMounted(() => {
     traerDatoProducto(72);
 });
@@ -207,10 +247,10 @@ onMounted(() => {
                 <div class="bg-white overflow-hidden p-6">
                     <div class="flex flex-wrap">
                         <div class="sm:w-1/6 lg:w-1/5 xl:w-1/4">
-                            <button
+                            <!-- <button
                                 class="flex flex-col bg-blue-700 text-white text-sm px-[15.5px] py-[0.5px] mb-1 rounded border text-center">
                                 Seleccionar
-                            </button>
+                            </button> -->
                             <button @click="printSelectedContent"
                                 class="flex flex-col bg-blue-700 text-white text-sm px-[25.5px] py-[0.5px] mb-5 rounded border text-center">
                                 Imprimir
@@ -240,6 +280,7 @@ onMounted(() => {
             </div>
         </div>
 
-        <ModalCantidadBarcodes v-if="showModalCantidad" @close="closeModalCantidad" />
+        <ModalCantidadBarcodes v-if="showModalCantidad" :imageItems="imageItems" @close="closeModalCantidad"
+            @updateQuantities="updateItemQuantities" />
     </AppLayout>
 </template>

@@ -1,29 +1,71 @@
 <script setup>
-import { defineEmits, ref } from "vue";
+import { defineProps, defineEmits, ref, watch } from "vue";
 
-const emit = defineEmits(['close']);
+const props = defineProps({
+    imageItems: {
+        type: Array,
+        default: () => [],
+    },
+});
 
-const items = ref([
-    { code: "7633188062077", description: "ADIDAS ZAPATILLAS SOLARGLIDE ST 3 - FV7251", attr: "6.5", quantity: 100 },
-    { code: "3393264635932", description: "ADIDAS ZAPATILLAS SOLARGLIDE ST 3 - FV7251", attr: "7", quantity: 1 },
-    { code: "6601971591111", description: "ADIDAS ZAPATILLAS SOLARGLIDE ST 3 - FV7251", attr: "8.5", quantity: 1 },
-    { code: "1650985588261", description: "ADIDAS ZAPATILLAS SOLARGLIDE ST 3 - FV7251", attr: "9", quantity: 1 },
-    { code: "8641100500186", description: "ADIDAS ZAPATILLAS SOLARGLIDE ST 3 - FV7251", attr: "9.5", quantity: 1 },
-]);
+const emit = defineEmits(["close"]);
+
+const items = ref([]);
+const initialItems = ref([]);
+
+watch(
+    () => props.imageItems,
+    (newItems) => {
+        if (JSON.stringify(newItems) !== JSON.stringify(initialItems.value)) {
+            const uniqueItems = [];
+            const seenCodes = new Set();
+
+            newItems.forEach((item) => {
+                if (!seenCodes.has(item.code)) {
+                    seenCodes.add(item.code);
+                    uniqueItems.push({
+                        ...item,
+                        quantity: item.quantity || 0,
+                        status: item.quantity > 0 ? "activo" : "inactivo",
+                    });
+                }
+            });
+
+            items.value = uniqueItems;
+            initialItems.value = JSON.parse(JSON.stringify(items.value));
+        }
+    },
+    { immediate: true }
+);
 
 const resetQuantities = () => {
-    items.value.forEach(item => {
+    items.value.forEach((item) => {
         item.quantity = 0;
+        item.status = "inactivo";
     });
 };
 
 const closeModal = () => {
-    emit('close');
+    emit("close");
 };
 
 const acceptChanges = () => {
+    const updatedItems = items.value.map((item) => ({
+        ...item,
+        quantity: item.quantity || 0,
+        status: item.quantity > 0 ? "activo" : "inactivo",
+    }));
+
+    emit("updateQuantities", updatedItems);
     closeModal();
 };
+
+
+watch(items, (newItems) => {
+    newItems.forEach((item) => {
+        item.status = item.quantity > 0 ? "activo" : "inactivo";
+    });
+});
 </script>
 
 <template>
@@ -46,7 +88,7 @@ const acceptChanges = () => {
                     <tr v-for="(item, index) in items" :key="index" :class="index % 2 === 0 ? 'bg-gray-100' : ''">
                         <td class="p-2">{{ item.code }}</td>
                         <td class="p-2">{{ item.description }}</td>
-                        <td class="p-2">{{ item.attr }}</td>
+                        <td class="p-2">{{ item.attribute }}</td>
                         <td class="p-2">
                             <input type="number" v-model="item.quantity" class="w-full border p-1 rounded" />
                         </td>

@@ -41,7 +41,7 @@ export default {
             <div class="text-xs text-black mb-4">{{ item.categ_id }}</div>
             <div class="flex items-center justify-center relative">
                 <div
-                    class="absolute left-[95px] top-1/2 transform -translate-y-1/2 -translate-x-full text-sm font-semibold -rotate-90">
+                    class="absolute left-[60px] top-1/2 transform -translate-y-1/2 -translate-x-full text-sm font-semibold -rotate-90">
                     {{ item.attribute }}</div>
                 <img :src="item.qrCode" alt="QR Code" class="mx-4"
                     :style="{ width: qrStyles.qrCodeSize + 'px', height: qrStyles.qrCodeSize + 'px' }" />
@@ -147,7 +147,7 @@ export default {
             <div class="text-[0.60rem] text-black mb-2">{{ item.categ_id }}</div>
             <div class="flex items-center justify-center relative">
                 <div
-                    class="absolute left-[6.5rem] top-1/2 transform -translate-y-1/2 -translate-x-full text-xs font-semibold -rotate-90">
+                    class="absolute left-[5rem] top-1/2 transform -translate-y-1/2 -translate-x-full text-xs font-semibold -rotate-90">
                     {{ item.attribute }}</div>
                 <img :src="item.qrCode" alt="QR Code" class="mx-4"
                     :style="{ width: qrStyles.qrCodeSize + 'px', height: qrStyles.qrCodeSize + 'px' }" />
