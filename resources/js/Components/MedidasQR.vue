@@ -20,6 +20,13 @@ export default {
         qrStyles() {
             return styles[this.selectedButtonIndex] || styles[0];
         },
+        groupedItems() {
+            const groups = [];
+            for (let i = 0; i < this.filteredItems.length; i += 3) {
+                groups.push(this.filteredItems.slice(i, i + 3));
+            }
+            return groups;
+        },
     },
 };
 </script>
@@ -65,16 +72,15 @@ export default {
         </div>
 
         <!-- Button 3 -->
-        <div v-for="(item) in filteredItems" v-else-if="selectedButtonIndex === 2 && filteredItems"
+        <div v-for="(group, groupIndex) in groupedItems" v-else-if="selectedButtonIndex === 2" :key="groupIndex"
             class="bg-white w-[12.5rem] h-[5.5rem] text-center relative">
-            <div class="flex items-center left-[-60px] -top-[-19px] justify-center relative">
-                <div class="text-xs absolute left-[76px] top-[-15px]">S/ {{ item.price }}
+            <div class="flex justify-around items-center h-full">
+                <div v-for="(item, index) in group" :key="index" class="relative">
+                    <div class="text-xs mb-1">S/ {{ item.price }}</div>
+                    <img :src="item.qrCode" alt="QR Code" class="mx-2"
+                        :style="{ width: qrStyles.qrCodeSize + 'px', height: qrStyles.qrCodeSize + 'px' }" />
+                    <div class="text-black text-[7.5px]">{{ item.code }}</div>
                 </div>
-                <img :src="item.qrCode" alt="QR Code" class="mx-4"
-                    :style="{ width: qrStyles.qrCodeSize + 'px', height: qrStyles.qrCodeSize + 'px' }" />
-                <div
-                    class="text-black text-[7.5px] absolute left-[128px] top-[60px] transform -translate-y-1/2 -translate-x-full">
-                    {{ item.code }}</div>
             </div>
         </div>
 

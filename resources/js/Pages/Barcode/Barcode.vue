@@ -4,6 +4,7 @@ import { ref, onMounted, computed } from "vue";
 import { styles } from "@/stylesConfig";
 import { generateContent1 } from "@/generateContent1.js";
 import { generateContent2 } from "@/generateContent2.js";
+import { generateContent3 } from "@/generateContent3.js";
 import ModalCantidadBarcodes from "@/Components/ModalCantidadBarcodes.vue";
 import MedidasQR from "@/Components/MedidasQR.vue";
 import QRCode from "qrcode";
@@ -21,6 +22,7 @@ const buttonImages = [
 const contentGenerators = [
     generateContent1,
     generateContent2,
+    generateContent3,
 ];
 
 const selectedButtonIndex = ref(null);
@@ -68,6 +70,17 @@ const filteredItems = computed(() => {
     return selectedButtonIndex.value !== null ? imageItems.value : [];
 });
 
+const filteredItemsFor3 = computed(() => {
+    if (selectedButtonIndex.value === null) return [];
+
+    const itemsPerGroup = 3;
+    const groupedItems = [];
+    for (let i = 0; i < imageItems.value.length; i += itemsPerGroup) {
+        groupedItems.push(imageItems.value.slice(i, i + itemsPerGroup));
+    }
+    return groupedItems;
+});
+
 const toggleSelection = (index) => {
     selectedButtonIndex.value = selectedButtonIndex.value === index ? null : index;
 };
@@ -79,6 +92,46 @@ const printSelectedContent = () => {
     }
 
     const style = styles[selectedButtonIndex.value];
+
+    if (selectedButtonIndex.value === 2) {
+        const selectedData = filteredItemsFor3.value;
+
+        if (!selectedData.length) {
+            alert("No hay elementos para imprimir.");
+            return;
+        }
+
+        const generateContent = contentGenerators[2];
+
+        const printWindow = window.open("", "_blank");
+        const printContent = selectedData.map((group) => generateContent(group, style)).join("");
+
+        printWindow.document.open();
+        printWindow.document.write(`
+            <html>
+                <head>
+                    <title>Impresión</title>
+                    <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            padding: 20px;
+                            background-color: #f9f9f9;
+                        }
+                    </style>
+                </head>
+                <body>${printContent}</body>
+            </html>
+        `);
+        printWindow.document.close();
+
+        printWindow.onload = () => {
+            printWindow.print();
+            printWindow.close();
+        };
+
+        return;
+    }
+
     const selectedData = filteredItems.value;
 
     if (!selectedData.length) {
