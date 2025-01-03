@@ -42,9 +42,10 @@ class ServicioOdoo
         $this->usuario = $autenticado->email;
         $this->contraseña = $autenticado->token;
         $this->uid = $common_cliente->authenticate($this->base_datos, $this->usuario, $this->contraseña, array());
+        // var_dump($this->uid);
 
-        if (!$this->uid) {
-            throw new Exception('Error de autenticación con Odoo');
+        if (!$this->uid || !is_int($this->uid)) {
+            throw new Exception('Error de autenticación: ' . var_export($this->uid, true));
         }
 
         $this->productoService = new ProductoService($this->modelos, $this->base_datos, $this->uid, $this->contraseña);
