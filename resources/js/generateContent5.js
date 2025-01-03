@@ -1,7 +1,7 @@
-export const generateContent1 = (item, style) => `
+export const generateContent5 = (item, style) => `
     <div style="
-        width: 15rem;
-        height: 15rem;
+        width: 13rem;
+        height: 14rem;
         padding: 0.25rem;
         text-align: center;
         position: relative;
@@ -11,27 +11,25 @@ export const generateContent1 = (item, style) => `
         font-family: Figtree, ui-sans-serif, system-ui, sans-serif,
             'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';">
 
-        <div style="font-size: 2.25rem; line-height: 2.5rem; font-weight: 500; margin-bottom: 0.5rem;">
+        <div style="font-size: 1.875rem; line-height: 2.25rem; font-weight: 500; margin-bottom: 0.25rem;">
             S/ ${item.price}
         </div>
 
-        <div style="font-size: 0.75rem; line-height: 1rem; margin-bottom: 1rem;">
+        <div style="font-size: 0.75rem; line-height: 1rem; margin-bottom: 0.25rem;">
             ${item.categ_id}
         </div>
 
         <div style="
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            margin-bottom: 10px;
             position: relative;">
 
         <div style="
             position: absolute;
-            left: -20px;
+            left: 5rem;
             top: 50%;
-            transform: translateY(-50%) rotate(-90deg);
+            transform: translateY(-50%) translateX(-100%) rotate(-90deg);
             font-size: 0.875rem;
             line-height: 1.25rem;
             font-weight: 600;
@@ -42,11 +40,14 @@ export const generateContent1 = (item, style) => `
         </div>
 
             <img src="${item.qrCode}" style="
-                width: ${style.qrCodeSize}px;
-                height: ${style.qrCodeSize}px;" />
+                width: 100px;
+                height: 100px;
+                margin-left: 1rem;
+                margin-right: 1rem;
+                max-width: 100%;" />
         </div>
 
-        <div style="font-size: 0.75rem; line-height: 1rem; margin-top: 0.5rem; font-weight: 500;">
+        <div style="font-size: 0.75rem; line-height: 1rem; margin-top: 0.25rem; font-weight: 500;">
             ${item.code}
         </div>
 
