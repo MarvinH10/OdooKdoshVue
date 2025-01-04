@@ -214,16 +214,15 @@ class ProductosController extends Controller
                 }
 
                 $datosProducto = [
-                    'is_favorite' => true,
-                    'available_in_pos' => true,
+                    'priority' =>  '1',
+                    'sale_ok' => true,
                     'name' => $producto['name'],
                     'categ_id' => $producto['categ_id'],
                     'default_code' => $producto['default_code'],
                     'list_price' => $producto['list_price'],
                     'type' => 'product',
-                    'is_storable' => true,
                     'create_uid' => $odooUid,
-                    'taxes_id' => [(int) 5],
+                    'taxes_id' => [(int) 6],
                 ];
 
                 foreach (['subcateg1_id', 'subcateg2_id', 'subcateg3_id', 'subcateg4_id'] as $subcateg) {

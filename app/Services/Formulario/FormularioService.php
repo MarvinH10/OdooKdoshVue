@@ -29,7 +29,7 @@ class FormularioService
             'product.template',
             'search_read',
             [
-                [['is_favorite', '=', true]],
+                [['priority', '=', '1']],
             ],
             [
                 'fields' => ['id', 'name', 'list_price', 'default_code'],
@@ -47,7 +47,7 @@ class FormularioService
                 'product.product',
                 'search_read',
                 [
-                    [['is_favorite', '=', true], ['create_uid', '=', $usuarioId]],
+                    [['priority', '=', '1'], ['create_uid', '=', $usuarioId]],
                 ],
                 [
                     'fields' => ['id', 'default_code', 'name', 'product_tmpl_id', 'product_template_attribute_value_ids', 'create_uid'],
@@ -99,7 +99,7 @@ class FormularioService
                     'write',
                     [
                         $productoIds,
-                        ['is_favorite' => false],
+                        ['priority' => '0'],
                     ]
                 );
 

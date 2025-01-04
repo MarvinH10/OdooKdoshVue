@@ -30,7 +30,7 @@ class ReposicionService
                 'product.product',
                 'search_read',
                 [
-                    [['type', '=', 'consu']],
+                    [['type', '=', 'product']],
                 ],
                 [
                     'fields' => ['id', 'name', 'default_code', 'product_tmpl_id', 'product_template_attribute_value_ids'],

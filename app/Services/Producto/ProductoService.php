@@ -29,7 +29,7 @@ class ProductoService
             'product.template',
             'search_read',
             [
-                [['is_favorite', '=', true]],
+                [['priority', '=', '0']],
             ],
             [
                 'fields' => ['id', 'name', 'list_price', 'default_code'],

@@ -230,7 +230,7 @@ const updateItemQuantities = (updatedItems) => {
 };
 
 onMounted(() => {
-    traerDatoProducto(72);
+    traerDatoProducto(39);
 });
 </script>
 

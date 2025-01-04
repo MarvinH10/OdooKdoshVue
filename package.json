@@ -25,6 +25,7 @@
         "@vueform/multiselect": "^2.6.9",
         "qrcode": "^1.5.4",
         "select2": "^4.1.0-rc.0",
+        "sweetalert2": "^11.6.13",
         "vue-router": "^4.0.13",
         "vue3-toastify": "^0.2.3"
     }

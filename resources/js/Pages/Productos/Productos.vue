@@ -190,6 +190,7 @@ const registrarTodosLosProductos = async () => {
 
 const loadInitialData = async () => {
     try {
+        // Cargar categorías y atributos (sin valores de atributos)
         const [categoriesResponse, attributesResponse] = await Promise.all([
             axios.get("/categorias/traer"),
             axios.get("/atributos/traer"),
@@ -201,18 +202,52 @@ const loadInitialData = async () => {
             return map;
         }, {});
 
-        allAttributes.value = attributesResponse.data;
-        const attributePromises = allAttributes.value.map((attribute) =>
-            axios
-                .get(`/valores_atributos/traer/${attribute.id}`)
-                .then((valuesResponse) => {
-                    attribute.values = valuesResponse.data;
-                })
-        );
-        await attributePromises;
-        // console.log("Categorías y atributos cargados exitosamente.");
+        allAttributes.value = attributesResponse.data.map(attribute => ({
+            ...attribute,
+            values: [], // Inicializar sin valores
+            isLoaded: false, // Indicador para saber si ya se cargaron los valores
+        }));
+
+        console.log("Categorías y atributos cargados exitosamente.");
     } catch (error) {
         console.error("Error cargando datos iniciales:", error);
+    }
+};
+
+// Cargar valores de atributo al seleccionar
+const loadAttributeValues = async (attributeId) => {
+    try {
+        const attribute = allAttributes.value.find(attr => attr.id === attributeId);
+        if (!attribute) {
+            console.warn(`Atributo con ID ${attributeId} no encontrado.`);
+            return;
+        }
+
+        // Evitar recargar si ya está cargado
+        if (attribute.isLoaded) {
+            console.log(`Valores de atributo ${attributeId} ya cargados.`);
+            return;
+        }
+
+        // Cargar valores desde la API
+        const valuesResponse = await axios.get(`/valores_atributos/traer/${attributeId}`);
+        attribute.values = valuesResponse.data;
+        attribute.isLoaded = true;
+
+        console.log(`Valores del atributo ${attributeId} cargados.`);
+    } catch (error) {
+        console.error(`Error cargando valores del atributo ${attributeId}:`, error);
+    }
+};
+
+// Ejemplo: Llamar a `loadAttributeValues` cuando un atributo es seleccionado
+const handleAttributeSelection = async (attributeId, selectedValue) => {
+    await loadAttributeValues(attributeId); // Cargar valores al seleccionar
+    const attribute = allAttributes.value.find(attr => attr.id === attributeId);
+    if (attribute) {
+        attribute.selectedValue = selectedValue; // Actualizar la selección
+        localStorage.setItem(`attribute_${attributeId}`, selectedValue); // Guardar en localStorage
+        console.log(`Atributo ${attributeId} seleccionado: ${selectedValue}`);
     }
 };
 
@@ -997,7 +1032,7 @@ window.addEventListener("keydown", handleKeyDown);
                                     </p>
                                     <ul class="mt-4">
                                         <li v-for="productId in registeredProductIds" :key="productId">
-                                            <a :href="`${baseUrl}odoo/action-610/${productId}?debug=1&cids=1-2`"
+                                            <a :href="`${baseUrl}web?debug=1#id=${productId}&cids=1&menu_id=206&action=354&model=product.template&view_type=form`"
                                                 target="_blank">
                                                 Ver Producto {{ productId }}
                                             </a>
