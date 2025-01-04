@@ -92,7 +92,7 @@ export default {
             <div class="text-sm text-black">{{ item.description }}</div>
             <div class="flex items-center justify-center relative">
                 <div
-                    class="absolute left-[145px] top-[40px] transform -translate-y-1/2 -translate-x-full text-sm font-semibold -rotate-90">
+                    class="absolute left-[110px] top-[40px] transform -translate-y-1/2 -translate-x-full text-sm font-semibold -rotate-90">
                     {{ item.categ_id }}</div>
                 <img :src="item.qrCode" alt="QR Code" class="mx-4"
                     :style="{ width: qrStyles.qrCodeSize + 'px', height: qrStyles.qrCodeSize + 'px' }" />

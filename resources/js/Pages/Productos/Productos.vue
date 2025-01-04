@@ -200,24 +200,46 @@ const registrarTodosLosProductos = async () => {
 
 const loadInitialData = async () => {
     try {
-        const [categoriesResponse, attributesResponse] = await Promise.all([
-            axios.get("/categorias/traer"),
-            axios.get("/atributos/traer"),
-        ]);
+        const storedCategories = localStorage.getItem("categories");
+        const storedAttributes = localStorage.getItem("attributes");
 
-        categories.value = categoriesResponse.data;
-        categoriesMap.value = categoriesResponse.data.reduce((map, category) => {
-            map[category.id] = category.name;
-            return map;
-        }, {});
+        if (storedCategories && storedAttributes) {
+            categories.value = JSON.parse(storedCategories);
+            categoriesMap.value = categories.value.reduce((map, category) => {
+                map[category.id] = category.name;
+                return map;
+            }, {});
 
-        allAttributes.value = attributesResponse.data.map(attribute => ({
-            ...attribute,
-            values: [],
-            isLoaded: false,
-        }));
+            allAttributes.value = JSON.parse(storedAttributes).map(attribute => ({
+                ...attribute,
+                values: [],
+                isLoaded: false,
+            }));
 
-        // console.log("Categorías y atributos cargados exitosamente.");
+            // console.log("Datos cargados desde localStorage.");
+        } else {
+            const [categoriesResponse, attributesResponse] = await Promise.all([
+                axios.get("/categorias/traer"),
+                axios.get("/atributos/traer"),
+            ]);
+
+            categories.value = categoriesResponse.data;
+            categoriesMap.value = categoriesResponse.data.reduce((map, category) => {
+                map[category.id] = category.name;
+                return map;
+            }, {});
+
+            allAttributes.value = attributesResponse.data.map(attribute => ({
+                ...attribute,
+                values: [],
+                isLoaded: false,
+            }));
+
+            localStorage.setItem("categories", JSON.stringify(categories.value));
+            localStorage.setItem("attributes", JSON.stringify(attributesResponse.data));
+
+            // console.log("Datos cargados desde el servidor y almacenados en localStorage.");
+        }
     } catch (error) {
         console.error("Error cargando datos iniciales:", error);
     }
