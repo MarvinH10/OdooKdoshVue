@@ -62,6 +62,8 @@ class ProductosController extends Controller
                 'attributes.*.attribute_id' => 'required|integer',
                 'attributes.*.value_ids' => 'required|array',
                 'attributes.*.value_ids.*' => 'required|integer',
+                'attributes.*.value_names' => 'required|array',
+                'attributes.*.value_names.*' => 'required|string',
                 'attributes.*.extra_references' => 'nullable|array',
                 'attributes.*.extra_references.*' => 'nullable|string',
                 'attributes.*.extra_prices' => 'nullable|array',
@@ -88,6 +90,7 @@ class ProductosController extends Controller
                     $AtributoProcesado = [
                         'attribute_id' => $atributo['attribute_id'],
                         'value_ids' => $atributo['value_ids'] ?? [],
+                        'value_names' => $atributo['value_names'] ?? [],
                         'extra_references' => $atributo['extra_references'] ?? [],
                         'extra_prices' => $atributo['extra_prices'] ?? [],
                     ];

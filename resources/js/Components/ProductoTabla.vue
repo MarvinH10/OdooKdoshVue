@@ -28,6 +28,9 @@ export default {
         },
     },
     emits: ["duplicar", "editar", "eliminar"],
+    mounted() {
+        console.log("Productos recibidos:", this.productos);
+    },
     methods: {
         duplicarProducto(producto) {
             this.$emit("duplicar", producto);
@@ -149,7 +152,7 @@ export default {
                     </td>
                     <td class="px-6 py-4 border-b border-gray-300">
                         <span v-for="attr in producto.attributes" :key="attr.attribute_id">
-                            <span v-for="val in attr.value_ids" :key="val" class="tag">{{ getValueAttributeName(val)
+                            <span v-for="(name, val) in attr.value_names" :key="val" class="tag">{{ name
                                 }}</span>
                         </span>
                     </td>

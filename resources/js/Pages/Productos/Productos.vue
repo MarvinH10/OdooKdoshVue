@@ -22,7 +22,14 @@ const producto = reactive({
     subcateg2_id: null,
     subcateg3_id: null,
     subcateg4_id: null,
-    attributes: [],
+    attributes: [
+        {
+            attribute_id: null,
+            value_ids: [],
+            extra_references: [],
+            extra_prices: [],
+        },
+    ],
 });
 const originalProducto = reactive({});
 const showModal = ref(false);
@@ -42,9 +49,8 @@ const registeredProductIds = ref([]);
 
 const allAttributes = ref([]);
 const attributeInputs = ref([]);
-const productosRegistrados = ref([]); // Arreglo que almacenará las concatenaciones
+const productosRegistrados = ref([]);
 
-// Función para generar una cadena con los valores de los atributos
 const getAttributeValuesString = (attributes) => {
     return attributes
         .map((attr) =>
@@ -96,9 +102,15 @@ const registrarProducto = async () => {
                     );
                 });
 
+                const valueIds = input.selectedAttributeValues.map((value) => parseInt(value));
+                const valueNames = valueIds.map((valueId) => {
+                    return getValueAttributeName(valueId);
+                });
+
                 return {
                     attribute_id: input.selectedAttribute,
-                    value_ids: input.selectedAttributeValues.map((value) => parseInt(value)),
+                    value_ids: valueIds,
+                    value_names: valueNames,
                     extra_references: extraReferences,
                     extra_prices: input.extraPrices.map((price) =>
                         parseFloat(price) || 0
@@ -112,6 +124,8 @@ const registrarProducto = async () => {
         } else {
             productPayload.attributes = [];
         }
+
+        console.log("Producto a registrar:", JSON.stringify(productPayload, null, 2));
 
         if (isEdit.value) {
             const updatePayload = {};
@@ -131,9 +145,6 @@ const registrarProducto = async () => {
             productos.value.push(response.data);
         }
 
-        const nombreFormateado = `[${productPayload.default_code}] ${productPayload.name} (${getAttributeValuesString(productPayload.attributes)})`;
-        productosRegistrados.value.push(nombreFormateado);
-
         resetProducto();
         showModal.value = false;
 
@@ -151,7 +162,6 @@ const registrarProducto = async () => {
         );
     }
 };
-
 
 const registrarTodosLosProductos = async () => {
     try {
@@ -190,7 +200,6 @@ const registrarTodosLosProductos = async () => {
 
 const loadInitialData = async () => {
     try {
-        // Cargar categorías y atributos (sin valores de atributos)
         const [categoriesResponse, attributesResponse] = await Promise.all([
             axios.get("/categorias/traer"),
             axios.get("/atributos/traer"),
@@ -204,50 +213,13 @@ const loadInitialData = async () => {
 
         allAttributes.value = attributesResponse.data.map(attribute => ({
             ...attribute,
-            values: [], // Inicializar sin valores
-            isLoaded: false, // Indicador para saber si ya se cargaron los valores
+            values: [],
+            isLoaded: false,
         }));
 
-        console.log("Categorías y atributos cargados exitosamente.");
+        // console.log("Categorías y atributos cargados exitosamente.");
     } catch (error) {
         console.error("Error cargando datos iniciales:", error);
-    }
-};
-
-// Cargar valores de atributo al seleccionar
-const loadAttributeValues = async (attributeId) => {
-    try {
-        const attribute = allAttributes.value.find(attr => attr.id === attributeId);
-        if (!attribute) {
-            console.warn(`Atributo con ID ${attributeId} no encontrado.`);
-            return;
-        }
-
-        // Evitar recargar si ya está cargado
-        if (attribute.isLoaded) {
-            console.log(`Valores de atributo ${attributeId} ya cargados.`);
-            return;
-        }
-
-        // Cargar valores desde la API
-        const valuesResponse = await axios.get(`/valores_atributos/traer/${attributeId}`);
-        attribute.values = valuesResponse.data;
-        attribute.isLoaded = true;
-
-        console.log(`Valores del atributo ${attributeId} cargados.`);
-    } catch (error) {
-        console.error(`Error cargando valores del atributo ${attributeId}:`, error);
-    }
-};
-
-// Ejemplo: Llamar a `loadAttributeValues` cuando un atributo es seleccionado
-const handleAttributeSelection = async (attributeId, selectedValue) => {
-    await loadAttributeValues(attributeId); // Cargar valores al seleccionar
-    const attribute = allAttributes.value.find(attr => attr.id === attributeId);
-    if (attribute) {
-        attribute.selectedValue = selectedValue; // Actualizar la selección
-        localStorage.setItem(`attribute_${attributeId}`, selectedValue); // Guardar en localStorage
-        console.log(`Atributo ${attributeId} seleccionado: ${selectedValue}`);
     }
 };
 
@@ -279,6 +251,8 @@ const fetchAttributeValues = async (id, index) => {
     try {
         const response = await axios.get(`/valores_atributos/traer/${id}`);
         attributeInputs.value[index].values = response.data;
+
+        localStorage.setItem(`attribute_values_${id}`, JSON.stringify(response.data));
 
         nextTick(() => {
             const selectElement = $(`#attribute_values${index}`);
@@ -635,30 +609,6 @@ watchCategoryChange(() => producto.categ_id, 1);
 watchCategoryChange(() => producto.subcateg1_id, 2);
 watchCategoryChange(() => producto.subcateg2_id, 3);
 watchCategoryChange(() => producto.subcateg3_id, 4);
-
-const getCategoryOrSubcategoryName = (id) => {
-    return categoriesMap.value[id] || subcategoriesMap.value[id] || "";
-};
-
-const getCategoryNames = (producto) => {
-    const names = [];
-    if (producto.categ_id)
-        names.push(getCategoryOrSubcategoryName(producto.categ_id));
-    if (producto.subcateg1_id)
-        names.push(getCategoryOrSubcategoryName(producto.subcateg1_id));
-    if (producto.subcateg2_id)
-        names.push(getCategoryOrSubcategoryName(producto.subcateg2_id));
-    if (producto.subcateg3_id)
-        names.push(getCategoryOrSubcategoryName(producto.subcateg3_id));
-    if (producto.subcateg4_id)
-        names.push(getCategoryOrSubcategoryName(producto.subcateg4_id));
-    return names.filter(Boolean).join(" / ");
-};
-
-const getAttributeName = (attributeId) => {
-    const attribute = allAttributes.value.find((attr) => attr.id === attributeId);
-    return attribute ? attribute.name : "Atributo Desconocido";
-};
 
 const getValueAttributeName = (valueId) => {
     for (const input of attributeInputs.value) {
