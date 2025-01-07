@@ -28,9 +28,9 @@ export default {
         },
     },
     emits: ["duplicar", "editar", "eliminar"],
-    mounted() {
-        console.log("Productos recibidos:", this.productos);
-    },
+    // mounted() {
+    //     console.log("Productos recibidos:", this.productos);
+    // },
     methods: {
         duplicarProducto(producto) {
             this.$emit("duplicar", producto);

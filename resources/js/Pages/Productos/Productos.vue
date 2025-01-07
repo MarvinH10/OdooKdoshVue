@@ -125,7 +125,7 @@ const registrarProducto = async () => {
             productPayload.attributes = [];
         }
 
-        console.log("Producto a registrar:", JSON.stringify(productPayload, null, 2));
+        // console.log("Producto a registrar:", JSON.stringify(productPayload, null, 2));
 
         if (isEdit.value) {
             const updatePayload = {};
@@ -408,10 +408,10 @@ const duplicarProducto = async (producto) => {
         );
         productos.value.push(response.data);
 
-        console.log(
-            `Producto duplicado y almacenado con ID ${newId}:`,
-            duplicatedProducto
-        );
+        // console.log(
+        //     `Producto duplicado y almacenado con ID ${newId}:`,
+        //     duplicatedProducto
+        // );
     } catch (error) {
         console.error("Error al almacenar el producto duplicado:", error);
     }
