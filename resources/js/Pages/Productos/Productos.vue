@@ -166,7 +166,7 @@ const registrarProducto = async () => {
 const registrarTodosLosProductos = async () => {
     try {
         isUploading.value = true;
-        console.log("Registrando todos los productos:", productos.value);
+        // console.log("Registrando todos los productos:", productos.value);
         const response = await axios.post(
             "/productos/registrar_todo",
             productos.value
@@ -804,10 +804,10 @@ window.addEventListener("keydown", handleKeyDown);
                                         <div class="mb-4 flex flex-wrap gap-4">
                                             <div class="flex-1">
                                                 <label for="categ_id"
-                                                    class="block text-gray-700 text-sm font-bold mb-2">Categoría
+                                                    class="block text-gray-700 text-sm font-bold mb-2 overflow-hidden text-ellipsis whitespace-nowrap">Categoría
                                                     Principal:</label>
                                                 <select id="categ_id" v-model="producto.categ_id"
-                                                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline overflow-hidden text-ellipsis whitespace-nowrap">
                                                     <option v-for="category in categories" :key="category.id"
                                                         :value="category.id">
                                                         {{ category.name }}
@@ -816,11 +816,11 @@ window.addEventListener("keydown", handleKeyDown);
                                             </div>
                                             <div class="flex-1">
                                                 <label for="subcateg1_id"
-                                                    class="block text-gray-700 text-sm font-bold mb-2">Categoría
+                                                    class="block text-gray-700 text-sm font-bold mb-2 overflow-hidden text-ellipsis whitespace-nowrap">Categoría
                                                     1:</label>
                                                 <select id="subcateg1_id" v-model="producto.subcateg1_id" :disabled="!subcategories[1] || subcategories[1].length === 0
                                                     "
-                                                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline overflow-hidden text-ellipsis whitespace-nowrap">
                                                     <option v-for="subcategory in subcategories[1]"
                                                         :key="subcategory.id" :value="subcategory.id">
                                                         {{ subcategory.name }}
@@ -829,11 +829,11 @@ window.addEventListener("keydown", handleKeyDown);
                                             </div>
                                             <div class="flex-1">
                                                 <label for="subcateg2_id"
-                                                    class="block text-gray-700 text-sm font-bold mb-2">Categoría
+                                                    class="block text-gray-700 text-sm font-bold mb-2 overflow-hidden text-ellipsis whitespace-nowrap">Categoría
                                                     2:</label>
                                                 <select id="subcateg2_id" v-model="producto.subcateg2_id" :disabled="!subcategories[2] || subcategories[2].length === 0
                                                     "
-                                                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline overflow-hidden text-ellipsis whitespace-nowrap">
                                                     <option v-for="subcategory in subcategories[2]"
                                                         :key="subcategory.id" :value="subcategory.id">
                                                         {{ subcategory.name }}
@@ -842,11 +842,11 @@ window.addEventListener("keydown", handleKeyDown);
                                             </div>
                                             <div class="flex-1">
                                                 <label for="subcateg3_id"
-                                                    class="block text-gray-700 text-sm font-bold mb-2">Categoría
+                                                    class="block text-gray-700 text-sm font-bold mb-2 overflow-hidden text-ellipsis whitespace-nowrap">Categoría
                                                     3:</label>
                                                 <select id="subcateg3_id" v-model="producto.subcateg3_id" :disabled="!subcategories[3] || subcategories[3].length === 0
                                                     "
-                                                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline overflow-hidden text-ellipsis whitespace-nowrap">
                                                     <option v-for="subcategory in subcategories[3]"
                                                         :key="subcategory.id" :value="subcategory.id">
                                                         {{ subcategory.name }}
@@ -855,11 +855,11 @@ window.addEventListener("keydown", handleKeyDown);
                                             </div>
                                             <div class="flex-1">
                                                 <label for="subcateg4_id"
-                                                    class="block text-gray-700 text-sm font-bold mb-2">Categoría
+                                                    class="block text-gray-700 text-sm font-bold mb-2 overflow-hidden text-ellipsis whitespace-nowrap">Categoría
                                                     4:</label>
                                                 <select id="subcateg4_id" v-model="producto.subcateg4_id" :disabled="!subcategories[4] || subcategories[4].length === 0
                                                     "
-                                                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline overflow-hidden text-ellipsis whitespace-nowrap">
                                                     <option v-for="subcategory in subcategories[4]"
                                                         :key="subcategory.id" :value="subcategory.id">
                                                         {{ subcategory.name }}
