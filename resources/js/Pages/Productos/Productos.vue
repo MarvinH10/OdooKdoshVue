@@ -109,7 +109,7 @@ const registrarProducto = async () => {
                 };
             });
 
-            const hasEmptyReferences = productPayload.attributes.some((attr) =>
+            productPayload.attributes.some((attr) =>
                 attr.extra_references.some((ref) => !ref || ref.trim() === "")
             );
         } else {
@@ -267,6 +267,13 @@ const fetchSubcategories = async (id, level) => {
 };
 
 const fetchAttributeValues = async (id, index) => {
+    const storedValues = localStorage.getItem(`attribute_values_${id}`);
+    if (storedValues) {
+        console.log(`Valores de atributo ${id} cargados desde localStorage.`);
+        attributeInputs.value[index].values = JSON.parse(storedValues);
+        return;
+    }
+
     try {
         const response = await axios.get(`/valores_atributos/traer/${id}`);
         attributeInputs.value[index].values = response.data;
@@ -296,7 +303,7 @@ const fetchAttributeValues = async (id, index) => {
                 });
         });
 
-        // console.log(`Valores de atributo cargados para atributo ${id}`);
+        console.log(`Valores de atributo ${id} cargados desde la API.`);
     } catch (error) {
         console.error(`Error cargando valores de atributo ${id}:`, error);
     }
