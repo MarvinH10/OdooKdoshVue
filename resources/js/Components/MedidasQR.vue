@@ -62,7 +62,7 @@ export default {
             <div class="text-black text-[0.5rem] ml-1 mr-[72px] leading-tight">
                 {{ item.attribute }}
             </div>
-            <div class="flex items-center left-[60px] -top-[67px] justify-center relative">
+            <div class="flex items-center left-[60px] -top-[60px] justify-center relative">
                 <img :src="item.qrCode" alt="QR Code" class="mx-4"
                     :style="{ width: qrStyles.qrCodeSize + 'px', height: qrStyles.qrCodeSize + 'px' }" />
                 <div

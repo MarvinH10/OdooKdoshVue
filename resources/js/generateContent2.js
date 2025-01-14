@@ -4,6 +4,7 @@ export const generateContent2 = (item, style) => `
         height: 5.5rem;
         text-align: center;
         position: relative;
+        padding: 4px;
         background-color: white;
         // border: 1px solid #ccc;
         color: black;
@@ -29,7 +30,7 @@ export const generateContent2 = (item, style) => `
         <div style="
             display: flex;
             left: 60px;
-            top: -67px;
+            top: -60px;
             justify-content: center;
             align-items: center;
             position: relative;">
