@@ -49,15 +49,6 @@ const registeredProductIds = ref([]);
 
 const allAttributes = ref([]);
 const attributeInputs = ref([]);
-const productosRegistrados = ref([]);
-
-const getAttributeValuesString = (attributes) => {
-    return attributes
-        .map((attr) =>
-            attr.value_ids.map((id) => getValueAttributeName(id)).join(", ")
-        )
-        .join(" ");
-};
 
 axios.defaults.withCredentials = true;
 
@@ -246,8 +237,11 @@ const loadInitialData = async () => {
 };
 
 const fetchSubcategories = async (id, level) => {
-    if (subcategoryCache.has(id)) {
-        subcategories[level] = subcategoryCache.get(id);
+    const storedData = localStorage.getItem(`subcategories_level_${level}_${id}`);
+    if (storedData) {
+        console.log(`Subcategorías nivel ${level} cargadas desde localStorage para categoría ${id}.`);
+        subcategories[level] = JSON.parse(storedData);
+        subcategoryCache.set(id, subcategories[level]);
         subcategories[level].forEach((subcat) => {
             subcategoriesMap.value[subcat.id] = subcat.name;
         });
@@ -257,13 +251,16 @@ const fetchSubcategories = async (id, level) => {
     try {
         const response = await axios.get(`/subcategorias/traer/${id}`);
         subcategories[level] = response.data;
+
         subcategoryCache.set(id, response.data);
+
+        localStorage.setItem(`subcategories_level_${level}_${id}`, JSON.stringify(response.data));
+
         response.data.forEach((subcat) => {
             subcategoriesMap.value[subcat.id] = subcat.name;
         });
-        //console.log(
-        //    `Subcategorías nivel ${level} cargadas para categoría ${id}.`
-        //);
+
+        console.log(`Subcategorías nivel ${level} cargadas para categoría ${id}.`);
     } catch (error) {
         console.error(`Error cargando subcategorías para id ${id}:`, error);
     }
@@ -429,6 +426,7 @@ const editarProducto = async (productoData) => {
             subcategories[level].forEach((subcat) => {
                 subcategoriesMap.value[subcat.id] = subcat.name;
             });
+            console.log(`Subcategorías cargadas desde caché para nivel ${level}:`, subcategories[level]);
             return true;
         }
         return false;
@@ -450,7 +448,13 @@ const editarProducto = async (productoData) => {
 
     if (producto.subcateg1_id) {
         if (!loadSubcategoriesFromCache(producto.subcateg1_id, 2)) {
-            promises.push(fetchSubcategories(producto.subcateg1_id, 2));
+            promises.push(
+                fetchSubcategories(producto.subcateg1_id, 2).then(() => {
+                    if (!subcategories[2].some(subcat => subcat.id === producto.subcateg2_id)) {
+                        producto.subcateg2_id = null;
+                    }
+                })
+            );
         }
     } else {
         producto.subcateg2_id = null;
@@ -606,14 +610,34 @@ onMounted(async () => {
 });
 
 const watchCategoryChange = (getter, level) => {
+    // watch(getter, (newVal, oldVal) => {
+    //     if (newVal && newVal !== oldVal) {
+    //         fetchSubcategories(newVal, level).then(() => {
+    //             for (let i = level + 1; i <= 4; i++) {
+    //                 subcategories[i] = [];
+    //                 producto[`subcateg${i}_id`] = null;
+    //             }
+
+    //             localStorage.setItem("subcategories", JSON.stringify(subcategories));
+    //         });
+    //     } else if (!newVal) {
+    //         for (let i = level; i <= 4; i++) {
+    //             subcategories[i] = [];
+    //             producto[`subcateg${i}_id`] = null;
+    //         }
+
+    //         localStorage.setItem("subcategories", JSON.stringify(subcategories));
+    //     }
+    // });
     watch(getter, (newVal, oldVal) => {
         if (newVal && newVal !== oldVal) {
             fetchSubcategories(newVal, level).then(() => {
                 for (let i = level + 1; i <= 4; i++) {
-                    subcategories[i] = [];
-                    producto[`subcateg${i}_id`] = null;
+                    if (!subcategories[i] || subcategories[i].length === 0) {
+                        subcategories[i] = [];
+                        producto[`subcateg${i}_id`] = null;
+                    }
                 }
-
                 localStorage.setItem("subcategories", JSON.stringify(subcategories));
             });
         } else if (!newVal) {
@@ -621,7 +645,6 @@ const watchCategoryChange = (getter, level) => {
                 subcategories[i] = [];
                 producto[`subcateg${i}_id`] = null;
             }
-
             localStorage.setItem("subcategories", JSON.stringify(subcategories));
         }
     });
@@ -705,6 +728,24 @@ watch(
         }
     }
 );
+
+watch(() => producto.subcateg1_id, (newVal) => {
+    if (newVal) {
+        fetchSubcategories(newVal, 2).then(() => {
+            producto.subcateg2_id = null;
+            subcategories[3] = [];
+            subcategories[4] = [];
+        });
+    } else {
+        subcategories[2] = [];
+        subcategories[3] = [];
+        subcategories[4] = [];
+        producto.subcateg2_id = null;
+        producto.subcateg3_id = null;
+        producto.subcateg4_id = null;
+    }
+});
+
 
 const handleKeyDown = (event) => {
     if (
