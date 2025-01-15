@@ -47,20 +47,32 @@ export default defineComponent({
             </button>
         </div>
 
-        <div class="overflow-y-auto max-h-[36rem] border border-black rounded">
+        <div class="overflow-y-auto max-h-[36rem] rounded">
             <table v-if="tieneProductos" class="min-w-full table-auto border-collapse">
                 <thead class="bg-black sticky top-[-1px] text-white z-10">
                     <tr>
+                        <th class="border border-gray-300 px-4 py-2 text-left">ID</th>
                         <th class="border border-gray-300 px-4 py-2 text-left">Nombre</th>
                         <th class="border border-gray-300 px-4 py-2 text-left">Código</th>
+                        <th class="border border-gray-300 px-4 py-2 text-left">Categorías</th>
                         <th class="border border-gray-300 px-4 py-2 text-left">Precio</th>
+                        <th class="border border-gray-300 px-4 py-2 text-left">Atributos</th>
+                        <th class="border border-gray-300 px-4 py-2 text-left">Valores de Atributos</th>
+                        <th class="border border-gray-300 px-4 py-2 text-left">Referencia Interna</th>
+                        <th class="border border-gray-300 px-4 py-2 text-left">Precio Extra</th>
                         <th class="border border-gray-300 px-4 py-2 text-left">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-for="producto in productos" :key="producto.id" class="hover:bg-gray-100">
+                        <td class="border border-gray-300 px-4 py-2">{{ producto.id }}</td>
                         <td class="border border-gray-300 px-4 py-2">{{ producto.name }}</td>
                         <td class="border border-gray-300 px-4 py-2">{{ producto.code }}</td>
+                        <td class="border border-gray-300 px-4 py-2">{{ producto.price }}</td>
+                        <td class="border border-gray-300 px-4 py-2">{{ producto.price }}</td>
+                        <td class="border border-gray-300 px-4 py-2">{{ producto.price }}</td>
+                        <td class="border border-gray-300 px-4 py-2">{{ producto.price }}</td>
+                        <td class="border border-gray-300 px-4 py-2">{{ producto.price }}</td>
                         <td class="border border-gray-300 px-4 py-2">{{ producto.price }}</td>
                         <td class="border border-gray-300 px-4 py-2">
                             <button class="bg-blue-500 text-white px-2 py-1 rounded">Editar</button>
