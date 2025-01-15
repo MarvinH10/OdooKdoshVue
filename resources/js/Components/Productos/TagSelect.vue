@@ -3,18 +3,37 @@ import VueMultiselect from "vue-multiselect";
 import "vue-multiselect/dist/vue-multiselect.css";
 
 export default {
-    components: { VueMultiselect },
-    data() {
-        return {
-            taggingSelected: [],
-            taggingOptions: ["Etiqueta1", "Etiqueta2", "Etiqueta3", "Etiqueta4", "Etiqueta5"],
-        };
+    props: {
+        options: {
+            type: Array,
+            required: true,
+        },
+        modelValue: {
+            type: Array,
+            default: () => [],
+        },
+        attributeId: {
+            type: [String, Number],
+            required: true,
+        },
     },
-    methods: {
-        addTag(newTag) {
-            if (!this.taggingOptions.includes(newTag)) {
-                this.taggingOptions.push(newTag);
-            }
+    components: { VueMultiselect },
+    watch: {
+        attributeId: {
+            handler() {
+                this.$emit("update:modelValue", []);
+            },
+            immediate: false,
+        },
+    },
+    computed: {
+        taggingSelected: {
+            get() {
+                return this.modelValue;
+            },
+            set(value) {
+                this.$emit("update:modelValue", value);
+            },
         },
     },
 };
@@ -22,19 +41,10 @@ export default {
 
 <template>
     <div>
-        <VueMultiselect
-            v-model="taggingSelected"
-            :options="taggingOptions"
-            :multiple="true"
-            :taggable="true"
-            @tag="addTag"
-            tag-placeholder="Seleccione valores de atributos"
-            placeholder="Seleccione valores de atributos"
-            :close-on-select="false"
-            :clear-on-select="false"
-            :allow-empty="true"
-            class="custom-multiselect shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-        />
+        <VueMultiselect v-model="taggingSelected" :options="options" :multiple="true" :taggable="false"
+            :close-on-select="false" label="name" track-by="id" tag-placeholder="Selecciona valores"
+            placeholder="Selecciona valores"
+            class="custom-multiselect shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
     </div>
 </template>
 

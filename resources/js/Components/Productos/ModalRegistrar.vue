@@ -1,9 +1,6 @@
 <script lang="ts" setup>
-import { defineProps, defineEmits, reactive, ref } from "vue";
+import { defineProps, defineEmits, reactive, watch, computed } from "vue";
 import TagSelect from "./TagSelect.vue";
-
-const atributoOptions = ref(["value1", "value2", "value3"]);
-const selectedValues = ref([]);
 
 type Categoria = {
     id: number;
@@ -36,36 +33,77 @@ defineProps({
         type: Array as () => Atributo[],
         required: true,
     },
+    valores_atributos: {
+        type: Object,
+        required: true,
+    },
 });
 
-const emit = defineEmits(["close", "submit", "cambiarCategoriaPrincipal", "cambiarSubcategoria"]);
+const emit = defineEmits(["close", "submit", "cambiarCategoriaPrincipal", "cambiarSubcategoria", "cambiarAtributo",]);
 
 const producto = reactive({
     name: "",
     code: "",
     price: 0,
-    categoryPrincipal: null as number | null,
+    category: null as number | null,
     subcategory1: null as number | null,
     subcategory2: null as number | null,
     subcategory3: null as number | null,
     subcategory4: null as number | null,
-    atributos: [] as Array<{
+    attributes: [] as Array<{
         attributeId: string;
-        attributeValues: string[];
-        referenceInternal: string;
+        attributeValues: Array<{ id: string; name: string }>;
+        referenceGlobal: string;
+        referencesInternal: Record<string, string>;
         extraPrice: number;
     }>,
 });
+
+const isSubcategory1Disabled = computed(() => !producto.category);
+const isSubcategory2Disabled = computed(() => !producto.subcategory1);
+const isSubcategory3Disabled = computed(() => !producto.subcategory2);
+const isSubcategory4Disabled = computed(() => !producto.subcategory3);
+
+const camposBloqueados = reactive({
+    codeInput: false,
+    referenceInputs: false,
+});
+
+const enReferenciaCambioGlobal = (index: number, value: string) => {
+    const attribute = producto.attributes[index];
+    attribute.referenceGlobal = value;
+
+    if (value.trim() === "") {
+        attribute.attributeValues.forEach((attrValue) => {
+            attribute.referencesInternal[attrValue.id] = "";
+        });
+    } else {
+        attribute.attributeValues.forEach((attrValue) => {
+            attribute.referencesInternal[attrValue.id] = `${value} | ${attrValue.name}`;
+        });
+    }
+};
+
+const actualizarReferencias = (index: number, values: Array<{ id: string; name: string }>) => {
+    const currentReferences = producto.attributes[index].referencesInternal || {};
+    const updatedReferences: Record<string, string> = {};
+    values.forEach((value) => {
+        updatedReferences[value.id] = currentReferences[value.id] || "";
+        updatedReferences[value.id + "_extraPrice"] = currentReferences[value.id + "_extraPrice"] || "";
+    });
+    producto.attributes[index].referencesInternal = updatedReferences;
+};
 
 const closeModal = () => {
     producto.name = "";
     producto.code = "";
     producto.price = 0;
-    producto.categoryPrincipal = null;
+    producto.category = null;
     producto.subcategory1 = null;
     producto.subcategory2 = null;
     producto.subcategory3 = null;
     producto.subcategory4 = null;
+    producto.attributes = [];
     emit("close");
 };
 
@@ -97,23 +135,64 @@ const onSubcategoryChange = (event: Event, nivel: number) => {
     emit("cambiarSubcategoria", idPadre, nivel);
 };
 
-const anadirAtributo = () => {
-    producto.atributos.push({
+const añadirAtributo = () => {
+    producto.attributes.push({
         attributeId: "",
         attributeValues: [],
-        referenceInternal: "",
+        referenceGlobal: "",
+        referencesInternal: {},
         extraPrice: 0,
     });
 };
 
 const removerAtributo = (index: number) => {
-    producto.atributos.splice(index, 1);
+    producto.attributes.splice(index, 1);
 };
 
 const submitProduct = () => {
+    const reorderedAttributes = producto.attributes.slice().sort((a, b) => {
+        const hasDataA =
+            a.referenceGlobal.trim() !== "" ||
+            Object.values(a.referencesInternal).some(value => value.toString().trim() !== "");
+        const hasDataB =
+            b.referenceGlobal.trim() !== "" ||
+            Object.values(b.referencesInternal).some(value => value.toString().trim() !== "");
+
+        if (hasDataA && !hasDataB) {
+            return 1;
+        } else if (!hasDataA && hasDataB) {
+            return -1;
+        }
+        return 0;
+    });
+
+    producto.attributes = reorderedAttributes;
+
     emit("submit", { ...producto });
     closeModal();
 };
+
+watch(
+    () => producto.code,
+    (newVal) => {
+        if (newVal) {
+            camposBloqueados.referenceInputs = true;
+        } else {
+            camposBloqueados.referenceInputs = false;
+        }
+    }
+);
+
+watch(
+    () => producto.attributes.map(attr => attr.referenceGlobal).join(""),
+    (newVal) => {
+        if (newVal.trim()) {
+            camposBloqueados.codeInput = true;
+        } else {
+            camposBloqueados.codeInput = false;
+        }
+    }
+);
 </script>
 
 <template>
@@ -124,7 +203,7 @@ const submitProduct = () => {
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
 
             <div
-                class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
+                class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-7xl sm:w-full">
                 <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                     <div class="sm:flex sm:items-start">
                         <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
@@ -143,17 +222,19 @@ const submitProduct = () => {
                                             <label for="code" class="block text-gray-700 text-sm font-bold mb-2">Código
                                                 del producto:</label>
                                             <input type="text" id="code" v-model="producto.code"
-                                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+                                                :disabled="camposBloqueados.codeInput" :class="[
+                                                    'shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline',
+                                                    { 'text-gray-500 bg-gray-100 cursor-not-allowed': camposBloqueados.codeInput }
+                                                ]" />
                                         </div>
                                     </div>
 
                                     <div class="mb-4 flex flex-wrap gap-4">
                                         <div class="flex-1">
-                                            <label for="categoryPrincipal"
-                                                class="block text-gray-700 text-sm font-bold mb-2">
+                                            <label for="category" class="block text-gray-700 text-sm font-bold mb-2">
                                                 Categoría Principal:
                                             </label>
-                                            <select id="categoryPrincipal" v-model="producto.categoryPrincipal"
+                                            <select id="category" v-model="producto.category"
                                                 @change="onCategoryPrincipalChange($event)" :disabled="isLoading[1]"
                                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                                                 <option value="">Seleccione una opción</option>
@@ -171,7 +252,7 @@ const submitProduct = () => {
                                             </label>
                                             <select id="subcategory1" v-model="producto.subcategory1"
                                                 @change="onSubcategoryChange($event, 1)"
-                                                :disabled="isLoading[1] || isLoading[2] || isLoading[3] || isLoading[4]"
+                                                :disabled="isLoading[1] || isLoading[2] || isLoading[3] || isLoading[4] || isSubcategory1Disabled"
                                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                                                 <option value="">Seleccione una opción</option>
                                                 <option v-for="subcat in subcategorias[1] || []" :key="subcat.id"
@@ -188,7 +269,7 @@ const submitProduct = () => {
                                             </label>
                                             <select id="subcategory2" v-model="producto.subcategory2"
                                                 @change="onSubcategoryChange($event, 2)"
-                                                :disabled="isLoading[1] || isLoading[2] || isLoading[3] || isLoading[4]"
+                                                :disabled="isLoading[1] || isLoading[2] || isLoading[3] || isLoading[4] || isSubcategory2Disabled"
                                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                                                 <option value="">Seleccione una opción</option>
                                                 <option v-for="subcat in subcategorias[2] || []" :key="subcat.id"
@@ -205,7 +286,7 @@ const submitProduct = () => {
                                             </label>
                                             <select id="subcategory3" v-model="producto.subcategory3"
                                                 @change="onSubcategoryChange($event, 3)"
-                                                :disabled="isLoading[1] || isLoading[2] || isLoading[3] || isLoading[4]"
+                                                :disabled="isLoading[1] || isLoading[2] || isLoading[3] || isLoading[4] || isSubcategory3Disabled"
                                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                                                 <option value="">Seleccione una opción</option>
                                                 <option v-for="subcat in subcategorias[3] || []" :key="subcat.id"
@@ -222,7 +303,7 @@ const submitProduct = () => {
                                             </label>
                                             <select id="subcategory4" v-model="producto.subcategory4"
                                                 @change="onSubcategoryChange($event, 4)"
-                                                :disabled="isLoading[1] || isLoading[2] || isLoading[3] || isLoading[4]"
+                                                :disabled="isLoading[1] || isLoading[2] || isLoading[3] || isLoading[4] || isSubcategory4Disabled"
                                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                                                 <option value="">Seleccione una opción</option>
                                                 <option v-for="subcat in subcategorias[4] || []" :key="subcat.id"
@@ -243,14 +324,15 @@ const submitProduct = () => {
                                     <div class="mb-4">
                                         <h3 class="text-lg leading-6 font-medium text-gray-900">Atributos del Producto
                                         </h3>
-                                        <div v-for="(attribute, index) in producto.atributos" :key="index"
+                                        <div v-for="(attribute, index) in producto.attributes" :key="index"
                                             class="flex gap-2 mb-2">
                                             <div class="flex-1 mt-7">
-                                                <label :for="'attribute' + index"
+                                                <label :for="'attribute_' + index"
                                                     class="block text-gray-700 text-sm font-bold mb-2">
                                                     Atributo:
                                                 </label>
-                                                <select :id="'attribute' + index" v-model="attribute.attributeId"
+                                                <select :id="'attribute_' + index" v-model="attribute.attributeId"
+                                                    @change="emit('cambiarAtributo', attribute.attributeId)"
                                                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                                                     <option value="">Seleccione un atributo</option>
                                                     <option v-for="atributo in atributos" :key="atributo.id"
@@ -261,31 +343,56 @@ const submitProduct = () => {
                                             </div>
 
                                             <div class="flex-1 mt-[27.5px] mr-5">
-                                                <label :for="'attribute_values' + index"
-                                                    class="block text-gray-700 text-sm font-bold mb-2">
+                                                <label class="block text-gray-700 text-sm font-bold mb-2">
                                                     Valores de Atributo:
                                                 </label>
-                                                <TagSelect id="attribute_values" label="Valores de Atributo"
-                                                    :options="atributoOptions" v-model="attribute.attributeValues" />
+                                                <template v-if="valores_atributos[attribute.attributeId]">
+                                                    <TagSelect :id="'attribute_values_' + index"
+                                                        :options="valores_atributos[attribute.attributeId]"
+                                                        :attributeId="attribute.attributeId"
+                                                        v-model="attribute.attributeValues"
+                                                        @update:modelValue="actualizarReferencias(index, $event)" />
+                                                </template>
+                                                <template v-else>
+                                                    <input :id="'attribute_values_' + index" type="text"
+                                                        value="Seleccione un atributo primero" disabled
+                                                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-500 bg-gray-100 leading-tight cursor-not-allowed" />
+                                                </template>
                                             </div>
 
                                             <div class="flex-1">
-                                                <input type="text"
-                                                    class="shadow appearance-none border rounded w-full py-1 px-2 text-sm text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                                    placeholder="Escribe una referencia global aquí">
+                                                <input type="text" :id="'referenceGlobal_' + index"
+                                                    v-model="attribute.referenceGlobal"
+                                                    :disabled="camposBloqueados.referenceInputs"
+                                                    @input="enReferenciaCambioGlobal(index, attribute.referenceGlobal)"
+                                                    :class="[
+                                                        'shadow appearance-none border rounded w-full py-1 px-2 text-sm leading-tight focus:outline-none focus:shadow-outline',
+                                                        { 'text-gray-500 bg-gray-100 cursor-not-allowed': camposBloqueados.referenceInputs }
+                                                    ]" placeholder="Escribe una referencia global aquí" />
                                                 <label class="block text-gray-700 text-sm font-bold mb-2">Referencia
                                                     Interna:</label>
-                                                <input type="text" v-model="attribute.referenceInternal"
-                                                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                                    placeholder="">
+                                                <div v-for="attrValue in attribute.attributeValues" :key="attrValue.id"
+                                                    class="mb-2">
+                                                    <input :id="'referenceInternal_' + index + '_' + attrValue.id"
+                                                        v-model="attribute.referencesInternal[attrValue.id]"
+                                                        :disabled="camposBloqueados.referenceInputs" :class="[
+                                                            'shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline',
+                                                            { 'text-gray-500 bg-gray-100 cursor-not-allowed': camposBloqueados.referenceInputs }
+                                                        ]"
+                                                        :placeholder="'Referencia interna para ' + attrValue.name" />
+                                                </div>
                                             </div>
 
                                             <div class="flex-1 mt-7">
                                                 <label class="block text-gray-700 text-sm font-bold mb-2">Precio
                                                     Extra:</label>
-                                                <input type="number" v-model="attribute.extraPrice"
-                                                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                                    placeholder="">
+                                                <div v-for="attrValue in attribute.attributeValues" :key="attrValue.id"
+                                                    class="mb-2">
+                                                    <input type="number"
+                                                        v-model="attribute.referencesInternal[attrValue.id + '_extraPrice']"
+                                                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                                        :placeholder="'Precio Extra para ' + attrValue.name" />
+                                                </div>
                                             </div>
 
                                             <div class="mt-[60px]">
@@ -296,7 +403,7 @@ const submitProduct = () => {
                                             </div>
                                         </div>
 
-                                        <button type="button" @click="anadirAtributo"
+                                        <button type="button" @click="añadirAtributo"
                                             class="bg-gray-500 text-white px-3 py-1 rounded mt-2">
                                             <i class="fas fa-circle-plus"></i> Nuevo Atributo
                                         </button>

@@ -7,27 +7,26 @@ import ModalRegistrar from "@/Components/Productos/ModalRegistrar.vue";
 
 const showModal = ref(false);
 
-type Producto = {
+const productos = ref<Array<{
     id: number;
     name: string;
     code: string;
     price: number;
-    categoryPrincipal: number | null;
-    subcategory1: number | null;
-    subcategory2: number | null;
-    subcategory3: number | null;
-    subcategory4: number | null;
-};
-
-const productos = ref<Producto[]>([
-    // { id: 1, name: "Producto 1", code: "P001", price: 100 },
-    // { id: 2, name: "Producto 2", code: "P002", price: 200 },
-    // { id: 3, name: "Producto 3", code: "P003", price: 300 },
-]);
+    category: string;
+    attributes: Array<{
+        attributeId: string;
+        attributeValues: Array<{ id: string; name: string }>;
+        referenceGlobal: string;
+        referencesInternal: Record<string, string>;
+        extraPrice: number;
+    }>;
+}>>([]);
 
 const categorias = ref([]);
 const subcategorias = reactive<{ [key: number]: any[] }>({});
 const subcategoriasMap = ref<{ [key: number]: string }>({});
+const atributos = ref([]);
+const valores_atributos = ref([]);
 const producto = reactive({
     subcategoria1: null,
     subcategoria2: null,
@@ -39,7 +38,6 @@ const isLoading = reactive({
     3: false,
     4: false,
 });
-const atributos = ref([]);
 
 const traerCategorias = async () => {
     try {
@@ -128,6 +126,25 @@ const traerAtributos = async () => {
     }
 };
 
+const traerValoresAtributos = async (idAtributo: number) => {
+    try {
+        const cacheKey = `valores_atributos_${idAtributo}`;
+        const cachedData = localStorage.getItem(cacheKey);
+
+        if (cachedData) {
+            valores_atributos.value[idAtributo] = JSON.parse(cachedData);
+            return;
+        }
+
+        const response = await axios.get(`/valores_atributos/traer/${idAtributo}`);
+        valores_atributos.value[idAtributo] = response.data;
+
+        localStorage.setItem(cacheKey, JSON.stringify(response.data));
+    } catch (error) {
+        console.error("Error al traer valores de atributos:", error);
+    }
+};
+
 const openModal = () => {
     showModal.value = true;
 };
@@ -136,8 +153,15 @@ const closeModal = () => {
     showModal.value = false;
 };
 
-const handleRegistrar = (producto: any) => {
-    console.log("Producto registrado:", producto);
+const agregarProducto = (producto: any) => {
+    const nuevoProducto = {
+        ...producto,
+        category: String(producto.category || "Sin categoría"),
+        attributes: producto.attributes || [],
+    };
+    nuevoProducto.id = productos.value.length + 1;
+    productos.value.push(nuevoProducto);
+    console.log(productos.value);
     closeModal();
 };
 
@@ -162,13 +186,15 @@ onMounted(() => {
         <div class="py-12">
             <div class="max-w-12xl mx-auto sm:px-6 lg:px-1">
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
-                    <ProductoTabla :productos="productos" @agregar="openModal" @registrar="registrarProductos" />
+                    <ProductoTabla :productos="productos" :categorias="categorias" :subcategorias-map="subcategoriasMap" :atributos="atributos" @agregar="openModal"
+                        @registrar="registrarProductos" />
                 </div>
             </div>
         </div>
 
-        <ModalRegistrar :show="showModal" @close="closeModal" @submit="handleRegistrar" :isLoading="isLoading"
+        <ModalRegistrar :show="showModal" @close="closeModal" @submit="agregarProducto" :isLoading="isLoading"
             :categorias="categorias" :subcategorias="subcategorias" :atributos="atributos"
-            @cambiarCategoriaPrincipal="alCambiarCategoriaPrincipal" @cambiarSubcategoria="alCambiarSubcategoria" />
+            :valores_atributos="valores_atributos" @cambiarCategoriaPrincipal="alCambiarCategoriaPrincipal"
+            @cambiarSubcategoria="alCambiarSubcategoria" @cambiarAtributo="traerValoresAtributos" />
     </AppLayout>
 </template>
