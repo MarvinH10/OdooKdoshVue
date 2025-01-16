@@ -127,54 +127,103 @@ class ProductoService
     {
         try {
             foreach ($attributes as $attribute) {
-                $attribute_id = (int) $attribute['attribute_id'];
-                $attribute_value_ids = array_map('intval', $attribute['value_ids']);
-                $attribute_references = [];
-                $attribute_prices_extra = [];
+                $attributeId = (int) $attribute['attributeId'];
+                $attributeValueIds = array_map(function ($value) {
+                    return (int) $value['id'];
+                }, $attribute['attributeValues']);
 
-                if (isset($attribute['extra_references'])) {
-                    $attribute_references = array_combine($attribute_value_ids, $attribute['extra_references']);
+                $attributeReferences = [];
+                $attributePricesExtra = [];
+
+                foreach ($attribute['attributeValues'] as $value) {
+                    $valueId = $value['id'];
+                    if (isset($attribute['referencesInternal']["{$valueId}_extraPrice"])) {
+                        $attributePricesExtra[$valueId] = (float) $attribute['referencesInternal']["{$valueId}_extraPrice"];
+                    }
+                    if (isset($attribute['referencesInternal']["{$valueId}"])) {
+                        $attributeReferences[$valueId] = $attribute['referencesInternal']["{$valueId}"];
+                    }
                 }
 
-                if (isset($attribute['extra_prices'])) {
-                    $attribute_prices_extra = array_combine($attribute_value_ids, $attribute['extra_prices']);
-                }
-
-                $variant_data = [
+                $variantData = [
                     'product_tmpl_id' => $productId,
-                    'attribute_id' => $attribute_id,
-                    'value_ids' => [[6, 0, $attribute_value_ids]],
+                    'attribute_id' => $attributeId,
+                    'value_ids' => [[6, 0, $attributeValueIds]],
                 ];
-                $this->modelos->execute_kw($this->base_datos, $this->uid, $this->contraseña, 'product.template.attribute.line', 'create', [$variant_data]);
+                $this->modelos->execute_kw(
+                    $this->base_datos,
+                    $this->uid,
+                    $this->contraseña,
+                    'product.template.attribute.line',
+                    'create',
+                    [$variantData]
+                );
 
-                foreach ($attribute_value_ids as $value_id) {
-                    if (isset($attribute_references[$value_id])) {
-                        $reference_extra = $attribute_references[$value_id];
-                        $variant_ids = $this->modelos->execute_kw($this->base_datos, $this->uid, $this->contraseña, 'product.product', 'search', [
-                            [['product_tmpl_id', '=', $productId],
-                                ['product_template_attribute_value_ids.product_attribute_value_id', '=', $value_id]],
-                        ]);
+                foreach ($attributeValueIds as $valueId) {
+                    if (isset($attributeReferences[$valueId])) {
+                        $referenceExtra = $attributeReferences[$valueId];
 
-                        foreach ($variant_ids as $variant_id) {
-                            $this->modelos->execute_kw($this->base_datos, $this->uid, $this->contraseña, 'product.product', 'write', [[$variant_id], ['default_code' => $reference_extra]]);
+                        $variantIds = $this->modelos->execute_kw(
+                            $this->base_datos,
+                            $this->uid,
+                            $this->contraseña,
+                            'product.product',
+                            'search',
+                            [
+                                [
+                                    ['product_tmpl_id', '=', $productId],
+                                    ['product_template_attribute_value_ids.product_attribute_value_id', '=', $valueId]
+                                ]
+                            ]
+                        );
+
+                        foreach ($variantIds as $variantId) {
+                            $this->modelos->execute_kw(
+                                $this->base_datos,
+                                $this->uid,
+                                $this->contraseña,
+                                'product.product',
+                                'write',
+                                [[$variantId], ['default_code' => $referenceExtra]]
+                            );
                         }
                     }
 
-                    if (isset($attribute_prices_extra[$value_id])) {
-                        $price_extra = $attribute_prices_extra[$value_id];
-                        $template_attribute_value_id = $this->modelos->execute_kw($this->base_datos, $this->uid, $this->contraseña, 'product.template.attribute.value', 'search', [
-                            [['product_tmpl_id', '=', $productId],
-                                ['product_attribute_value_id', '=', $value_id]],
-                        ]);
+                    if (isset($attributePricesExtra[$valueId])) {
+                        $priceExtra = $attributePricesExtra[$valueId];
+                        $templateAttributeValueId = $this->modelos->execute_kw(
+                            $this->base_datos,
+                            $this->uid,
+                            $this->contraseña,
+                            'product.template.attribute.value',
+                            'search',
+                            [
+                                [
+                                    ['product_tmpl_id', '=', $productId],
+                                    ['product_attribute_value_id', '=', $valueId]
+                                ]
+                            ]
+                        );
 
-                        if (!empty($template_attribute_value_id)) {
-                            $this->modelos->execute_kw($this->base_datos, $this->uid, $this->contraseña, 'product.template.attribute.value', 'write', [[$template_attribute_value_id[0]], ['price_extra' => $price_extra]]);
+                        if (!empty($templateAttributeValueId)) {
+                            $this->modelos->execute_kw(
+                                $this->base_datos,
+                                $this->uid,
+                                $this->contraseña,
+                                'product.template.attribute.value',
+                                'write',
+                                [[$templateAttributeValueId[0]], ['price_extra' => $priceExtra]]
+                            );
                         }
                     }
                 }
             }
         } catch (Exception $e) {
-            Log::error('Error creando variantes en Odoo:', ['message' => $e->getMessage(), 'productId' => $productId]);
+            Log::error('Error creando variantes en Odoo:', [
+                'message' => $e->getMessage(),
+                'productId' => $productId,
+                'attributes' => $attributes,
+            ]);
             return null;
         }
     }

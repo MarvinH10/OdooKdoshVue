@@ -4,6 +4,8 @@ import axios from "axios";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import ProductoTabla from "@/Components/Productos/ProductoTabla.vue";
 import ModalRegistrar from "@/Components/Productos/ModalRegistrar.vue";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 
 const showModal = ref(false);
 
@@ -31,6 +33,7 @@ const producto = reactive({
     subcategoria1: null,
     subcategoria2: null,
     subcategoria3: null,
+    subcategoria4: null,
 });
 const isLoading = reactive({
     1: false,
@@ -93,6 +96,7 @@ const alCambiarCategoriaPrincipal = async (idCategoria: number) => {
         producto.subcategoria1 = null;
         producto.subcategoria2 = null;
         producto.subcategoria3 = null;
+        producto.subcategoria4 = null;
     }
 };
 
@@ -103,8 +107,12 @@ const alCambiarSubcategoria = async (idPadre: number, nivel: number) => {
         if (nivel === 1) {
             producto.subcategoria2 = null;
             producto.subcategoria3 = null;
+            producto.subcategoria4 = null;
         } else if (nivel === 2) {
             producto.subcategoria3 = null;
+            producto.subcategoria4 = null;
+        } else if (nivel === 3) {
+            producto.subcategoria4 = null;
         }
     }
 };
@@ -161,12 +169,65 @@ const agregarProducto = (producto: any) => {
     };
     nuevoProducto.id = productos.value.length + 1;
     productos.value.push(nuevoProducto);
-    console.log(productos.value);
+    // console.log(productos.value);
     closeModal();
 };
 
-const registrarProductos = () => {
-    // console.log("Registrar productos en Odoo");
+const registrarProductos = async () => {
+    try {
+        if (!productos.value.length) {
+            console.warn("No hay productos para registrar.");
+            return;
+        }
+
+        const response = await axios.post('/productos/registrar_todo', productos.value);
+
+        if (response.status === 200) {
+            // console.log("Productos registrados con éxito:", response.data);
+            alert("Productos registrados con éxito.");
+            productos.value = [];
+        } else {
+            console.error("Error al registrar productos:", response.data);
+            alert("Ocurrió un error al registrar los productos.");
+        }
+    } catch (error) {
+        console.error("Error al enviar los productos:", error);
+        alert("Ocurrió un error al registrar los productos.");
+    }
+};
+
+const duplicarProducto = (producto: any) => {
+    try {
+        const newId = productos.value.length + 1;
+
+        const duplicatedProducto = {
+            ...producto,
+            id: newId,
+            name: `${producto.name} (Copia)`,
+        };
+
+        if (duplicatedProducto.attributes) {
+            duplicatedProducto.attributes = duplicatedProducto.attributes.map((attr) => ({
+                ...attr,
+                attributeValues: [...attr.attributeValues],
+                referencesInternal: { ...attr.referencesInternal },
+            }));
+        }
+
+        productos.value.push(duplicatedProducto);
+
+        toast.success("Producto duplicado con éxito.", {
+            autoClose: 3000,
+            position: "bottom-right",
+        });
+    } catch (error) {
+        console.error("Error al duplicar el producto:", error);
+
+        toast.error("Ocurrió un error al duplicar el producto.", {
+            autoClose: 3000,
+            position: "bottom-right",
+        });
+    }
 };
 
 onMounted(() => {
@@ -186,8 +247,8 @@ onMounted(() => {
         <div class="py-12">
             <div class="max-w-12xl mx-auto sm:px-6 lg:px-1">
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
-                    <ProductoTabla :productos="productos" :categorias="categorias" :subcategorias-map="subcategoriasMap" :atributos="atributos" @agregar="openModal"
-                        @registrar="registrarProductos" />
+                    <ProductoTabla :productos="productos" :categorias="categorias" :subcategorias-map="subcategoriasMap"
+                        :atributos="atributos" @agregar="openModal" @registrar="registrarProductos" @duplicar="duplicarProducto" />
                 </div>
             </div>
         </div>

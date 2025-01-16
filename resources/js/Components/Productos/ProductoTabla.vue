@@ -30,7 +30,7 @@ export default defineComponent({
             required: true,
         },
     },
-    emits: ["agregar", "registrar"],
+    emits: ["agregar", "registrar", "duplicar"],
     setup(props, { emit }) {
         console.log("Productos recibidos:", props.productos);
         const tieneProductos = computed(() => {
@@ -65,11 +65,16 @@ export default defineComponent({
             emit("registrar");
         };
 
+        const handleDuplicar = (producto: any) => {
+            emit("duplicar", producto);
+        };
+
         return {
             tieneProductos,
             getCategoryNameWithSubcategories,
             handleAgregar,
             handleRegistrar,
+            handleDuplicar,
         };
     },
 });
@@ -115,7 +120,8 @@ export default defineComponent({
                         <td class="border border-gray-300 px-4 py-2">{{ producto.price }}</td>
                         <td class="border border-gray-300 px-4 py-2">
                             <div v-for="attribute in producto.attributes" :key="attribute.attributeId">
-                                <span class="bg-gray-200 text-gray-700 px-2 py-1 rounded-full text-sm inline-block mb-2">
+                                <span
+                                    class="bg-gray-200 text-gray-700 px-2 py-1 rounded-full text-sm inline-block mb-2">
                                     {{
                                         atributos.find((atributo) => atributo.id === parseInt(attribute.attributeId))?.name
                                         || ""
@@ -156,7 +162,8 @@ export default defineComponent({
                             </div>
                         </td>
                         <td class="border border-gray-300 px-4 py-2">
-                            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 ml-1 rounded">
+                            <button @click="handleDuplicar(producto)"
+                                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 ml-1 rounded">
                                 <i class="fas fa-copy"></i>
                             </button>
                             <button

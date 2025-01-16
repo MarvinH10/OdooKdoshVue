@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { defineProps, defineEmits, reactive, watch, computed } from "vue";
 import TagSelect from "./TagSelect.vue";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 
 type Categoria = {
     id: number;
@@ -150,6 +152,21 @@ const removerAtributo = (index: number) => {
 };
 
 const submitProduct = () => {
+    if (!producto.name.trim()) {
+        toast.error("El campo Nombre es obligatorio.", {
+            autoClose: 3000,
+            position: "bottom-right",
+        });
+        return;
+    }
+
+    if (!producto.category) {
+        toast.error("Debe seleccionar al menos una Categoría Principal.", {
+            autoClose: 3000,
+            position: "bottom-right",
+        });
+        return;
+    }
     const reorderedAttributes = producto.attributes.slice().sort((a, b) => {
         const hasDataA =
             a.referenceGlobal.trim() !== "" ||
@@ -169,6 +186,10 @@ const submitProduct = () => {
     producto.attributes = reorderedAttributes;
 
     emit("submit", { ...producto });
+    toast.success("Producto añadido a la lista correctamente.", {
+        autoClose: 3000,
+        position: "bottom-right",
+    });
     closeModal();
 };
 

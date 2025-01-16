@@ -44,77 +44,6 @@ class ProductosController extends Controller
         return response()->json(Producto::all());
     }
 
-    public function almacenar(Request $request)
-    {
-        try {
-            $productos = $this->leerProductosDeArchivo();
-
-            $nuevoProducto = $request->validate([
-                'name' => 'required|string|max:255',
-                'default_code' => 'nullable|string|max:255',
-                'categ_id' => 'required|integer',
-                'subcateg1_id' => 'nullable|integer',
-                'subcateg2_id' => 'nullable|integer',
-                'subcateg3_id' => 'nullable|integer',
-                'subcateg4_id' => 'nullable|integer',
-                'list_price' => 'nullable|numeric',
-                'attributes' => 'nullable|array',
-                'attributes.*.attribute_id' => 'required|integer',
-                'attributes.*.value_ids' => 'required|array',
-                'attributes.*.value_ids.*' => 'required|integer',
-                'attributes.*.value_names' => 'required|array',
-                'attributes.*.value_names.*' => 'required|string',
-                'attributes.*.extra_references' => 'nullable|array',
-                'attributes.*.extra_references.*' => 'nullable|string',
-                'attributes.*.extra_prices' => 'nullable|array',
-                'attributes.*.extra_prices.*' => 'nullable|numeric',
-            ]);
-
-            $nuevoProducto['id'] = !empty($productos) ? end($productos)['id'] + 1 : 1;
-
-            if (!empty($nuevoProducto['attributes'])) {
-                $AtributosProcesados = [];
-                $AtributosReferenciados = [];
-
-                foreach ($nuevoProducto['attributes'] as $atributo) {
-                    $tieneReferencias = false;
-                    if (!empty($atributo['extra_references'])) {
-                        foreach ($atributo['extra_references'] as $ref) {
-                            if (!empty($ref)) {
-                                $tieneReferencias = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    $AtributoProcesado = [
-                        'attribute_id' => $atributo['attribute_id'],
-                        'value_ids' => $atributo['value_ids'] ?? [],
-                        'value_names' => $atributo['value_names'] ?? [],
-                        'extra_references' => $atributo['extra_references'] ?? [],
-                        'extra_prices' => $atributo['extra_prices'] ?? [],
-                    ];
-
-                    if ($tieneReferencias) {
-                        $AtributosReferenciados[] = $AtributoProcesado;
-                    } else {
-                        $AtributosProcesados[] = $AtributoProcesado;
-                    }
-                }
-
-                $nuevoProducto['attributes'] = array_merge($AtributosProcesados, $AtributosReferenciados);
-            }
-
-            $productos[] = $nuevoProducto;
-            $this->escribirProductosAlArchivo($productos);
-
-            return response()->json($nuevoProducto);
-        } catch (Exception $e) {
-            Log::error('Error almacenando producto:', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
-            return response()->json(['error' => 'Error almacenando producto: ' . $e->getMessage()], 500);
-        }
-    }
-
     public function quitar($id)
     {
         try {
@@ -220,15 +149,15 @@ class ProductosController extends Controller
                     'priority' =>  '1',
                     'sale_ok' => true,
                     'name' => $producto['name'],
-                    'categ_id' => $producto['categ_id'],
-                    'default_code' => $producto['default_code'],
-                    'list_price' => $producto['list_price'],
+                    'categ_id' => $producto['category'],
+                    'default_code' => $producto['code'],
+                    'list_price' => $producto['price'],
                     'type' => 'product',
                     'create_uid' => $odooUid,
                     'taxes_id' => [(int) 6],
                 ];
 
-                foreach (['subcateg1_id', 'subcateg2_id', 'subcateg3_id', 'subcateg4_id'] as $subcateg) {
+                foreach (['subcategory1', 'subcategory2', 'subcategory3', 'subcategory4'] as $subcateg) {
                     if (!empty($producto[$subcateg])) {
                         $datosProducto['categ_id'] = $producto[$subcateg];
                     }
@@ -258,7 +187,7 @@ class ProductosController extends Controller
         $sinReferencias = [];
 
         foreach ($attributes as $attribute) {
-            $tieneReferencias = !empty(array_filter($attribute['extra_references'] ?? [], function ($ref) {
+            $tieneReferencias = !empty(array_filter($attribute['referencesInternal'] ?? [], function ($ref) {
                 return trim($ref) !== '';
             }));
 
