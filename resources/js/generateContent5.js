@@ -27,7 +27,7 @@ export const generateContent5 = (item, style) => `
 
         <div style="
             position: absolute;
-            left: 5rem;
+            left: 32px;
             top: 50%;
             transform: translateY(-50%) translateX(-100%) rotate(-90deg);
             font-size: 0.875rem;

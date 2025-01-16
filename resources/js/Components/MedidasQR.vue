@@ -92,7 +92,7 @@ export default {
             <div class="text-sm text-black">{{ item.description }}</div>
             <div class="flex items-center justify-center relative">
                 <div
-                    class="absolute left-[110px] top-[40px] transform -translate-y-1/2 -translate-x-full text-sm font-semibold -rotate-90">
+                    class="absolute left-[150px] top-[40px] transform -translate-y-1/2 -translate-x-full text-sm font-semibold -rotate-90">
                     {{ item.categ_id }}</div>
                 <img :src="item.qrCode" alt="QR Code" class="mx-4"
                     :style="{ width: qrStyles.qrCodeSize + 'px', height: qrStyles.qrCodeSize + 'px' }" />
@@ -110,7 +110,7 @@ export default {
             <div class="text-xs text-black mb-1">{{ item.categ_id }}</div>
             <div class="flex items-center justify-center relative">
                 <div
-                    class="absolute left-[5rem] top-1/2 transform -translate-y-1/2 -translate-x-full text-sm font-semibold -rotate-90">
+                    class="absolute left-[32px] top-1/2 transform -translate-y-1/2 -translate-x-full text-sm font-semibold -rotate-90">
                     {{ item.attribute }}</div>
                 <img :src="item.qrCode" alt="QR Code" class="mx-4"
                     :style="{ width: qrStyles.qrCodeSize + 'px', height: qrStyles.qrCodeSize + 'px' }" />
@@ -131,7 +131,7 @@ export default {
             <div class="text-black text-[7.8px] ml-1 mr-[72px] leading-tight">
                 {{ item.attribute }}
             </div>
-            <div class="flex items-center left-[80px] -top-[60px] justify-center relative">
+            <div class="flex items-center left-[80px] -top-[50px] justify-center relative">
                 <img :src="item.qrCode" alt="QR Code" class="mx-4"
                     :style="{ width: qrStyles.qrCodeSize + 'px', height: qrStyles.qrCodeSize + 'px' }" />
                 <div
