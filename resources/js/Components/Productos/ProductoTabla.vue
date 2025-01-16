@@ -181,10 +181,10 @@ export default defineComponent({
                                 class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 ml-1 rounded">
                                 <i class="fas fa-copy"></i>
                             </button>
-                            <button
+                            <!-- <button
                                 class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-2 ml-1 rounded">
                                 <i class="fas fa-edit"></i>
-                            </button>
+                            </button> -->
                             <button @click="handleEliminar(producto)"
                                 class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 ml-1 rounded">
                                 <i class="fas fa-trash-alt"></i>
