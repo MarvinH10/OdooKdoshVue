@@ -29,10 +29,14 @@ export default defineComponent({
             type: Array as PropType<Array<{ id: number; name: string }>>,
             required: true,
         },
+        isUploading: {
+            type: Boolean,
+            required: true,
+        },
     },
-    emits: ["agregar", "registrar", "duplicar"],
+    emits: ["agregar", "registrar", "duplicar", "eliminar"],
     setup(props, { emit }) {
-        console.log("Productos recibidos:", props.productos);
+        // console.log("Productos recibidos:", props.productos);
         const tieneProductos = computed(() => {
             return props.productos.length > 0;
         });
@@ -69,12 +73,17 @@ export default defineComponent({
             emit("duplicar", producto);
         };
 
+        const handleEliminar = (producto: any) => {
+            emit("eliminar", producto.id);
+        };
+
         return {
             tieneProductos,
             getCategoryNameWithSubcategories,
             handleAgregar,
             handleRegistrar,
             handleDuplicar,
+            handleEliminar,
         };
     },
 });
@@ -88,10 +97,16 @@ export default defineComponent({
                 <i class="fas fa-circle-plus"></i> Agregar
             </button>
 
-            <button @click="handleRegistrar"
-                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                <i class="fas fa-save"></i> Crear Productos en Odoo
-            </button>
+            <div class="flex justify-end mt-4">
+                <button v-if="!isUploading" @click="handleRegistrar"
+                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    <i class="fas fa-save"></i> Crear Productos en Odoo
+                </button>
+
+                <div v-else class="text-center text-blue-500 font-bold">
+                    <i class="fas fa-spinner fa-spin mr-2"></i> Subiendo productos...
+                </div>
+            </div>
         </div>
 
         <div class="overflow-y-auto max-h-[36rem] rounded">
@@ -170,7 +185,8 @@ export default defineComponent({
                                 class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-2 ml-1 rounded">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 ml-1 rounded">
+                            <button @click="handleEliminar(producto)"
+                                class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 ml-1 rounded">
                                 <i class="fas fa-trash-alt"></i>
                             </button>
                         </td>

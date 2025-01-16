@@ -24,6 +24,7 @@ const productos = ref<Array<{
     }>;
 }>>([]);
 
+const isUploading = ref(false);
 const categorias = ref([]);
 const subcategorias = reactive<{ [key: number]: any[] }>({});
 const subcategoriasMap = ref<{ [key: number]: string }>({});
@@ -174,9 +175,13 @@ const agregarProducto = (producto: any) => {
 };
 
 const registrarProductos = async () => {
+    isUploading.value = true;
     try {
         if (!productos.value.length) {
-            console.warn("No hay productos para registrar.");
+            toast.warn("No hay productos para registrar.", {
+                autoClose: 3000,
+                position: "bottom-right",
+            });
             return;
         }
 
@@ -184,15 +189,26 @@ const registrarProductos = async () => {
 
         if (response.status === 200) {
             // console.log("Productos registrados con éxito:", response.data);
-            alert("Productos registrados con éxito.");
+            toast.success("Productos registrados con éxito.", {
+                autoClose: 3000,
+                position: "bottom-right",
+            });
             productos.value = [];
         } else {
-            console.error("Error al registrar productos:", response.data);
-            alert("Ocurrió un error al registrar los productos.");
+            // console.error("Error al registrar productos:", response.data);
+            toast.error("Ocurrió un error al registrar los productos.", {
+                autoClose: 3000,
+                position: "bottom-right",
+            });
         }
     } catch (error) {
         console.error("Error al enviar los productos:", error);
-        alert("Ocurrió un error al registrar los productos.");
+        toast.error("Ocurrió un error al registrar los productos.", {
+            autoClose: 3000,
+            position: "bottom-right",
+        });
+    } finally {
+        isUploading.value = false;
     }
 };
 
@@ -230,6 +246,22 @@ const duplicarProducto = (producto: any) => {
     }
 };
 
+const eliminarProducto = (id: number) => {
+    const index = productos.value.findIndex((producto) => producto.id === id);
+    if (index !== -1) {
+        productos.value.splice(index, 1);
+        toast.success("Producto eliminado con éxito.", {
+            autoClose: 3000,
+            position: "bottom-right",
+        });
+    } else {
+        toast.error("No se pudo eliminar el producto.", {
+            autoClose: 3000,
+            position: "bottom-right",
+        });
+    }
+};
+
 onMounted(() => {
     traerCategorias();
     traerAtributos();
@@ -247,8 +279,9 @@ onMounted(() => {
         <div class="py-12">
             <div class="max-w-12xl mx-auto sm:px-6 lg:px-1">
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
-                    <ProductoTabla :productos="productos" :categorias="categorias" :subcategorias-map="subcategoriasMap"
-                        :atributos="atributos" @agregar="openModal" @registrar="registrarProductos" @duplicar="duplicarProducto" />
+                    <ProductoTabla :isUploading="isUploading" :productos="productos" :categorias="categorias"
+                        :subcategorias-map="subcategoriasMap" :atributos="atributos" @agregar="openModal"
+                        @registrar="registrarProductos" @duplicar="duplicarProducto" @eliminar="eliminarProducto" />
                 </div>
             </div>
         </div>

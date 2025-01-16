@@ -157,10 +157,18 @@ class ProductosController extends Controller
                     'taxes_id' => [(int) 6],
                 ];
 
-                foreach (['subcategory1', 'subcategory2', 'subcategory3', 'subcategory4'] as $subcateg) {
-                    if (!empty($producto[$subcateg])) {
-                        $datosProducto['categ_id'] = $producto[$subcateg];
-                    }
+                if (!empty($producto['subcategory4'])) {
+                    $datosProducto['categ_id'] = (int)$producto['subcategory4'];
+                } elseif (!empty($producto['subcategory3'])) {
+                    $datosProducto['categ_id'] = (int)$producto['subcategory3'];
+                } elseif (!empty($producto['subcategory2'])) {
+                    $datosProducto['categ_id'] = (int)$producto['subcategory2'];
+                } elseif (!empty($producto['subcategory1'])) {
+                    $datosProducto['categ_id'] = (int)$producto['subcategory1'];
+                } elseif (!empty($producto['category'])) {
+                    $datosProducto['categ_id'] = (int)$producto['category'];
+                } else {
+                    throw new Exception('No se proporcionó ninguna categoría válida.');
                 }
 
                 $granearDatosProducto[] = $datosProducto;
