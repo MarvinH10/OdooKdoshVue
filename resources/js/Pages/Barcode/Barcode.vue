@@ -64,7 +64,7 @@ const traerDatoProducto = async (id) => {
                 return {
                     categ_id: producto.categ_id ? producto.categ_id[1] : "",
                     code: item.barcode || "",
-                    description: `${item.default_code || ""}`,
+                    description: `${producto.name || ""}`,
                     price: item.lst_price ? item.lst_price.toFixed(2) : "",
                     attribute: item.atributos
                         ? item.atributos.map(attr => attr.split(":")[1]?.trim() || attr).join(", ")

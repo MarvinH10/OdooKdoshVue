@@ -29,7 +29,7 @@ export const generateContent6 = (item, style) => `
         <div style="
             display: flex;
             left: 80px;
-            top: -50px;
+            top: -60px;
             justify-content: center;
             align-items: center;
             position: relative;">
