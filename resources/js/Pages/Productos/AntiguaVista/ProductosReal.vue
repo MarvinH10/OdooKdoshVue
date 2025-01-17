@@ -919,7 +919,7 @@ window.addEventListener("keydown", handleKeyDown);
                                             <label for="list_price"
                                                 class="block text-gray-700 text-sm font-bold mb-2">Precio
                                                 Venta:</label>
-                                            <input value="0" type="number" id="list_price" v-model="producto.list_price"
+                                            <input type="number" id="list_price" v-model="producto.list_price"
                                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
                                         </div>
                                         <div class="mb-4">
