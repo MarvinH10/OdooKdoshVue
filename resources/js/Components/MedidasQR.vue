@@ -56,16 +56,19 @@ export default {
         <!-- Button 2 -->
         <div v-for="(item) in filteredItems" v-else-if="selectedButtonIndex === 1 && filteredItems"
             class="bg-white w-[12.5rem] h-[5.5rem] text-center relative">
-            <div class="text-xl font-bold mr-20 mt-2">S/ {{ item.price }}</div>
-            <div class="text-black text-[0.5rem] ml-1 mr-[80px] leading-tight mb-1">
+            <div class="text-xl font-bold mr-20 mt-1">S/ {{ item.price }}</div>
+            <div class="text-black text-[0.5rem] ml-1 mr-[80px] leading-tight">
                 {{ item.categ_id }}
             </div>
-            <div class="text-black text-[0.5rem] ml-1 mr-[72px] leading-tight">{{
+            <div class="text-black text-[0.5rem] ml-1 mr-[80px] leading-tight">
+                {{ item.default_code || "\u00A0" }}
+            </div>
+            <div class="text-black text-[0.5rem] ml-1 mr-[80px] leading-tight">{{
                 item.description }}</div>
-            <div class="text-black text-[0.5rem] ml-1 mr-[72px] leading-tight">
+            <div class="text-black text-[0.5rem] ml-1 mr-[80px] leading-tight">
                 {{ item.attribute }}
             </div>
-            <div class="flex items-center left-[60px] -top-[68px] justify-center relative">
+            <div class="flex items-center left-[60px] -top-[72px] justify-center relative">
                 <img :src="item.qrCode" alt="QR Code" class="mx-4"
                     :style="{ width: qrStyles.qrCodeSize + 'px', height: qrStyles.qrCodeSize + 'px' }" />
                 <div
