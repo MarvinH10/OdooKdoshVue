@@ -5,7 +5,7 @@ import vue from '@vitejs/plugin-vue';
 export default defineConfig({
     plugins: [
         laravel({
-            input: ['resources/js/app.js'],
+            input: 'resources/js/app.js',
             ssr: 'resources/js/ssr.js',
             refresh: true,
         }),
@@ -18,14 +18,9 @@ export default defineConfig({
             },
         }),
     ],
-    resolve: {
-        alias: {
-            '@': '/resources/js',
-        },
-    },
     server: {
         hmr: {
-            overlay: true,
+            overlay: false,
         },
     },
 });
