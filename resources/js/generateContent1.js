@@ -29,7 +29,7 @@ export const generateContent1 = (item, style) => `
 
         <div style="
             position: absolute;
-            left: 60px;
+            left: 50px;
             top: 50%;
             transform: translateY(-50%) rotate(-90deg);
             font-size: 0.875rem;
@@ -44,6 +44,20 @@ export const generateContent1 = (item, style) => `
             <img src="${item.qrCode}" style="
                 width: ${style.qrCodeSize}px;
                 height: ${style.qrCodeSize}px;" />
+
+        <div style="
+            position: absolute;
+            left: 160px;
+            top: 50%;
+            transform: translateY(-50%) rotate(-90deg);
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+            font-weight: 600;
+            max-width: 100px;
+            white-space: normal;
+            word-wrap: break-word;">
+            ${item.default_code}
+        </div>
         </div>
 
         <div style="font-size: 0.75rem; line-height: 1rem; margin-top: 0.5rem; font-weight: 500;">

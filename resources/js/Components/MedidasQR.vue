@@ -45,6 +45,9 @@ export default {
                     {{ item.attribute }}</div>
                 <img :src="item.qrCode" alt="QR Code" class="mx-4"
                     :style="{ width: qrStyles.qrCodeSize + 'px', height: qrStyles.qrCodeSize + 'px' }" />
+                <div
+                    class="absolute left-[210px] top-1/2 transform -translate-y-1/2 -translate-x-full text-sm font-semibold -rotate-90">
+                    {{ item.default_code }}</div>
             </div>
             <div class="text-xs font-mono mt-2">{{ item.code }}</div>
             <div class="text-xs text-black">{{ item.description }}</div>

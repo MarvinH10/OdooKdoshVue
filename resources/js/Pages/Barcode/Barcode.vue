@@ -17,7 +17,8 @@ import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 
 const route = useRoute();
-const productId = ref(route.query.product_id || null);
+const productId = ref(route.query.product_id ? parseInt(route.query.product_id, 10) : undefined);
+const isUploading = ref(false);
 
 const buttonImages = [
     "/images/BarcodeMedidas/type1.jpg",
@@ -42,6 +43,64 @@ const contentGenerators = [
 const selectedButtonIndex = ref(null);
 const showModalCantidad = ref(false);
 const imageItems = ref([]);
+
+const traerDatoProductoSinCache = async (id) => {
+    isUploading.value = true;
+    try {
+        const response = await axios.get(`/barcode/traer/${id}`);
+        if (response.data && response.data.length > 0) {
+            const producto = response.data[0];
+
+            if (!producto.variantes || !Array.isArray(producto.variantes)) {
+                console.error("El campo 'variantes' no está presente o no es válido:", producto);
+                toast.error("El producto no contiene variantes o no es válido.", {
+                    autoClose: 3000,
+                    position: "bottom-right",
+                });
+                return;
+            }
+
+            const promises = producto.variantes.map(async (item) => {
+                const qrCode = await QRCode.toDataURL(item.barcode || "", { width: 100, margin: 1 });
+                return {
+                    categ_id: producto.categ_id ? producto.categ_id[1] : "",
+                    code: item.barcode || "",
+                    description: `${producto.name || ""}`,
+                    price: item.lst_price ? item.lst_price.toFixed(2) : "",
+                    attribute: item.atributos
+                        ? item.atributos.map(attr => attr.split(":")[1]?.trim() || attr).join(", ")
+                        : "",
+                    default_code: item.default_code || "",
+                    qrCode,
+                    status: "activo",
+                    quantity: 1,
+                };
+            });
+
+            imageItems.value = await Promise.all(promises);
+
+            localStorage.setItem(`producto_${id}`, JSON.stringify(imageItems.value));
+            toast.success("Datos cargados correctamente.", {
+                autoClose: 3000,
+                position: "bottom-right",
+            });
+        } else {
+            console.error("La respuesta no contiene datos válidos:", response.data);
+            toast.error("No se pudo obtener información del producto.", {
+                autoClose: 3000,
+                position: "bottom-right",
+            });
+        }
+    } catch (error) {
+        console.error("Error al obtener datos del producto:", error.response || error);
+        toast.error("Ocurrió un error al consultar los datos del producto.", {
+            autoClose: 3000,
+            position: "bottom-right",
+        });
+    } finally {
+        isUploading.value = false;
+    }
+};
 
 const traerDatoProducto = async (id) => {
     try {
@@ -69,6 +128,7 @@ const traerDatoProducto = async (id) => {
                     attribute: item.atributos
                         ? item.atributos.map(attr => attr.split(":")[1]?.trim() || attr).join(", ")
                         : "",
+                    default_code: item.default_code || "",
                     qrCode,
                     status: "activo",
                     quantity: 1,
@@ -83,8 +143,8 @@ const traerDatoProducto = async (id) => {
                 position: "bottom-right",
             });
         } else {
-            console.error("La respuesta no contiene 'variantes'.", response.data);
-            toast.error("La respuesta no contiene 'variantes.", {
+            console.error("Error al obtener datos del producto.", response.data);
+            toast.error("Error al obtener datos del producto.", {
                 autoClose: 3000,
                 position: "bottom-right",
             });
@@ -273,10 +333,14 @@ watch(
                 <div class="bg-white overflow-hidden p-6">
                     <div class="flex flex-wrap">
                         <div class="sm:w-1/6 lg:w-1/5 xl:w-1/4">
-                            <!-- <button
-                                class="flex flex-col bg-blue-700 text-white text-sm px-[15.5px] py-[0.5px] mb-1 rounded border text-center">
-                                Seleccionar
-                            </button> -->
+                            <button v-if="!isUploading" @click="traerDatoProductoSinCache(productId)"
+                                class="flex flex-col-2 bg-green-700 text-white text-sm px-[9.5px] py-[0.5px] mb-1 rounded border text-center items-center justify-center">
+                                <i class="fas fa-sync-alt mr-2"></i> Actualizar
+                            </button>
+
+                            <div v-else class="text-left text-blue-500 font-bold text-sm">
+                                <i class="fas fa-spinner fa-spin mr-2"></i> Actualizando...
+                            </div>
                             <button @click="printSelectedContent"
                                 class="flex flex-col bg-blue-700 text-white text-sm px-[25.5px] py-[0.5px] mb-5 rounded border text-center">
                                 Imprimir
