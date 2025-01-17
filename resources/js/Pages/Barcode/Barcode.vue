@@ -1,7 +1,8 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import { ref, onMounted, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import { styles } from "@/stylesConfig";
+import { useRoute } from "vue-router";
 import { generateContent1 } from "@/generateContent1.js";
 import { generateContent2 } from "@/generateContent2.js";
 import { generateContent3 } from "@/generateContent3.js";
@@ -12,6 +13,11 @@ import { generateContent7 } from "@/generateContent7.js";
 import ModalCantidadBarcodes from "@/Components/ModalCantidadBarcodes.vue";
 import MedidasQR from "@/Components/MedidasQR.vue";
 import QRCode from "qrcode";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
+
+const route = useRoute();
+const productId = ref(route.query.product_id || null);
 
 const buttonImages = [
     "/images/BarcodeMedidas/type1.jpg",
@@ -72,11 +78,23 @@ const traerDatoProducto = async (id) => {
             imageItems.value = await Promise.all(promises);
 
             localStorage.setItem(`producto_${id}`, JSON.stringify(imageItems.value));
+            toast.success("Cargo correctamente y ya puedes continuar, selecciona un tipo.", {
+                autoClose: 3000,
+                position: "bottom-right",
+            });
         } else {
             console.error("La respuesta no contiene 'variantes'.", response.data);
+            toast.error("La respuesta no contiene 'variantes.", {
+                autoClose: 3000,
+                position: "bottom-right",
+            });
         }
     } catch (error) {
         console.error("Error al obtener datos del producto:", error);
+        toast.error("El ID del producto que elegiste no es un producto almacenable.", {
+            autoClose: 3000,
+            position: "bottom-right",
+        });
     }
 };
 
@@ -229,9 +247,17 @@ const updateItemQuantities = (updatedItems) => {
     console.log("Quantities updated in imageItems:", imageItems.value);
 };
 
-onMounted(() => {
-    traerDatoProducto(39);
-});
+watch(
+    () => route.query.product_id,
+    (newProductId) => {
+        if (newProductId) {
+            productId.value = newProductId;
+            traerDatoProducto(newProductId);
+        } else {
+            console.error("El product_id cambió, pero no es válido.");
+        }
+    }
+);
 </script>
 
 <template>
