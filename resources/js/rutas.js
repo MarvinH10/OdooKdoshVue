@@ -1,11 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Barcode from '@/Pages/Barcode/Barcode.vue';
 
 const routes = [
     {
         path: '/barcode',
         name: 'Barcode',
-        component: Barcode,
+        component: () => import('@/Pages/Barcode/Barcode.vue'),
     },
 ];
 
