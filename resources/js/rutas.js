@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Barcode from '@/Pages/Barcode/Barcode.vue';
+import Barcode from '../js/Pages/Barcode/Barcode.vue';
 
 const routes = [
     {
