@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { defineProps, defineEmits, reactive, watch, computed } from "vue";
+import { defineProps, defineEmits, reactive, watch, computed, PropType } from "vue";
 import TagSelect from "./TagSelect.vue";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
@@ -14,10 +14,30 @@ type Atributo = {
     name: string;
 };
 
-defineProps({
+const props = defineProps({
     show: {
         type: Boolean,
         required: true,
+    },
+    productoInicial: {
+        type: Object as PropType<{
+            name: string;
+            code: string;
+            price: number;
+            category: number | null;
+            subcategory1: number | null;
+            subcategory2: number | null;
+            subcategory3: number | null;
+            subcategory4: number | null;
+            attributes: Array<{
+                attributeId: string;
+                attributeValues: Array<{ id: string; name: string }>;
+                referenceGlobal: string;
+                referencesInternal: Record<string, string>;
+                extraPrice: number;
+            }>;
+        }> | null,
+        default: null,
     },
     isLoading: {
         type: Object,
@@ -41,7 +61,7 @@ defineProps({
     },
 });
 
-const emit = defineEmits(["close", "submit", "cambiarCategoriaPrincipal", "cambiarSubcategoria", "cambiarAtributo",]);
+const emit = defineEmits(["close", "submit", "update", "cambiarCategoriaPrincipal", "cambiarSubcategoria", "cambiarAtributo",]);
 
 const producto = reactive({
     name: "",
@@ -96,7 +116,7 @@ const actualizarReferencias = (index: number, values: Array<{ id: string; name: 
     producto.attributes[index].referencesInternal = updatedReferences;
 };
 
-const closeModal = () => {
+const resetFormulario = () => {
     producto.name = "";
     producto.code = "";
     producto.price = 0;
@@ -106,6 +126,11 @@ const closeModal = () => {
     producto.subcategory3 = null;
     producto.subcategory4 = null;
     producto.attributes = [];
+};
+
+
+const closeModal = () => {
+    resetFormulario();
     emit("close");
 };
 
@@ -185,13 +210,33 @@ const submitProduct = () => {
 
     producto.attributes = reorderedAttributes;
 
-    emit("submit", { ...producto });
-    toast.success("Producto añadido a la lista correctamente.", {
-        autoClose: 3000,
-        position: "bottom-right",
-    });
+    if (props.productoInicial) {
+        emit("update", { ...producto });
+        toast.success("Producto actualizado correctamente.", {
+            autoClose: 3000,
+            position: "bottom-right",
+        });
+    } else {
+        emit("submit", { ...producto });
+        toast.success("Producto añadido a la lista correctamente.", {
+            autoClose: 3000,
+            position: "bottom-right",
+        });
+    }
     closeModal();
 };
+
+watch(
+  () => props.productoInicial,
+  (nuevoProducto) => {
+    if (nuevoProducto) {
+      Object.assign(producto, nuevoProducto);
+    } else {
+      resetFormulario();
+    }
+  },
+  { immediate: true }
+);
 
 watch(
     () => producto.code,
@@ -228,7 +273,7 @@ watch(
                 <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                     <div class="sm:flex sm:items-start">
                         <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                            <h3 class="text-lg leading-6 font-medium text-gray-900">Registrar Producto</h3>
+                            <h3 class="text-lg leading-6 font-medium text-gray-900">{{ productoInicial ? "Editar Producto" : "Registrar Producto" }}</h3>
                             <div class="mt-2">
                                 <form @submit.prevent="submitProduct">
                                     <div class="mb-4 flex flex-wrap gap-4">
@@ -433,7 +478,7 @@ watch(
                                     <div class="flex items-center justify-end mt-4">
                                         <button type="submit"
                                             class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mr-2">
-                                            Registrar
+                                            {{ productoInicial ? "Actualizar" : "Registrar" }}
                                         </button>
                                         <button type="button" @click="closeModal"
                                             class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">

@@ -24,6 +24,8 @@ const productos = ref<Array<{
     }>;
 }>>([]);
 
+const productoEditado = ref(null);
+
 const isUploading = ref(false);
 const categorias = ref([]);
 const subcategorias = reactive<{ [key: number]: any[] }>({});
@@ -161,7 +163,12 @@ const traerValoresAtributos = async (idAtributo: number) => {
     }
 };
 
-const openModal = () => {
+const openModal = (modo: "agregar" | "editar", productoSeleccionado: any = null) => {
+    if (modo === "agregar") {
+        productoEditado.value = null;
+    } else if (modo === "editar") {
+        productoEditado.value = { ...productoSeleccionado };
+    }
     showModal.value = true;
 };
 
@@ -180,6 +187,24 @@ const agregarProducto = (producto: any) => {
     // console.log(productos.value);
     closeModal();
 };
+
+const actualizarProducto = (productoActualizado: any) => {
+    const index = productos.value.findIndex((producto) => producto.id === productoActualizado.id);
+    if (index !== -1) {
+        productos.value[index] = { ...productoActualizado };
+        toast.success("Producto actualizado correctamente.", {
+            autoClose: 3000,
+            position: "bottom-right",
+        });
+    } else {
+        toast.error("No se pudo actualizar el producto, no encontrado.", {
+            autoClose: 3000,
+            position: "bottom-right",
+        });
+    }
+    closeModal();
+};
+
 
 const registrarProductos = async () => {
     isUploading.value = true;
@@ -291,15 +316,16 @@ onMounted(() => {
                     <ProductoTabla @cerrarLinkModal="cerrarLinkModal" :idProductoRegistrado="idProductoRegistrado"
                         :baseUrl="baseUrl" :showLinksModal="showLinksModal" :isUploading="isUploading"
                         :productos="productos" :categorias="categorias" :subcategorias-map="subcategoriasMap"
-                        :atributos="atributos" @agregar="openModal" @registrar="registrarProductos"
-                        @duplicar="duplicarProducto" @eliminar="eliminarProducto" />
+                        :atributos="atributos" @agregar="(producto) => openModal('agregar', producto)" @registrar="registrarProductos"
+                        @duplicar="duplicarProducto" @eliminar="eliminarProducto" @editar="(producto) => openModal('editar', producto)" />
                 </div>
             </div>
         </div>
 
-        <ModalRegistrar :show="showModal" @close="closeModal" @submit="agregarProducto" :isLoading="isLoading"
-            :categorias="categorias" :subcategorias="subcategorias" :atributos="atributos"
-            :valores_atributos="valores_atributos" @cambiarCategoriaPrincipal="alCambiarCategoriaPrincipal"
-            @cambiarSubcategoria="alCambiarSubcategoria" @cambiarAtributo="traerValoresAtributos" />
+        <ModalRegistrar :show="showModal" @close="closeModal" @submit="agregarProducto" @update="actualizarProducto"
+            :productoInicial="productoEditado" :isLoading="isLoading" :categorias="categorias"
+            :subcategorias="subcategorias" :atributos="atributos" :valores_atributos="valores_atributos"
+            @cambiarCategoriaPrincipal="alCambiarCategoriaPrincipal" @cambiarSubcategoria="alCambiarSubcategoria"
+            @cambiarAtributo="traerValoresAtributos" />
     </AppLayout>
 </template>
