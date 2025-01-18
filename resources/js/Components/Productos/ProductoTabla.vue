@@ -54,11 +54,23 @@ export default defineComponent({
         });
 
         const getCategoryNameWithSubcategories = (producto: any): string => {
-            const categoriaPrincipal = props.categorias.find((cat) => String(cat.id) === producto.category);
+            // console.log("Producto recibido:", producto);
+
+            const categoriaPrincipal = props.categorias.find(
+                (cat) => String(cat.id) === String(producto.category)
+            );
+            // console.log("Categoría principal encontrada:", categoriaPrincipal);
+
             const subcategoria1 = props.subcategoriasMap[producto.subcategory1] || "";
             const subcategoria2 = props.subcategoriasMap[producto.subcategory2] || "";
             const subcategoria3 = props.subcategoriasMap[producto.subcategory3] || "";
             const subcategoria4 = props.subcategoriasMap[producto.subcategory4] || "";
+
+            // console.log("Subcategorías encontradas:");
+            // console.log("Subcategoría 1:", subcategoria1);
+            // console.log("Subcategoría 2:", subcategoria2);
+            // console.log("Subcategoría 3:", subcategoria3);
+            // console.log("Subcategoría 4:", subcategoria4);
 
             const categoriasConcatenadas = [
                 categoriaPrincipal ? categoriaPrincipal.name : "Sin categoría",
@@ -69,6 +81,8 @@ export default defineComponent({
             ]
                 .filter((nombre) => nombre)
                 .join(" / ");
+
+            // console.log("Categorías concatenadas:", categoriasConcatenadas);
 
             return categoriasConcatenadas;
         };

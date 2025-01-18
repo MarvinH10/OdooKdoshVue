@@ -9,9 +9,29 @@ import { createRouter, createWebHistory } from 'vue-router';
 
 const routes = [
     {
+        path: '/',
+        name: 'Welcome',
+        component: () => import('@/Pages/Welcome.vue'),
+    },
+    {
+        path: '/dashboard',
+        name: 'Dashboard',
+        component: () => import('@/Pages/Dashboard.vue'),
+    },
+    {
         path: '/productos',
         name: 'Productos',
         component: () => import('@/Pages/Productos/Productos.vue'),
+    },
+    {
+        path: '/formulas',
+        name: 'Formulas',
+        component: () => import('@/Pages/Formula/Formula.vue'),
+    },
+    {
+        path: '/reposicion',
+        name: 'Reposicion',
+        component: () => import('@/Pages/Reposicion/Reposicion.vue'),
     },
     {
         path: '/barcode',
