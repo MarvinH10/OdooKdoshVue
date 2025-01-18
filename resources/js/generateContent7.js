@@ -46,6 +46,20 @@ export const generateContent7 = (item, style) => `
                 margin-left: 1rem;
                 margin-right: 1rem;
                 max-width: 100%;" />
+
+        <div style="
+            position: absolute;
+            left: 13rem;
+            top: 50%;
+            transform: translateY(-50%) translateX(-100%) rotate(-90deg);
+            font-size: 0.75rem;
+            line-height: 1rem;
+            font-weight: 600;
+            max-width: 100px;
+            white-space: normal;
+            word-wrap: break-word;">
+            ${item.default_code}
+        </div>
         </div>
 
         <div style="font-size: 0.75rem; line-height: 1rem; margin-top: 0.25rem; font-weight: 500;">

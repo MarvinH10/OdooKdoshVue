@@ -6,7 +6,7 @@ export const generateContent2 = (item, style) => `
         position: relative;
         padding: 4px;
         background-color: white;
-        border: 1px solid #ccc;
+        // border: 1px solid #ccc;
         color: black;
         font-family: Figtree, ui-sans-serif, system-ui, sans-serif,
             'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';">

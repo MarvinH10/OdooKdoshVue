@@ -33,13 +33,13 @@ export const generateContent4 = (item, style) => `
             line-height: 2.5rem;
             font-weight: 500;
             margin-bottom: 0.5rem;">
-            S/ ${item.price || "N/A"}
+            S/ ${item.price}
         </div>
 
         <div style="
             font-size: 0.875rem;
             line-height: 1.25rem;">
-            ${item.description || "N/A"}
+            ${item.description}
         </div>
 
         <div style="
@@ -57,7 +57,7 @@ export const generateContent4 = (item, style) => `
                 line-height: 1.25rem;
                 font-weight: 600;
                 word-wrap: break-word;">
-                ${item.categ_id || "N/A"}
+                ${item.categ_id}
             </div>
 
             <img src="${item.qrCode || ""}" alt="QR Code" style="
@@ -68,13 +68,25 @@ export const generateContent4 = (item, style) => `
                 max-width: 100%;
                 display: block;
                 vertical-align: middle;" />
+
+            <div style="
+                position: absolute;
+                left: 390px;
+                top: 40px;
+                transform: translateY(-50%) translateX(-100%) rotate(-90deg);
+                font-size: 0.875rem;
+                line-height: 1.25rem;
+                font-weight: 600;
+                word-wrap: break-word;">
+                ${item.default_code}
+            </div>
         </div>
 
         <div style="
             font-size: 0.75rem;
             line-height: 1rem;
             margin-top: 0.5rem;">
-            ${item.code || "N/A"}
+            ${item.code}
         </div>
 
         <div style="
