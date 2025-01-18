@@ -205,13 +205,21 @@ const agregarProducto = (producto: any) => {
 };
 
 const actualizarProducto = (productoActualizado: any) => {
-    const index = productos.value.findIndex((producto) => producto.id === productoActualizado.id);
-    if (index !== -1) {
-        productos.value[index] = { ...productoActualizado };
-        toast.success("Producto actualizado correctamente.", {
+    const categoriaValida = categorias.value.find(
+        (cat) => String(cat.id) === String(productoActualizado.category)
+    );
+
+    if (!categoriaValida) {
+        toast.error("Categoría principal no válida.", {
             autoClose: 3000,
             position: "bottom-right",
         });
+        return;
+    }
+
+    const index = productos.value.findIndex((producto) => producto.id === productoActualizado.id);
+    if (index !== -1) {
+        productos.value[index] = { ...productoActualizado };
     } else {
         toast.error("No se pudo actualizar el producto, no encontrado.", {
             autoClose: 3000,
