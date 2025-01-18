@@ -11,26 +11,30 @@ export const generateContent2 = (item, style) => `
         font-family: Figtree, ui-sans-serif, system-ui, sans-serif,
             'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';">
 
-        <div style="font-size: 1.25rem; line-height: 1.75rem; font-weight: 500; margin-top: 0.5rem; margin-right: 5rem;">
+        <div style="font-size: 1.25rem; line-height: 1.75rem; font-weight: 500; margin-top: 0.25rem; margin-right: 5rem;">
             S/ ${item.price}
         </div>
 
-        <div style="font-size: 0.5rem; line-height: 1.25; margin-bottom: 0.25rem; margin-right: 80px; margin-left: 0.25rem;">
+        <div style="font-size: 0.5rem; line-height: 1.25; margin-right: 80px; margin-left: 0.25rem;">
             ${item.categ_id}
         </div>
 
-        <div style="font-size: 0.5rem; line-height: 1.25; margin-right: 72px; margin-left: 0.25rem;">
+        <div style="font-size: 0.5rem; line-height: 1.25; margin-right: 80px; margin-left: 0.25rem;">
+            ${item.default_code || "\u00A0"}
+        </div>
+
+        <div style="font-size: 0.5rem; line-height: 1.25; margin-right: 80px; margin-left: 0.25rem;">
             ${item.description}
         </div>
 
-        <div style="font-size: 0.5rem; line-height: 1.25; margin-right: 72px; margin-left: 0.25rem;">
+        <div style="font-size: 0.5rem; line-height: 1.25; margin-right: 80px; margin-left: 0.25rem;">
             ${item.attribute}
         </div>
 
         <div style="
             display: flex;
             left: 60px;
-            top: -68px;
+            top: -72px;
             justify-content: center;
             align-items: center;
             position: relative;">
