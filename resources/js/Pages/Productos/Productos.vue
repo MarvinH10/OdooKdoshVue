@@ -42,6 +42,13 @@ const isLoading = reactive({
     3: false,
     4: false,
 });
+const baseUrl = import.meta.env.VITE_APP_ODOO_URL;
+const showLinksModal = ref(false);
+const idProductoRegistrado = ref([]);
+
+const cerrarLinkModal = (): void => {
+    showLinksModal.value = false;
+};
 
 const traerCategorias = async () => {
     try {
@@ -186,6 +193,8 @@ const registrarProductos = async () => {
         }
 
         const response = await axios.post('/productos/registrar_todo', productos.value);
+        idProductoRegistrado.value = response.data.product_ids;
+        showLinksModal.value = true;
 
         if (response.status === 200) {
             // console.log("Productos registrados con éxito:", response.data);
@@ -279,9 +288,11 @@ onMounted(() => {
         <div class="py-12">
             <div class="max-w-12xl mx-auto sm:px-6 lg:px-1">
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
-                    <ProductoTabla :isUploading="isUploading" :productos="productos" :categorias="categorias"
-                        :subcategorias-map="subcategoriasMap" :atributos="atributos" @agregar="openModal"
-                        @registrar="registrarProductos" @duplicar="duplicarProducto" @eliminar="eliminarProducto" />
+                    <ProductoTabla @cerrarLinkModal="cerrarLinkModal" :idProductoRegistrado="idProductoRegistrado"
+                        :baseUrl="baseUrl" :showLinksModal="showLinksModal" :isUploading="isUploading"
+                        :productos="productos" :categorias="categorias" :subcategorias-map="subcategoriasMap"
+                        :atributos="atributos" @agregar="openModal" @registrar="registrarProductos"
+                        @duplicar="duplicarProducto" @eliminar="eliminarProducto" />
                 </div>
             </div>
         </div>

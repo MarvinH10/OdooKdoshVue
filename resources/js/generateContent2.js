@@ -28,7 +28,7 @@ export const generateContent2 = (item, style) => `
         </div>
 
         <div style="font-size: 0.5rem; line-height: 1.25; margin-right: 80px; margin-left: 0.25rem;">
-            ${item.attribute}
+            ${item.attribute || "\u00A0"}
         </div>
 
         <div style="

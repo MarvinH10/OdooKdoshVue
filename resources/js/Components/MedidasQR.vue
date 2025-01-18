@@ -66,7 +66,7 @@ export default {
             <div class="text-black text-[0.5rem] ml-1 mr-[80px] leading-tight">{{
                 item.description }}</div>
             <div class="text-black text-[0.5rem] ml-1 mr-[80px] leading-tight">
-                {{ item.attribute }}
+                {{ item.attribute || "\u00A0" }}
             </div>
             <div class="flex items-center left-[60px] -top-[72px] justify-center relative">
                 <img :src="item.qrCode" alt="QR Code" class="mx-4"
@@ -144,7 +144,7 @@ export default {
             <div class="text-[0.5rem] text-black mr-[72px] leading-tight">{{
                 item.description }}</div>
             <div class="text-black text-[7.8px] ml-1 mr-[72px] leading-tight">
-                {{ item.attribute }}
+                {{ item.attribute || "\u00A0" }}
             </div>
             <div class="flex items-center left-[80px] -top-[67px] justify-center relative">
                 <img :src="item.qrCode" alt="QR Code" class="mx-4"

@@ -9,6 +9,11 @@ import { createRouter, createWebHistory } from 'vue-router';
 
 const routes = [
     {
+        path: '/productos',
+        name: 'Productos',
+        component: () => import('@/Pages/Productos/Productos.vue'),
+    },
+    {
         path: '/barcode',
         name: 'Barcode',
         component: () => import('@/Pages/Barcode/Barcode.vue'),
