@@ -3,7 +3,11 @@
         "baseUrl": ".",
         "paths": {
             "@/*": ["resources/js/*"]
-        }
+        },
+        "target": "es2020",
+        "module": "es2020",
+        "moduleResolution": "node",
+        "types": ["vite/client"],
     },
-    "exclude": ["node_modules", "public"]
+    "exclude": ["node_modules", "public"],
 }

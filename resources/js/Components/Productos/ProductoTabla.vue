@@ -33,8 +33,20 @@ export default defineComponent({
             type: Boolean,
             required: true,
         },
+        idProductoRegistrado: {
+            type: Array as PropType<Array<{ id: number; }>>,
+            required: true,
+        },
+        baseUrl: {
+            type: String,
+            required: true,
+        },
+        showLinksModal: {
+            type: Boolean,
+            required: true,
+        }
     },
-    emits: ["agregar", "registrar", "duplicar", "eliminar"],
+    emits: ["agregar", "registrar", "duplicar", "eliminar", "cerrarLinkModal"],
     setup(props, { emit }) {
         // console.log("Productos recibidos:", props.productos);
         const tieneProductos = computed(() => {
@@ -77,6 +89,10 @@ export default defineComponent({
             emit("eliminar", producto.id);
         };
 
+        const handleCerrarLinkModal = () => {
+            emit("cerrarLinkModal");
+        };
+
         return {
             tieneProductos,
             getCategoryNameWithSubcategories,
@@ -84,6 +100,7 @@ export default defineComponent({
             handleRegistrar,
             handleDuplicar,
             handleEliminar,
+            handleCerrarLinkModal,
         };
     },
 });
@@ -195,6 +212,46 @@ export default defineComponent({
             </table>
             <div v-else class="text-center text-gray-500 py-8">
                 No hay productos por mostrar
+            </div>
+        </div>
+    </div>
+    <div v-if="showLinksModal" class="fixed z-10 inset-0 overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity">
+                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen"></span>&#8203;
+            <div
+                class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl w-full max-w-6xl">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900">
+                                Productos Registrados
+                            </h3>
+                            <div class="mt-2">
+                                <p>
+                                    A continuación se muestran los enlaces a los productos
+                                    registrados en Odoo:
+                                </p>
+                                <ul class="mt-4">
+                                    <li v-for="producto in idProductoRegistrado" :key="producto.id">
+                                        <a :href="`${baseUrl}web?debug=1#id=${producto}&cids=1&menu_id=206&action=354&model=product.template&view_type=form`"
+                                            target="_blank">
+                                            Ver Producto {{ producto }}
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="mt-4 flex justify-end">
+                                <button @click="handleCerrarLinkModal"
+                                    class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded ml-2">
+                                    Cerrar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
