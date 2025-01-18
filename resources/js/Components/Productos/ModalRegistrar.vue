@@ -229,6 +229,7 @@ const submitProduct = () => {
 watch(
   () => props.productoInicial,
   (nuevoProducto) => {
+    // console.log("Nuevo Producto Inicial en Modal:", nuevoProducto);
     if (nuevoProducto) {
       Object.assign(producto, nuevoProducto);
     } else {

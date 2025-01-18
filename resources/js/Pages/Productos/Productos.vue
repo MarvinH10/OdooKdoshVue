@@ -163,14 +163,30 @@ const traerValoresAtributos = async (idAtributo: number) => {
     }
 };
 
-const openModal = (modo: "agregar" | "editar", productoSeleccionado: any = null) => {
+const openModal = async (modo: "agregar" | "editar", productoSeleccionado: any = null) => {
+    // console.log("Abrir Modal - Modo:", modo, "Producto seleccionado:", productoSeleccionado);
+
     if (modo === "agregar") {
         productoEditado.value = null;
     } else if (modo === "editar") {
         productoEditado.value = { ...productoSeleccionado };
+
+        if (productoSeleccionado.category) {
+            await traerSubcategorias(productoSeleccionado.category, 1);
+        }
+        if (productoSeleccionado.subcategory1) {
+            await traerSubcategorias(productoSeleccionado.subcategory1, 2);
+        }
+        if (productoSeleccionado.subcategory2) {
+            await traerSubcategorias(productoSeleccionado.subcategory2, 3);
+        }
+        if (productoSeleccionado.subcategory3) {
+            await traerSubcategorias(productoSeleccionado.subcategory3, 4);
+        }
     }
     showModal.value = true;
 };
+
 
 const closeModal = () => {
     showModal.value = false;
