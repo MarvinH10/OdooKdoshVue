@@ -10,6 +10,8 @@ const productosConcatenados = ref([]);
 const productosSeleccionados = ref([]);
 const searchQuery = ref("");
 const isLoading = ref(false);
+const pageSize = ref(20);
+const currentPage = ref(1);
 
 const fetchProductosRepo = async () => {
     try {
@@ -68,12 +70,17 @@ const loadProductosFromLocalStorage = () => {
 };
 
 const filteredProductos = computed(() => {
-    if (!searchQuery.value) {
-        return [];
-    }
+    if (!searchQuery.value) return productosConcatenados.value;
     return productosConcatenados.value.filter((producto) =>
         producto.toLowerCase().includes(searchQuery.value.toLowerCase())
     );
+});
+
+const paginatedProductos = computed(() => {
+    const start = (currentPage.value - 1) * pageSize.value;
+    const end = start + pageSize.value;
+
+    return filteredProductos.value.slice(start, end);
 });
 
 const seleccionarProducto = (producto) => {
@@ -126,6 +133,22 @@ const copyToClipboardTable = () => {
     });
 };
 
+const nextPage = () => {
+    if (currentPage.value * pageSize.value < productosConcatenados.value.length) {
+        currentPage.value++;
+    }
+};
+
+const prevPage = () => {
+    if (currentPage.value > 1) {
+        currentPage.value--;
+    }
+};
+
+const resetPagination = () => {
+    currentPage.value = 1;
+};
+
 const refreshPage = () => {
     fetchProductosRepo();
 };
@@ -151,7 +174,8 @@ onMounted(() => {
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
                     <div class="mb-4 relative w-1/2 mx-auto">
                         <i class="fas fa-search absolute left-3 top-3 text-gray-500"></i>
-                        <input v-model="searchQuery" type="text" class="border p-2 pl-10 rounded-lg w-full"
+                        <input v-model="searchQuery" @input="resetPagination" type="text"
+                            class="border p-2 pl-10 rounded-lg w-full"
                             placeholder="Buscar producto por nombre o referencia interna..." />
                     </div>
 
@@ -173,8 +197,8 @@ onMounted(() => {
                     </div>
 
                     <div v-else>
-                        <ul v-if="filteredProductos.length > 0">
-                            <li v-for="(producto, index) in filteredProductos" :key="index"
+                        <ul v-if="paginatedProductos.length > 0">
+                            <li v-for="(producto, index) in paginatedProductos" :key="index"
                                 class="py-2 flex justify-between">
                                 <span>{{ producto }}</span>
                                 <button @click="seleccionarProducto(producto)"
@@ -183,10 +207,21 @@ onMounted(() => {
                                 </button>
                             </li>
                         </ul>
-                        <p v-else>
-                            Escribe algo para buscar esos productos en
-                            reposición...
-                        </p>
+                        <p v-else>Escribe algo para buscar esos productos en reposición...</p>
+                    </div>
+
+                    <div class="flex justify-between mt-4">
+                        <button @click="prevPage" :disabled="currentPage === 1"
+                            class="bg-gray-400 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded"
+                            :class="{ 'opacity-50 cursor-not-allowed': currentPage === 1 }">
+                            Anterior
+                        </button>
+                        <span class="text-gray-700">Página {{ currentPage }}</span>
+                        <button @click="nextPage" :disabled="currentPage * pageSize >= productosConcatenados.length"
+                            class="bg-gray-400 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded"
+                            :class="{ 'opacity-50 cursor-not-allowed': currentPage * pageSize >= productosConcatenados.length }">
+                            Siguiente
+                        </button>
                     </div>
 
                     <div v-if="productosSeleccionados.length > 0" class="mt-8">

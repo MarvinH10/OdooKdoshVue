@@ -23,46 +23,74 @@ class ReposicionService
     public function traerDatosReposicion()
     {
         try {
-            $products = $this->modelos->execute_kw(
+            Log::info('🔍 Iniciando consulta optimizada de productos desde Odoo...');
+            $offset = 0;
+            $limit = 5000;
+            $todosProductos = [];
+
+            $fields = $this->modelos->execute_kw(
                 $this->base_datos,
                 $this->uid,
                 $this->contraseña,
                 'product.product',
-                'search_read',
-                [
-                    [['type', '=', 'product']],
-                ],
-                [
-                    'fields' => ['id', 'name', 'default_code', 'product_tmpl_id', 'product_template_attribute_value_ids'],
-                ]
+                'fields_get',
+                [],
+                ['attributes' => ['string', 'type']]
             );
 
-            foreach ($products as &$product) {
-                if (!empty($product['product_template_attribute_value_ids']) && is_array($product['product_template_attribute_value_ids'])) {
-                    $attributeValues = $this->modelos->execute_kw(
-                        $this->base_datos,
-                        $this->uid,
-                        $this->contraseña,
-                        'product.template.attribute.value',
-                        'search_read',
-                        [
-                            [['id', 'in', $product['product_template_attribute_value_ids']]],
-                        ],
-                        ['fields' => ['id', 'name']]
-                    );
-
-                    if (!empty($attributeValues)) {
-                        $product['attribute_values'] = array_map(function ($attributeValue) {
-                            return $attributeValue['name'];
-                        }, $attributeValues);
-                    }
-                }
+            if (!array_key_exists('detailed_type', $fields)) {
+                Log::warning('⚠️ detailed_type no existe en product.product. Usando type en su lugar.');
+                $filterField = 'type';
+            } else {
+                $filterField = 'detailed_type';
             }
 
-            return $products;
+            do {
+                Log::info("📌 Consultando productos desde offset: {$offset}");
+
+                $products = $this->modelos->execute_kw(
+                    $this->base_datos,
+                    $this->uid,
+                    $this->contraseña,
+                    'product.product',
+                    'search_read',
+                    [[[$filterField, '=', 'product']]],
+                    [
+                        'fields' => ['id', 'name', 'default_code', 'product_tmpl_id', 'product_template_attribute_value_ids'],
+                        'limit' => $limit,
+                        'offset' => $offset
+                    ]
+                );
+
+                if (!is_array($products)) {
+                    Log::error('⛔ La respuesta de Odoo no es un array.', ['response' => $products]);
+                    return [];
+                }
+
+                Log::info('✅ Productos obtenidos en este lote:', ['count' => count($products)]);
+
+                foreach ($products as &$product) {
+                    if (!empty($product['product_template_attribute_value_ids']) && is_array($product['product_template_attribute_value_ids'])) {
+                        $product['attribute_values'] = array_map(function ($attributeId) {
+                            return $attributeId;
+                        }, $product['product_template_attribute_value_ids']);
+                    }
+                }
+
+                $todosProductos = array_merge($todosProductos, $products);
+                $offset += $limit;
+
+            } while (count($products) === $limit);
+
+            Log::info('✅ Consulta finalizada. Total de productos obtenidos:', ['total' => count($todosProductos)]);
+            return $todosProductos;
+
         } catch (Exception $e) {
-            Log::error('Error al obtener referencias de productos:', ['message' => $e->getMessage()]);
-            return null;
+            Log::error('❌ Error en traerDatosReposicion:', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return [];
         }
     }
 }

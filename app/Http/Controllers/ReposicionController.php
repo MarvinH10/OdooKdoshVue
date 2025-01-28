@@ -40,18 +40,12 @@ class ReposicionController extends Controller
             $this->servicioOdoo->authenticate();
 
             $user = Auth::user();
-
             if (!$user) {
                 return response()->json(['error' => 'Usuario no autenticado en Laravel'], 401);
             }
 
-            $usuarioId = $this->servicioOdoo->authenticate();
-
-            if (!$usuarioId) {
-                return response()->json(['error' => 'Usuario no autenticado en Odoo'], 401);
-            }
-
             $dataRepo = $this->servicioOdoo->traerDatosReposicion();
+
             return response()->json($dataRepo);
         } catch (Exception $e) {
             Log::error('Error al obtener los datos del repositorio:', ['message' => $e->getMessage()]);
