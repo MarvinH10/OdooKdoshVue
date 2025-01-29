@@ -25,7 +25,7 @@ class ReposicionService
         try {
             Log::info('🔍 Iniciando consulta optimizada de productos desde Odoo...');
             $offset = 0;
-            $limit = 5000;
+            $limit = 100;
             $todosProductos = [];
 
             $fields = $this->modelos->execute_kw(
