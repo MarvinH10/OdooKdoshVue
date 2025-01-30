@@ -34,7 +34,7 @@ class ReposicionController extends Controller
     }
 
     /********************LO QUE RESPECTA A TRAER DATOS DE ODOO 17********************/
-    public function traerDatosReposicion()
+    public function traerDatosReposicion($default_code)
     {
         try {
             $this->servicioOdoo->authenticate();
@@ -44,7 +44,7 @@ class ReposicionController extends Controller
                 return response()->json(['error' => 'Usuario no autenticado en Laravel'], 401);
             }
 
-            $dataRepo = $this->servicioOdoo->traerDatosReposicion();
+            $dataRepo = $this->servicioOdoo->traerDatosReposicion($default_code);
 
             return response()->json($dataRepo);
         } catch (Exception $e) {
