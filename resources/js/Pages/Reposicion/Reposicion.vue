@@ -16,13 +16,25 @@ const default_code = ref("");
 
 const fetchProductosRepo = async (default_code) => {
     if (!default_code) {
-        return; 
+        return;
     }
     try {
         isLoading.value = true;
         const response = await axios.get(`/reposicion/data_repo/traer/${default_code}`);
 
         productosRepo.value = response.data;
+
+        if (productosRepo.value.length === 0) {
+            toast.error("No se encontraron productos con esa referencia", {
+                autoClose: 3000,
+                position: "bottom-right",
+                style: {
+                    width: "400px",
+                },
+                className: "border-l-4 border-red-500 p-4",
+            });
+            return;
+        }
 
         productosConcatenados.value = productosRepo.value.map((producto) => {
             const referencia = producto.default_code ? `[${producto.default_code}]` : "";
@@ -150,10 +162,6 @@ const prevPage = () => {
     }
 };
 
-const resetPagination = () => {
-    currentPage.value = 1;
-};
-
 const refreshPage = () => {
     fetchProductosRepo();
 };
@@ -164,6 +172,15 @@ const handleSearch = () => {
         fetchProductosRepo(default_code.value);
     }
 };
+
+watch(searchQuery, (newValue) => {
+    if (!newValue) {
+        productosRepo.value = [];
+        productosConcatenados.value = [];
+        productosSeleccionados.value = [];
+        currentPage.value = 1;
+    }
+});
 
 onMounted(() => {
     loadProductosFromLocalStorage();
@@ -184,12 +201,15 @@ onMounted(() => {
         <div class="py-12">
             <div class="mx-auto max-w-12xl sm:px-6 lg:px-1">
                 <div class="p-6 overflow-hidden bg-white shadow-xl sm:rounded-lg">
-                    <div class="relative w-1/2 mx-auto mb-4">
+                    <div class="relative flex w-1/2 mx-auto mb-4">
                         <i class="absolute text-gray-500 fas fa-search left-3 top-3"></i>
                         <input v-model="searchQuery" @keyup.enter="handleSearch" type="text"
                             class="w-full p-2 pl-10 border rounded-lg"
                             placeholder="Buscar producto por nombre o referencia interna..." />
-                        <button @click="handleSearch" class="p-2 ml-2 text-white bg-blue-500 rounded-lg">Buscar</button>
+                        <button @click="handleSearch"
+                            class="flex items-center p-2 ml-2 text-white bg-blue-500 rounded-lg">
+                            <i class="text-white fas fa-search mr-2"></i> Buscar
+                        </button>
                     </div>
 
                     <button @click="copyToClipboard"
