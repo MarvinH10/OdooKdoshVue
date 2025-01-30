@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, watch } from "vue";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 import axios from "axios";
@@ -12,11 +12,16 @@ const searchQuery = ref("");
 const isLoading = ref(false);
 const pageSize = ref(20);
 const currentPage = ref(1);
+const default_code = ref("");
 
-const fetchProductosRepo = async () => {
+const fetchProductosRepo = async (default_code) => {
+    if (!default_code) {
+        return;
+    }
     try {
         isLoading.value = true;
-        const response = await axios.get("/reposicion/data_repo/traer");
+        const response = await axios.get(`/reposicion/data_repo/traer/${default_code}`);
+
         productosRepo.value = response.data;
 
         productosConcatenados.value = productosRepo.value.map((producto) => {
@@ -153,10 +158,17 @@ const refreshPage = () => {
     fetchProductosRepo();
 };
 
+const handleSearch = () => {
+    default_code.value = searchQuery.value;
+    if (default_code.value) {
+        fetchProductosRepo(default_code.value);
+    }
+};
+
 onMounted(() => {
     loadProductosFromLocalStorage();
-    if (!productosRepo.value.length) {
-        fetchProductosRepo();
+    if (!productosRepo.value.length && default_code.value) {
+        fetchProductosRepo(default_code.value);
     }
 });
 </script>
@@ -164,45 +176,48 @@ onMounted(() => {
 <template>
     <AppLayout title="Reposición">
         <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            <h2 class="text-xl font-semibold leading-tight text-gray-800">
                 Reposición
             </h2>
         </template>
 
         <div class="py-12">
-            <div class="max-w-12xl mx-auto sm:px-6 lg:px-1">
-                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
-                    <div class="mb-4 relative w-1/2 mx-auto">
-                        <i class="fas fa-search absolute left-3 top-3 text-gray-500"></i>
-                        <input v-model="searchQuery" @input="resetPagination" type="text"
-                            class="border p-2 pl-10 rounded-lg w-full"
+            <div class="mx-auto max-w-12xl sm:px-6 lg:px-1">
+                <div class="p-6 overflow-hidden bg-white shadow-xl sm:rounded-lg">
+                    <div class="relative flex w-1/2 mx-auto mb-4">
+                        <i class="absolute text-gray-500 fas fa-search left-3 top-3"></i>
+                        <input v-model="searchQuery" @keyup.enter="handleSearch" type="text"
+                            class="w-full p-2 pl-10 border rounded-lg"
                             placeholder="Buscar producto por nombre o referencia interna..." />
+                        <button @click="handleSearch" class="flex items-center p-2 ml-2 text-white bg-blue-500 rounded-lg">
+                            <i class="text-white fas fa-search mr-2"></i> Buscar
+                        </button>
                     </div>
 
                     <button @click="copyToClipboard"
-                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4">
-                        <i class="fas fa-copy mr-2"></i>
+                        class="px-4 py-2 mb-4 font-bold text-white bg-blue-500 rounded hover:bg-blue-700">
+                        <i class="mr-2 fas fa-copy"></i>
                         Copiar al portapapeles
                     </button>
 
                     <button @click="refreshPage"
-                        class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mb-4 float-right">
-                        <i class="fas fa-sync-alt mr-2"></i>
+                        class="float-right px-4 py-2 mb-4 font-bold text-white bg-gray-500 rounded hover:bg-gray-700">
+                        <i class="mr-2 fas fa-sync-alt"></i>
                         Actualizar
                     </button>
 
-                    <div v-if="isLoading" class="text-center my-4">
-                        <i class="fas fa-spinner fa-spin mr-2"></i>
+                    <div v-if="isLoading" class="my-4 text-center">
+                        <i class="mr-2 fas fa-spinner fa-spin"></i>
                         Buscando más productos en reposición...
                     </div>
 
                     <div v-else>
                         <ul v-if="paginatedProductos.length > 0">
                             <li v-for="(producto, index) in paginatedProductos" :key="index"
-                                class="py-2 flex justify-between">
+                                class="flex justify-between py-2">
                                 <span>{{ producto }}</span>
                                 <button @click="seleccionarProducto(producto)"
-                                    class="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 rounded">
+                                    class="px-2 py-1 font-bold text-white bg-green-500 rounded hover:bg-green-700">
                                     Seleccionar
                                 </button>
                             </li>
@@ -212,20 +227,20 @@ onMounted(() => {
 
                     <div class="flex justify-between mt-4">
                         <button @click="prevPage" :disabled="currentPage === 1"
-                            class="bg-gray-400 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded"
+                            class="px-4 py-2 font-bold text-white bg-gray-400 rounded hover:bg-gray-600"
                             :class="{ 'opacity-50 cursor-not-allowed': currentPage === 1 }">
                             Anterior
                         </button>
                         <span class="text-gray-700">Página {{ currentPage }}</span>
                         <button @click="nextPage" :disabled="currentPage * pageSize >= productosConcatenados.length"
-                            class="bg-gray-400 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded"
+                            class="px-4 py-2 font-bold text-white bg-gray-400 rounded hover:bg-gray-600"
                             :class="{ 'opacity-50 cursor-not-allowed': currentPage * pageSize >= productosConcatenados.length }">
                             Siguiente
                         </button>
                     </div>
 
                     <div v-if="productosSeleccionados.length > 0" class="mt-8">
-                        <h3 class="font-semibold text-lg mb-4">
+                        <h3 class="mb-4 text-lg font-semibold">
                             Productos Seleccionados:
                         </h3>
                         <table class="min-w-full table-auto">
@@ -239,16 +254,16 @@ onMounted(() => {
                                 <tr v-for="(
                                         producto, index
                                     ) in productosSeleccionados" :key="index">
-                                    <td class="border px-4 py-2">
+                                    <td class="px-4 py-2 border">
                                         {{ producto }}
                                     </td>
-                                    <td class="border px-4 py-2 text-center">
+                                    <td class="px-4 py-2 text-center border">
                                         <button @click="
                                             eliminarProductoSeleccionado(
                                                 producto
                                             )
                                             "
-                                            class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">
+                                            class="px-2 py-1 font-bold text-white bg-red-500 rounded hover:bg-red-700">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </td>
@@ -257,8 +272,8 @@ onMounted(() => {
                         </table>
 
                         <button @click="copyToClipboardTable"
-                            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
-                            <i class="fas fa-copy mr-2"></i>
+                            class="px-4 py-2 mt-4 font-bold text-white bg-blue-500 rounded hover:bg-blue-700">
+                            <i class="mr-2 fas fa-copy"></i>
                             Copiar seleccionados al portapapeles
                         </button>
                     </div>

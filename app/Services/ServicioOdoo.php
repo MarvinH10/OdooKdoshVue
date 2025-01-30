@@ -110,6 +110,7 @@ class ServicioOdoo
     {
         return $this->reposicionService->traerDatosReposicion();
     }
+
     /*FIN REPOSICION SERVICIO*/
 
     /*INICIO BARCODE SERVICIO*/

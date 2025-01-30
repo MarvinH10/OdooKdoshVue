@@ -52,18 +52,4 @@ class ReposicionController extends Controller
             return response()->json(['error' => 'Error al obtener los datos del repositorio'], 500);
         }
     }
-
-    /********************ACA ALMACENAREMOS LOS DATOS TRAIDOS POR LA FUNCION ARRIBA (AUN PENSANDO)********************/
-    public function almacenarDatosReposicion()
-    {
-        try {
-            $this->servicioOdoo->authenticate();
-            $dataRepo = $this->servicioOdoo->traerDatosReposicion();
-            file_put_contents($this->productsFile, json_encode($dataRepo));
-            return response()->json(['message' => 'Datos almacenados correctamente'], 200);
-        } catch (Exception $e) {
-            Log::error('Error al almacenar los datos del repositorio:', ['message' => $e->getMessage()]);
-            return response()->json(['error' => 'Error al almacenar los datos del repositorio'], 500);
-        }
-    }
 }
