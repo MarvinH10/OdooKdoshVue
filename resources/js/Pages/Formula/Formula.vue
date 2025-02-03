@@ -95,9 +95,23 @@ const cargarProductosFavoritos = () => {
 };
 
 const copyToClipboard = () => {
+    const xmlIds = productosFavoritos.value
+        .map(producto => producto.xml_id)
+        .filter(xml_id => xml_id);
+
+    const formattedTextbyxmlIds = xmlIds.join("\n");
     const formattedText = productosConcatenados.value.join("\n");
+
+    const combinedText = formattedText
+        .split("\n")
+        .map((line, index) => {
+            const xmlIdLine = formattedTextbyxmlIds.split("\n")[index] || "";
+            return `${line}\t${xmlIdLine}`;
+        })
+        .join("\n");
+
     const textArea = document.createElement("textarea");
-    textArea.value = formattedText;
+    textArea.value = combinedText;
     document.body.appendChild(textArea);
     textArea.select();
     document.execCommand("copy");
