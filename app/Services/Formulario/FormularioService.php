@@ -74,6 +74,24 @@ class FormularioService
                 } else {
                     $producto['attribute_values'] = "";
                 }
+
+                $xmlDato = $this->modelos->execute_kw(
+                    $this->base_datos,
+                    $this->uid,
+                    $this->contraseña,
+                    'ir.model.data',
+                    'search_read',
+                    [
+                        [['model', '=', 'product.product'], ['res_id', '=', $producto['id']]],
+                    ],
+                    ['fields' => ['module', 'name']]
+                );
+
+                if (!empty($xmlDato)) {
+                    $producto['xml_id'] = $xmlDato[0]['module'] . '.' . $xmlDato[0]['name'];
+                } else {
+                    $producto['xml_id'] = null;
+                }
             }
 
             return $productos;
