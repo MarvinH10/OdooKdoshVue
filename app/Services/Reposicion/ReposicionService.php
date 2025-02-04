@@ -32,7 +32,7 @@ class ReposicionService
                 'search_read',
                 [
                     [['detailed_type', '=', 'product'], ['default_code', '=', $default_code]],
-    ],
+                ],
                 [
                     'fields' => ['id', 'name', 'default_code', 'product_tmpl_id', 'product_template_attribute_value_ids'],
                 ]
@@ -58,12 +58,30 @@ class ReposicionService
                         }, $attributeValues);
                     }
                 }
+
+                $xmlDato = $this->modelos->execute_kw(
+                    $this->base_datos,
+                    $this->uid,
+                    $this->contraseña,
+                    'ir.model.data',
+                    'search_read',
+                    [
+                        [['model', '=', 'product.product'], ['res_id', '=', $product['id']]],
+                    ],
+                    ['fields' => ['module', 'name']]
+                );
+
+                if (!empty($xmlDato)) {
+                    $product['xml_id'] = $xmlDato[0]['module'] . '.' . $xmlDato[0]['name'];
+                } else {
+                    $product['xml_id'] = null;
+                }
             }
 
             return $products;
-
         } catch (Exception $e) {
-
+            Log::error('Error al traer los datos de la reposición:', ['message' => $e->getMessage()]);
+            return null;
         }
     }
 }

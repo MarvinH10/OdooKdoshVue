@@ -40,18 +40,21 @@ const fetchProductosRepo = async (default_code) => {
             const referencia = producto.default_code ? `[${producto.default_code}]` : "";
             const nombreProducto = producto.name;
 
-            if (producto.referencia && producto.referencia.length > 0) {
-                return `${nombreProducto} (${valoresAtributos})`;
+            let valoresAtributos = "";
+            if (producto.attribute_values && producto.attribute_values.length > 0) {
+                valoresAtributos = producto.attribute_values.join(", ");
             }
-            else if (
-                producto.attribute_values &&
-                producto.attribute_values.length > 0
-            ) {
-                const valoresAtributos = producto.attribute_values.join(", ");
-                return `${referencia} ${nombreProducto} (${valoresAtributos})`;
-            } else {
-                return `${referencia} ${nombreProducto}`;
-            }
+
+            // Construir el nombre concatenado
+            const nombreConcatenado = valoresAtributos
+                ? `${referencia} ${nombreProducto} (${valoresAtributos})`
+                : `${referencia} ${nombreProducto}`;
+
+            // Retornar un objeto con nombre concatenado y xml_id
+            return {
+                nombreConcatenado: nombreConcatenado,
+                xml_id: producto.xml_id || "Sin XML ID"
+            };
         });
 
         localStorage.setItem("productosRepo", JSON.stringify(productosRepo.value));
@@ -89,7 +92,9 @@ const loadProductosFromLocalStorage = () => {
 const filteredProductos = computed(() => {
     if (!searchQuery.value) return productosConcatenados.value;
     return productosConcatenados.value.filter((producto) =>
-        producto.toLowerCase().includes(searchQuery.value.toLowerCase())
+        producto && producto.nombreConcatenado
+        ? producto.nombreConcatenado.toLowerCase().includes(searchQuery.value.toLowerCase())
+        : false
     );
 });
 
@@ -103,6 +108,7 @@ const paginatedProductos = computed(() => {
 const seleccionarProducto = (producto) => {
     if (!productosSeleccionados.value.includes(producto)) {
         productosSeleccionados.value.push(producto);
+        // console.log("Producto seleccionado:", producto);
     }
 };
 
@@ -113,7 +119,9 @@ const eliminarProductoSeleccionado = (producto) => {
 };
 
 const copyToClipboard = () => {
-    const formattedText = filteredProductos.value.join("\n");
+    const formattedText = filteredProductos.value.map(producto => {
+        return `${producto.nombreConcatenado}\t${producto.xml_id || "Sin XML ID"}`;
+    }).join("\n");
     const textArea = document.createElement("textarea");
     textArea.value = formattedText;
     document.body.appendChild(textArea);
@@ -132,9 +140,12 @@ const copyToClipboard = () => {
 };
 
 const copyToClipboardTable = () => {
-    const formattedText = productosSeleccionados.value.join("\n");
+    const formattedData = productosSeleccionados.value.map(producto => {
+        return `${producto.nombreConcatenado}\t${producto.xml_id || "Sin XML ID"}`;
+    }).join("\n");
+
     const textArea = document.createElement("textarea");
-    textArea.value = formattedText;
+    textArea.value = formattedData;
     document.body.appendChild(textArea);
     textArea.select();
     document.execCommand("copy");
@@ -233,7 +244,7 @@ onMounted(() => {
                         <ul v-if="paginatedProductos.length > 0">
                             <li v-for="(producto, index) in paginatedProductos" :key="index"
                                 class="flex justify-between py-2">
-                                <span>{{ producto }}</span>
+                                <span>{{ producto.nombreConcatenado }}</span>
                                 <button @click="seleccionarProducto(producto)"
                                     class="px-2 py-1 font-bold text-white bg-green-500 rounded hover:bg-green-700">
                                     Seleccionar
@@ -273,7 +284,7 @@ onMounted(() => {
                                         producto, index
                                     ) in productosSeleccionados" :key="index">
                                     <td class="px-4 py-2 border">
-                                        {{ producto }}
+                                        {{ producto.nombreConcatenado }}
                                     </td>
                                     <td class="px-4 py-2 text-center border">
                                         <button @click="
