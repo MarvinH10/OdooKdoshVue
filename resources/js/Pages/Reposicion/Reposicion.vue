@@ -18,19 +18,47 @@ const fetchProductosRepo = async (default_code) => {
     if (!default_code) {
         return;
     }
+
+    const storedProductos = localStorage.getItem(`productosRepo_${default_code}`);
+    if (storedProductos) {
+        productosRepo.value = JSON.parse(storedProductos);
+        productosConcatenados.value = productosRepo.value.map((producto) => {
+            const referencia = producto.default_code ? `[${producto.default_code}]` : "";
+            const nombreProducto = producto.name;
+
+            let valoresAtributos = "";
+            if (producto.attribute_values && producto.attribute_values.length > 0) {
+                valoresAtributos = producto.attribute_values.join(", ");
+            }
+
+            const nombreConcatenado = valoresAtributos
+                ? `${referencia} ${nombreProducto} (${valoresAtributos})`
+                : `${referencia} ${nombreProducto}`;
+
+            return {
+                nombreConcatenado: nombreConcatenado,
+                xml_id: producto.xml_id || "Sin XML ID"
+            };
+        });
+        return;
+    }
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 120000);
+
     try {
         isLoading.value = true;
-        const response = await axios.get(`/reposicion/data_repo/traer/${default_code}`);
+        const response = await axios.get(`/reposicion/data_repo/traer/${default_code}`, {
+            signal: controller.signal,
+        });
 
         productosRepo.value = response.data;
 
         if (productosRepo.value.length === 0) {
-            toast.error("No se encontraron productos con esa referencia", {
+            toast.error("No se encontraron productos con esa referencia.", {
                 autoClose: 3000,
                 position: "bottom-right",
-                style: {
-                    width: "400px",
-                },
+                style: { width: "400px" },
                 className: "border-l-4 border-red-500 p-4",
             });
             return;
@@ -45,47 +73,36 @@ const fetchProductosRepo = async (default_code) => {
                 valoresAtributos = producto.attribute_values.join(", ");
             }
 
-            // Construir el nombre concatenado
             const nombreConcatenado = valoresAtributos
                 ? `${referencia} ${nombreProducto} (${valoresAtributos})`
                 : `${referencia} ${nombreProducto}`;
 
-            // Retornar un objeto con nombre concatenado y xml_id
             return {
                 nombreConcatenado: nombreConcatenado,
                 xml_id: producto.xml_id || "Sin XML ID"
             };
         });
 
-        localStorage.setItem("productosRepo", JSON.stringify(productosRepo.value));
+        localStorage.setItem(`productosRepo_${default_code}`, JSON.stringify(productosRepo.value));
     } catch (error) {
-        console.error("Error al traer productos repo:", error);
+        if (axios.isCancel(error)) {
+            toast.warning("La búsqueda tardó demasiado, escribe una referencia más específica.", {
+                autoClose: 4000,
+                position: "bottom-right",
+                style: { width: "400px" },
+                className: "border-l-4 border-yellow-500 p-4",
+            });
+        } else {
+            toast.warning("No hay ese producto en reposición", {
+                autoClose: 3000,
+                position: "bottom-right",
+                style: { width: "400px" },
+                className: "border-l-4 border-yellow-500 p-4",
+            });
+        }
     } finally {
         isLoading.value = false;
-    }
-};
-
-const loadProductosFromLocalStorage = () => {
-    const storedProductos = localStorage.getItem("productosRepo");
-    if (storedProductos) {
-        productosRepo.value = JSON.parse(storedProductos);
-
-        productosConcatenados.value = productosRepo.value.map((producto) => {
-            const referencia = producto.default_code ? `[${producto.default_code}]` : "";
-            const nombreProducto = producto.name;
-
-            if (producto.referencia && producto.referencia.length > 0) {
-                return `${nombreProducto} (${valoresAtributos})`;
-            } else if (
-                producto.attribute_values &&
-                producto.attribute_values.length > 0
-            ) {
-                const valoresAtributos = producto.attribute_values.join(", ");
-                return `${referencia} ${nombreProducto} (${valoresAtributos})`;
-            } else {
-                return `${referencia} ${nombreProducto}`;
-            }
-        });
+        clearTimeout(timeout);
     }
 };
 
@@ -93,8 +110,8 @@ const filteredProductos = computed(() => {
     if (!searchQuery.value) return productosConcatenados.value;
     return productosConcatenados.value.filter((producto) =>
         producto && producto.nombreConcatenado
-        ? producto.nombreConcatenado.toLowerCase().includes(searchQuery.value.toLowerCase())
-        : false
+            ? producto.nombreConcatenado.toLowerCase().includes(searchQuery.value.toLowerCase())
+            : false
     );
 });
 
@@ -173,8 +190,23 @@ const prevPage = () => {
     }
 };
 
-const refreshPage = () => {
-    fetchProductosRepo();
+const clearProductosCache = () => {
+    Object.keys(localStorage).forEach((key) => {
+        if (key.startsWith("productosRepo_")) {
+            localStorage.removeItem(key);
+        }
+    });
+
+    productosRepo.value = [];
+    productosConcatenados.value = [];
+    productosSeleccionados.value = [];
+
+    toast.success("Se eliminó correctamente el cache de las reposiciones.", {
+        autoClose: 3000,
+        position: "bottom-right",
+        style: { width: "400px" },
+        className: "border-l-4 border-green-500 p-4",
+    });
 };
 
 const handleSearch = () => {
@@ -190,13 +222,20 @@ watch(searchQuery, (newValue) => {
         productosConcatenados.value = [];
         productosSeleccionados.value = [];
         currentPage.value = 1;
+        localStorage.removeItem("searchQuery");
+    } else {
+        localStorage.setItem("searchQuery", newValue);
     }
 });
 
 onMounted(() => {
-    loadProductosFromLocalStorage();
-    if (!productosRepo.value.length && default_code.value) {
-        fetchProductosRepo(default_code.value);
+    const storedQuery = localStorage.getItem("searchQuery");
+    if (storedQuery) {
+        searchQuery.value = storedQuery;
+        fetchProductosRepo(storedQuery);
+    } else {
+        productosRepo.value = [];
+        productosConcatenados.value = [];
     }
 });
 </script>
@@ -229,10 +268,10 @@ onMounted(() => {
                         Copiar al portapapeles
                     </button>
 
-                    <button @click="refreshPage"
-                        class="float-right px-4 py-2 mb-4 font-bold text-white bg-gray-500 rounded hover:bg-gray-700">
-                        <i class="mr-2 fas fa-sync-alt"></i>
-                        Actualizar
+                    <button @click="clearProductosCache"
+                        class="float-right px-4 py-2 mb-4 font-bold text-white bg-red-500 rounded hover:bg-red-700">
+                        <i class="mr-2 fas fa-trash"></i>
+                        Borrar Caché
                     </button>
 
                     <div v-if="isLoading" class="my-4 text-center">

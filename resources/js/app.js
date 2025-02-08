@@ -9,6 +9,11 @@ import { createRouter, createWebHistory } from 'vue-router';
 
 const routes = [
     {
+        path: '/login',
+        name: 'Login',
+        component: () => import('@/Pages/Auth/Login.vue'),
+    },
+    {
         path: '/',
         name: 'Welcome',
         component: () => import('@/Pages/Welcome.vue'),
