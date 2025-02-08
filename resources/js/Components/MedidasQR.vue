@@ -40,9 +40,9 @@ export default {
             <div class="text-4xl font-bold mb-2">S/ {{ item.price }}</div>
             <div class="text-xs text-black mb-4">{{ item.categ_id }}</div>
             <div class="flex items-center justify-center relative">
-                <div
-                    class="absolute left-[60px] top-1/2 transform -translate-y-1/2 -translate-x-full text-sm font-semibold -rotate-90">
-                    {{ item.attribute }}</div>
+                <div class="absolute left-[90px] top-1/2 transform -translate-y-1/2 -translate-x-full text-xs font-semibold -rotate-90 w-[90px]">
+                    {{ item.attribute }}
+                </div>
                 <img :src="item.qrCode" alt="QR Code" class="mx-4"
                     :style="{ width: qrStyles.qrCodeSize + 'px', height: qrStyles.qrCodeSize + 'px' }" />
                 <div

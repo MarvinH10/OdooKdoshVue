@@ -21,6 +21,7 @@ const productIdPrueba = ref(24796);
 const route = useRoute();
 const productId = ref(route.query.product_id ? parseInt(route.query.product_id, 10) : undefined);
 const isUploading = ref(false);
+const estaCargando = ref(false);
 
 const buttonImages = [
     "/images/BarcodeMedidas/type1.jpg",
@@ -105,6 +106,7 @@ const traerDatoProductoSinCache = async (id) => {
 };
 
 const traerDatoProducto = async (id) => {
+    estaCargando.value = true;
     try {
         const storedData = localStorage.getItem(`producto_${id}`);
         if (storedData) {
@@ -113,6 +115,7 @@ const traerDatoProducto = async (id) => {
                 status: "activo",
                 quantity: item.quantity || 1,
             }));
+            estaCargando.value = false;
             return;
         }
 
@@ -158,6 +161,8 @@ const traerDatoProducto = async (id) => {
             autoClose: 3000,
             position: "bottom-right",
         });
+    } finally {
+        estaCargando.value = false;
     }
 };
 
@@ -341,37 +346,42 @@ onMounted(() => {
         <div class="py-12">
             <div class="max-w-12xl mx-auto sm:px-6 lg:px-1">
                 <div class="bg-white overflow-hidden p-6">
-                    <div class="flex flex-wrap">
-                        <div class="sm:w-1/6 lg:w-1/5 xl:w-1/4">
-                            <button v-if="!isUploading" @click="traerDatoProductoSinCache(productId)"
-                                class="flex flex-col-2 bg-green-700 text-white text-sm px-[9.5px] py-[0.5px] mb-1 rounded border text-center items-center justify-center">
-                                <i class="fas fa-sync-alt mr-2"></i> Actualizar
-                            </button>
-
-                            <div v-else class="text-left text-blue-500 font-bold text-sm">
-                                <i class="fas fa-spinner fa-spin mr-2"></i> Actualizando...
-                            </div>
-                            <button @click="printSelectedContent"
-                                class="flex flex-col bg-blue-700 text-white text-sm px-[25.5px] py-[0.5px] mb-5 rounded border text-center">
-                                Imprimir
-                            </button>
-                            <button @click="openModalCantidad"
-                                class="flex flex-col bg-blue-700 text-white text-sm px-[15.5px] py-[0.5px] rounded border text-center">
-                                Cantidades
-                            </button>
-                        </div>
-
-                        <div class="w-1/2">
-                            <div class="flex relative">
-                                <button v-for="(src, index) in buttonImages" :key="index"
-                                    @click="toggleSelection(index)" :class="[
-                                        'border border-dashed w-32 h-30 p-2 rounded bg-gray-100',
-                                        selectedButtonIndex === index ? 'bg-[#8d99ae] border-gray-700' : 'hover:bg-[#8d99ae] hover:border-gray-700'
-                                    ]">
-                                    <div class="w-auto p-2 rounded">
-                                        <img :src="src" class="w-32 h-30 object-cover" alt="Barcode" />
-                                    </div>
+                    <div v-if="estaCargando" class="flex justify-center items-center h-64">
+                        <i class="fas fa-spinner fa-spin mr-2"></i> Cargando los datos...
+                    </div>
+                    <div v-else>
+                        <div class="flex flex-wrap">
+                            <div class="sm:w-1/6 lg:w-1/5 xl:w-1/4">
+                                <button v-if="!isUploading" @click="traerDatoProductoSinCache(productId)"
+                                    class="flex flex-col-2 bg-green-700 text-white text-sm px-[9.5px] py-[0.5px] mb-1 rounded border text-center items-center justify-center">
+                                    <i class="fas fa-sync-alt mr-2"></i> Actualizar
                                 </button>
+
+                                <div v-else class="text-left text-blue-500 font-bold text-sm">
+                                    <i class="fas fa-spinner fa-spin mr-2"></i> Actualizando...
+                                </div>
+                                <button @click="printSelectedContent"
+                                    class="flex flex-col bg-blue-700 text-white text-sm px-[25.5px] py-[0.5px] mb-5 rounded border text-center">
+                                    Imprimir
+                                </button>
+                                <button @click="openModalCantidad"
+                                    class="flex flex-col bg-blue-700 text-white text-sm px-[15.5px] py-[0.5px] rounded border text-center">
+                                    Cantidades
+                                </button>
+                            </div>
+
+                            <div class="w-1/2">
+                                <div class="flex relative">
+                                    <button v-for="(src, index) in buttonImages" :key="index"
+                                        @click="toggleSelection(index)" :class="[
+                                            'border border-dashed w-32 h-30 p-2 rounded bg-gray-100',
+                                            selectedButtonIndex === index ? 'bg-[#8d99ae] border-gray-700' : 'hover:bg-[#8d99ae] hover:border-gray-700'
+                                        ]">
+                                        <div class="w-auto p-2 rounded">
+                                            <img :src="src" class="w-32 h-30 object-cover" alt="Barcode" />
+                                        </div>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
