@@ -1,6 +1,6 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import { ref, computed, watch } from "vue";
+import { ref, computed, watch, onMounted } from "vue";
 import { styles } from "@/stylesConfig";
 import { useRoute } from "vue-router";
 import { generateContent1 } from "@/generateContent1.js";
@@ -15,6 +15,8 @@ import MedidasQR from "@/Components/MedidasQR.vue";
 import QRCode from "qrcode";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
+
+const productIdPrueba = ref(24796);
 
 const route = useRoute();
 const productId = ref(route.query.product_id ? parseInt(route.query.product_id, 10) : undefined);
@@ -115,6 +117,7 @@ const traerDatoProducto = async (id) => {
         }
 
         const response = await axios.get(`/barcode/traer/${id}`);
+
         if (response.data && response.data.length >= 0) {
             const producto = response.data[0];
 
@@ -318,6 +321,13 @@ watch(
         }
     }
 );
+
+onMounted(() => {
+    if (!productIdPrueba.value) {
+        productIdPrueba.value = 24796;
+    }
+    traerDatoProducto(productIdPrueba.value);
+});
 </script>
 
 <template>
