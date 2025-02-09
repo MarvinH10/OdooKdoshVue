@@ -7,12 +7,12 @@ export const generateContent7 = (item, style) => `
         text-align: center;
         position: relative;
         background-color: white;
-        // border: 1px solid #ccc;
+        border: 1px solid #ccc;
         color: black;
         font-family: Figtree, ui-sans-serif, system-ui, sans-serif,
             'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';">
 
-        <div style="font-size: 2.25rem; line-height: 2.5rem; font-weight: 500; margin-top: 0.95rem;">
+        <div style="font-size: 1.875rem; line-height: 2.5rem; font-weight: 500; margin-top: 0.95rem;">
             S/ ${item.price}
         </div>
 
@@ -26,19 +26,21 @@ export const generateContent7 = (item, style) => `
             align-items: center;
             position: relative;">
 
-        <div style="
-            position: absolute;
-            left: 2rem;
-            top: 50%;
-            transform: translateY(-50%) translateX(-100%) rotate(-90deg);
-            font-size: 0.75rem;
-            line-height: 1rem;
-            font-weight: 600;
-            max-width: 100px;
-            white-space: normal;
-            word-wrap: break-word;">
-            ${item.attribute}
-        </div>
+            <div style="
+                position: absolute;
+                left: 50px;
+                top: 50%;
+                transform: translateY(-50%) translateX(-50%) rotate(-90deg);
+                font-size: 0.75rem;
+                font-weight: 600;
+                white-space: normal;
+                word-break: break-word;
+                text-align: center;
+                max-width: 100px;
+                overflow: hidden;
+                text-overflow: ellipsis;">
+                ${item.attribute}
+            </div>
 
             <img src="${item.qrCode}" style="
                 width: 100px;
@@ -65,8 +67,9 @@ export const generateContent7 = (item, style) => `
         <div style="font-size: 0.75rem; line-height: 1rem; margin-top: 0.25rem; font-weight: 500;">
             ${item.code}
         </div>
-
-        <div style="font-size: 0.75rem; line-height: 1rem;">
-            ${item.description}
+        <div style="display: flex; justify-content: center;">
+            <div style="font-size: 8px; width: 90px; text-align: center;">
+                ${item.description}
+            </div>
         </div>
     </div>`;
