@@ -7,7 +7,7 @@ export const generateContent7 = (item, style) => `
         text-align: center;
         position: relative;
         background-color: white;
-        border: 1px solid #ccc;
+        // border: 1px solid #ccc;
         color: black;
         font-family: Figtree, ui-sans-serif, system-ui, sans-serif,
             'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';">
@@ -51,7 +51,7 @@ export const generateContent7 = (item, style) => `
 
         <div style="
             position: absolute;
-            left: 13rem;
+            left: 247px;
             top: 50%;
             transform: translateY(-50%) translateX(-100%) rotate(-90deg);
             font-size: 0.75rem;

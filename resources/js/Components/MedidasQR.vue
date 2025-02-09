@@ -40,14 +40,16 @@ export default {
             <div class="text-4xl font-bold mb-2">S/ {{ item.price }}</div>
             <div class="text-xs text-black mb-4">{{ item.categ_id }}</div>
             <div class="flex items-center justify-center relative">
-                <div class="absolute left-[90px] top-1/2 transform -translate-y-1/2 -translate-x-full text-xs font-semibold -rotate-90 w-[90px]">
+                <div
+                    class="absolute left-[90px] top-1/2 transform -translate-y-1/2 -translate-x-full text-xs font-semibold -rotate-90 w-[90px]">
                     {{ item.attribute }}
                 </div>
                 <img :src="item.qrCode" alt="QR Code" class="mx-4"
                     :style="{ width: qrStyles.qrCodeSize + 'px', height: qrStyles.qrCodeSize + 'px' }" />
                 <div
-                    class="absolute left-[230px] top-1/2 transform -translate-y-1/2 -translate-x-full text-xs font-semibold -rotate-90 w-[100px]">
-                    {{ item.default_code }}</div>
+                    class="absolute left-[235px] top-1/2 transform -translate-y-1/2 -translate-x-full text-xs font-semibold -rotate-90 max-w-[110px] overflow-hidden">
+                    {{ item.default_code }}
+                </div>
             </div>
             <div class="text-xs font-mono mt-2">{{ item.code }}</div>
             <div class="text-xs text-black">{{ item.description }}</div>
@@ -98,7 +100,7 @@ export default {
             <div class="text-sm text-black">{{ item.description }}</div>
             <div class="flex items-center justify-center relative">
                 <div
-                    class="absolute left-[130px] top-[40px] transform -translate-y-1/2 -translate-x-full text-sm font-semibold -rotate-90">
+                    class="absolute left-[145px] top-[40px] transform -translate-y-1/2 -translate-x-full text-sm font-semibold -rotate-90">
                     {{ item.categ_id }}</div>
                 <img :src="item.qrCode" alt="QR Code" class="mx-4"
                     :style="{ width: qrStyles.qrCodeSize + 'px', height: qrStyles.qrCodeSize + 'px' }" />
@@ -124,7 +126,7 @@ export default {
                 <img :src="item.qrCode" alt="QR Code" class="mx-4"
                     :style="{ width: qrStyles.qrCodeSize + 'px', height: qrStyles.qrCodeSize + 'px' }" />
                 <div
-                    class="absolute left-[220px] top-1/2 transform -translate-y-1/2 -translate-x-full text-xs font-semibold -rotate-90 w-[100px]">
+                    class="absolute left-[220px] top-1/2 transform -translate-y-1/2 -translate-x-full text-xs font-semibold -rotate-90 max-w-[110px] overflow-hidden">
                     {{ item.default_code }}</div>
             </div>
             <div class="text-xs font-mono mt-1">{{ item.code }}</div>
@@ -146,12 +148,12 @@ export default {
             <div class="text-black text-[0.45rem] ml-1 mr-[72px] leading-tight">
                 {{ item.attribute || "\u00A0" }}
             </div>
-            <div class="flex items-center left-[80px] -top-[70px] justify-center relative">
-                <img :src="item.qrCode" alt="QR Code" class="mx-4"
-                    :style="{ width: qrStyles.qrCodeSize + 'px', height: qrStyles.qrCodeSize + 'px' }" />
-                <div
-                    class="text-black text-[8.5px] absolute left-[146px] top-[65px] transform -translate-y-1/2 -translate-x-full">
-                    {{ item.code }}</div>
+            <div class="absolute right-[5px] top-1/2 transform -translate-y-1/2 flex flex-col items-center">
+                <img :src="item.qrCode" alt="QR Code" class="w-[50px] h-[50px] mb-1" />
+
+                <div class="text-black text-[8.5px] text-center">
+                    {{ item.code }}
+                </div>
             </div>
         </div>
 
@@ -172,7 +174,7 @@ export default {
             </div>
             <div class="text-xs font-mono mt-1">{{ item.code }}</div>
             <div class="flex justify-center">
-            <div class="text-[8px] text-black text-center w-[90px]">
+                <div class="text-[8px] text-black text-center w-[90px]">
                     {{ item.description }}
                 </div>
             </div>
