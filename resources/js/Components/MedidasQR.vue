@@ -46,7 +46,7 @@ export default {
                 <img :src="item.qrCode" alt="QR Code" class="mx-4"
                     :style="{ width: qrStyles.qrCodeSize + 'px', height: qrStyles.qrCodeSize + 'px' }" />
                 <div
-                    class="absolute left-[210px] top-1/2 transform -translate-y-1/2 -translate-x-full text-sm font-semibold -rotate-90">
+                    class="absolute left-[230px] top-1/2 transform -translate-y-1/2 -translate-x-full text-xs font-semibold -rotate-90 w-[100px]">
                     {{ item.default_code }}</div>
             </div>
             <div class="text-xs font-mono mt-2">{{ item.code }}</div>
@@ -56,16 +56,16 @@ export default {
         <!-- Button 2 -->
         <div v-for="(item) in filteredItems" v-else-if="selectedButtonIndex === 1 && filteredItems"
             class="bg-white w-[12.5rem] h-[5.5rem] text-center relative">
-            <div class="text-xl font-bold mr-20 mt-1">S/ {{ item.price }}</div>
+            <div class="text-xl font-bold mt-[1px] mr-20">S/ {{ item.price }}</div>
             <div class="text-black text-[0.5rem] ml-1 mr-[80px] leading-tight">
                 {{ item.categ_id }}
             </div>
-            <div class="text-black text-[0.5rem] ml-1 mr-[80px] leading-tight">
+            <div class="text-black text-[0.45rem] ml-1 mr-[80px] leading-tight">
                 {{ item.default_code || "\u00A0" }}
             </div>
-            <div class="text-black text-[0.5rem] ml-1 mr-[80px] leading-tight">{{
+            <div class="text-black text-[0.45rem] ml-1 mr-[80px] leading-tight">{{
                 item.description }}</div>
-            <div class="text-black text-[0.5rem] ml-1 mr-[80px] leading-tight">
+            <div class="text-black text-[0.45rem] ml-1 mr-[80px] leading-tight">
                 {{ item.attribute || "\u00A0" }}
             </div>
             <div class="flex items-center left-[60px] -top-[72px] justify-center relative">
@@ -98,7 +98,7 @@ export default {
             <div class="text-sm text-black">{{ item.description }}</div>
             <div class="flex items-center justify-center relative">
                 <div
-                    class="absolute left-[150px] top-[40px] transform -translate-y-1/2 -translate-x-full text-sm font-semibold -rotate-90">
+                    class="absolute left-[130px] top-[40px] transform -translate-y-1/2 -translate-x-full text-sm font-semibold -rotate-90">
                     {{ item.categ_id }}</div>
                 <img :src="item.qrCode" alt="QR Code" class="mx-4"
                     :style="{ width: qrStyles.qrCodeSize + 'px', height: qrStyles.qrCodeSize + 'px' }" />
@@ -119,12 +119,12 @@ export default {
             <div class="text-xs text-black mb-1">{{ item.categ_id }}</div>
             <div class="flex items-center justify-center relative">
                 <div
-                    class="absolute left-[32px] top-1/2 transform -translate-y-1/2 -translate-x-full text-sm font-semibold -rotate-90">
+                    class="absolute left-[70px] top-1/2 transform -translate-y-1/2 -translate-x-full text-xs font-semibold -rotate-90 w-[90px]">
                     {{ item.attribute }}</div>
                 <img :src="item.qrCode" alt="QR Code" class="mx-4"
                     :style="{ width: qrStyles.qrCodeSize + 'px', height: qrStyles.qrCodeSize + 'px' }" />
                 <div
-                    class="absolute left-[200px] top-1/2 transform -translate-y-1/2 -translate-x-full text-sm font-semibold -rotate-90">
+                    class="absolute left-[220px] top-1/2 transform -translate-y-1/2 -translate-x-full text-xs font-semibold -rotate-90 w-[100px]">
                     {{ item.default_code }}</div>
             </div>
             <div class="text-xs font-mono mt-1">{{ item.code }}</div>
@@ -134,19 +134,19 @@ export default {
         <!-- Button 6 -->
         <div v-for="(item) in filteredItems" v-else-if="selectedButtonIndex === 5 && filteredItems"
             class="bg-white w-[230px] h-20 text-center relative">
-            <div class="text-xl font-bold mr-20 mt-1">S/ {{ item.price }}</div>
+            <div class="text-xl font-bold mr-20 mt-[1px]">S/ {{ item.price }}</div>
             <div class="text-[0.5rem] text-black ml-1 mr-[62px] leading-tight">
                 {{ item.categ_id }}
             </div>
-            <div class="text-[0.5rem] text-black mr-[72px] leading-tight">
+            <div class="text-[0.45rem] text-black mr-[72px] leading-tight">
                 {{ item.default_code || "\u00A0" }}
             </div>
-            <div class="text-[0.5rem] text-black mr-[72px] leading-tight">{{
+            <div class="text-[0.45rem] text-black mr-[72px] leading-tight">{{
                 item.description }}</div>
-            <div class="text-black text-[7.8px] ml-1 mr-[72px] leading-tight">
+            <div class="text-black text-[0.45rem] ml-1 mr-[72px] leading-tight">
                 {{ item.attribute || "\u00A0" }}
             </div>
-            <div class="flex items-center left-[80px] -top-[67px] justify-center relative">
+            <div class="flex items-center left-[80px] -top-[70px] justify-center relative">
                 <img :src="item.qrCode" alt="QR Code" class="mx-4"
                     :style="{ width: qrStyles.qrCodeSize + 'px', height: qrStyles.qrCodeSize + 'px' }" />
                 <div
@@ -158,20 +158,24 @@ export default {
         <!-- Button 7 -->
         <div v-for="(item) in filteredItems" v-else-if="selectedButtonIndex === 6 && filteredItems"
             class="bg-white p-1 w-60 h-60 text-center relative" :style="{ borderRadius: '50%' }">
-            <div class="text-4xl font-bold mt-[0.95rem]">S/ {{ item.price }}</div>
+            <div class="text-3xl font-bold mt-[0.95rem]">S/ {{ item.price }}</div>
             <div class="text-[0.60rem] text-black mb-2">{{ item.categ_id }}</div>
             <div class="flex items-center justify-center relative">
                 <div
-                    class="absolute left-[2rem] top-1/2 transform -translate-y-1/2 -translate-x-full text-xs font-semibold -rotate-90">
+                    class="absolute left-[90px] top-1/2 transform -translate-y-1/2 -translate-x-full text-xs font-semibold -rotate-90 w-[90px]">
                     {{ item.attribute }}</div>
                 <img :src="item.qrCode" alt="QR Code" class="mx-4"
                     :style="{ width: qrStyles.qrCodeSize + 'px', height: qrStyles.qrCodeSize + 'px' }" />
                 <div
-                    class="absolute left-[13rem] top-1/2 transform -translate-y-1/2 -translate-x-full text-xs font-semibold -rotate-90">
+                    class="absolute left-[230px] top-1/2 transform -translate-y-1/2 -translate-x-full text-xs font-semibold -rotate-90 w-[100px]">
                     {{ item.default_code }}</div>
             </div>
             <div class="text-xs font-mono mt-1">{{ item.code }}</div>
-            <div class="text-xs text-black">{{ item.description }}</div>
+            <div class="flex justify-center">
+            <div class="text-[8px] text-black text-center w-[90px]">
+                    {{ item.description }}
+                </div>
+            </div>
         </div>
     </div>
 </template>

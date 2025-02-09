@@ -11,7 +11,7 @@ export const generateContent2 = (item, style) => `
         font-family: Figtree, ui-sans-serif, system-ui, sans-serif,
             'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';">
 
-        <div style="font-size: 1.25rem; line-height: 1.75rem; font-weight: 500; margin-top: 0.25rem; margin-right: 5rem;">
+        <div style="font-size: 1.25rem; line-height: 1.75rem; font-weight: 500; margin-top: 1px; margin-right: 5rem;">
             S/ ${item.price}
         </div>
 
@@ -19,15 +19,15 @@ export const generateContent2 = (item, style) => `
             ${item.categ_id}
         </div>
 
-        <div style="font-size: 0.5rem; line-height: 1.25; margin-right: 80px; margin-left: 0.25rem;">
+        <div style="font-size: 0.45rem; line-height: 1.25; margin-right: 80px; margin-left: 0.25rem;">
             ${item.default_code || "\u00A0"}
         </div>
 
-        <div style="font-size: 0.5rem; line-height: 1.25; margin-right: 80px; margin-left: 0.25rem;">
+        <div style="font-size: 0.45rem; line-height: 1.25; margin-right: 80px; margin-left: 0.25rem;">
             ${item.description}
         </div>
 
-        <div style="font-size: 0.5rem; line-height: 1.25; margin-right: 80px; margin-left: 0.25rem;">
+        <div style="font-size: 0.45rem; line-height: 1.25; margin-right: 80px; margin-left: 0.25rem;">
             ${item.attribute || "\u00A0"}
         </div>
 

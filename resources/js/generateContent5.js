@@ -25,19 +25,21 @@ export const generateContent5 = (item, style) => `
             align-items: center;
             position: relative;">
 
-        <div style="
-            position: absolute;
-            left: 32px;
-            top: 50%;
-            transform: translateY(-50%) translateX(-100%) rotate(-90deg);
-            font-size: 0.875rem;
-            line-height: 1.25rem;
-            font-weight: 600;
-            max-width: 100px;
-            white-space: normal;
-            word-wrap: break-word;">
-            ${item.attribute}
-        </div>
+            <div style="
+                position: absolute;
+                left: 30px;
+                top: 50%;
+                transform: translateY(-50%) translateX(-50%) rotate(-90deg);
+                font-size: 0.75rem;
+                font-weight: 600;
+                white-space: normal;
+                word-break: break-word;
+                text-align: center;
+                max-width: 100px;
+                overflow: hidden;
+                text-overflow: ellipsis;">
+                ${item.attribute}
+            </div>
 
             <img src="${item.qrCode}" style="
                 width: 100px;

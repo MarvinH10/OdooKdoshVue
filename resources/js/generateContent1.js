@@ -47,7 +47,7 @@ export const generateContent1 = (item, style) => `
                 left: 160px;
                 top: 50%;
                 transform: translateY(-50%) rotate(-90deg);
-                font-size: 0.875rem;
+                font-size: 0.75rem;
                 font-weight: 600;
                 white-space: normal;
                 word-break: break-word;
