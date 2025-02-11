@@ -23,7 +23,7 @@ export const generateContent1 = (item, style) => `
 
             <div style="
                 position: absolute;
-                left: 50px;
+                left: 55px;
                 top: 50%;
                 transform: translateY(-50%) translateX(-50%) rotate(-90deg);
                 font-size: 0.75rem;
