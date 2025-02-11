@@ -50,13 +50,17 @@ export const generateContent4 = (item, style) => `
 
             <div style="
                 position: absolute;
-                left: 145px;
-                top: 40px;
-                transform: translateY(-50%) translateX(-100%) rotate(-90deg);
-                font-size: 0.875rem;
-                line-height: 1.25rem;
+                left: 14px;
+                top: 50%;
+                transform: translateY(-50%) translateX(-50%) rotate(-90deg);
+                font-size: 0.75rem;
                 font-weight: 600;
-                word-wrap: break-word;">
+                white-space: normal;
+                word-break: break-word;
+                text-align: center;
+                width: 300px;
+                overflow: hidden;
+                text-overflow: ellipsis;">
                 ${item.categ_id}
             </div>
 
@@ -71,13 +75,17 @@ export const generateContent4 = (item, style) => `
 
             <div style="
                 position: absolute;
-                left: 390px;
-                top: 40px;
-                transform: translateY(-50%) translateX(-100%) rotate(-90deg);
-                font-size: 0.875rem;
-                line-height: 1.25rem;
+                left: 340px;
+                top: 50%;
+                transform: translateY(-50%) rotate(-90deg);
+                font-size: 0.75rem;
                 font-weight: 600;
-                word-wrap: break-word;">
+                white-space: normal;
+                word-break: break-word;
+                text-align: center;
+                width: 100px;
+                overflow: hidden;
+                text-overflow: ellipsis;">
                 ${item.default_code}
             </div>
         </div>

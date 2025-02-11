@@ -27,7 +27,7 @@ export const generateContent5 = (item, style) => `
 
             <div style="
                 position: absolute;
-                left: 30px;
+                left: 40px;
                 top: 50%;
                 transform: translateY(-50%) translateX(-50%) rotate(-90deg);
                 font-size: 0.75rem;
@@ -50,11 +50,11 @@ export const generateContent5 = (item, style) => `
 
         <div style="
             position: absolute;
-            left: 230px;
+            left: 190px;
             top: 50%;
             transform: translateY(-50%) translateX(-100%) rotate(-90deg);
             font-size: 0.75rem;
-            line-height: 1.25rem;
+            line-height: 1rem;
             font-weight: 600;
             max-width: 100px;
             white-space: normal;

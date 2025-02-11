@@ -4,6 +4,7 @@ export const generateContent6 = (item, style) => `
         height: 80px;
         text-align: center;
         position: relative;
+        padding: 4px;
         background-color: white;
         // border: 1px solid #ccc;
         color: black;
@@ -32,27 +33,24 @@ export const generateContent6 = (item, style) => `
 
         <div style="
             display: flex;
-            left: 80px;
-            top: -65px;
-            justify-content: center;
+            flex-direction: column;
+            right: 5px;
+            top: 10px;
             align-items: center;
-            position: relative;">
+            position: absolute;
+            --tw-translate-y: -50%;
+            transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));">
 
             <img src="${item.qrCode}" style="
-                width: 55px;
-                height: 55px;
-                margin-left: 1rem;
-                margin-right: 1rem;
-                max-width: 100%;" />
+                width: 50px;
+                height: 50px;
+                margin-bottom: 0.25rem;" />
 
             <div style="
-                position: absolute;
                 font-size: 8.5px;
-                color: black;
-                top: 65px;
-                left: 146px;
-                transform: translateY(-50%) translateX(-100%);
-            ">
+                --tw-text-opacity: 1;
+                color: rgb(0 0 0 / var(--tw-text-opacity));
+                text-align: center;">
                 ${item.code}
             </div>
         </div>

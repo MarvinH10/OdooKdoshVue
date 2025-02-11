@@ -41,15 +41,13 @@ export default {
             <div class="text-xs text-black mb-4">{{ item.categ_id }}</div>
             <div class="flex items-center justify-center relative">
                 <div
-                    class="absolute left-[90px] top-1/2 transform -translate-y-1/2 -translate-x-full text-xs font-semibold -rotate-90 w-[90px]">
-                    {{ item.attribute }}
-                </div>
+                    class="absolute left-[96px] top-1/2 transform -translate-y-1/2 -translate-x-full text-xs font-semibold -rotate-90 w-[90px]">
+                    {{ item.attribute }}</div>
                 <img :src="item.qrCode" alt="QR Code" class="mx-4"
                     :style="{ width: qrStyles.qrCodeSize + 'px', height: qrStyles.qrCodeSize + 'px' }" />
                 <div
-                    class="absolute left-[235px] top-1/2 transform -translate-y-1/2 -translate-x-full text-xs font-semibold -rotate-90 max-w-[110px] overflow-hidden">
-                    {{ item.default_code }}
-                </div>
+                    class="absolute left-[230px] top-1/2 transform -translate-y-1/2 -translate-x-full text-xs font-semibold -rotate-90 w-[100px]">
+                    {{ item.default_code }}</div>
             </div>
             <div class="text-xs font-mono mt-2">{{ item.code }}</div>
             <div class="text-xs text-black">{{ item.description }}</div>
@@ -70,12 +68,12 @@ export default {
             <div class="text-black text-[0.45rem] ml-1 mr-[80px] leading-tight">
                 {{ item.attribute || "\u00A0" }}
             </div>
-            <div class="flex items-center left-[60px] -top-[72px] justify-center relative">
-                <img :src="item.qrCode" alt="QR Code" class="mx-4"
-                    :style="{ width: qrStyles.qrCodeSize + 'px', height: qrStyles.qrCodeSize + 'px' }" />
-                <div
-                    class="text-black text-[8.5px] absolute left-[127px] top-[65px] transform -translate-y-1/2 -translate-x-full">
-                    {{ item.code }}</div>
+            <div class="absolute right-[10px] top-1/2 transform -translate-y-1/2 flex flex-col items-center">
+                <img :src="item.qrCode" alt="QR Code" class="w-[50px] h-[50px] mb-1" />
+
+                <div class="text-black text-[8.5px] text-center">
+                    {{ item.code }}
+                </div>
             </div>
         </div>
 
@@ -100,12 +98,12 @@ export default {
             <div class="text-sm text-black">{{ item.description }}</div>
             <div class="flex items-center justify-center relative">
                 <div
-                    class="absolute left-[145px] top-[40px] transform -translate-y-1/2 -translate-x-full text-sm font-semibold -rotate-90">
+                    class="absolute left-[167px] top-1/2 transform -translate-y-1/2 -translate-x-full text-xs font-semibold -rotate-90 w-[300px]">
                     {{ item.categ_id }}</div>
                 <img :src="item.qrCode" alt="QR Code" class="mx-4"
                     :style="{ width: qrStyles.qrCodeSize + 'px', height: qrStyles.qrCodeSize + 'px' }" />
                 <div
-                    class="absolute left-[390px] top-[40px] transform -translate-y-1/2 -translate-x-full text-sm font-semibold -rotate-90">
+                    class="absolute left-[430px] top-1/2 transform -translate-y-1/2 -translate-x-full text-xs font-semibold -rotate-90 w-[100px]">
                     {{ item.default_code }}</div>
             </div>
             <div class="text-xs font-mono mt-2">{{ item.code }}</div>
@@ -121,12 +119,12 @@ export default {
             <div class="text-xs text-black mb-1">{{ item.categ_id }}</div>
             <div class="flex items-center justify-center relative">
                 <div
-                    class="absolute left-[70px] top-1/2 transform -translate-y-1/2 -translate-x-full text-xs font-semibold -rotate-90 w-[90px]">
+                    class="absolute left-[80px] top-1/2 transform -translate-y-1/2 -translate-x-full text-xs font-semibold -rotate-90 w-[90px]">
                     {{ item.attribute }}</div>
                 <img :src="item.qrCode" alt="QR Code" class="mx-4"
                     :style="{ width: qrStyles.qrCodeSize + 'px', height: qrStyles.qrCodeSize + 'px' }" />
                 <div
-                    class="absolute left-[220px] top-1/2 transform -translate-y-1/2 -translate-x-full text-xs font-semibold -rotate-90 max-w-[110px] overflow-hidden">
+                    class="absolute left-[215px] top-1/2 transform -translate-y-1/2 -translate-x-full text-xs font-semibold -rotate-90 w-[100px]">
                     {{ item.default_code }}</div>
             </div>
             <div class="text-xs font-mono mt-1">{{ item.code }}</div>
@@ -164,7 +162,7 @@ export default {
             <div class="text-[0.60rem] text-black mb-2">{{ item.categ_id }}</div>
             <div class="flex items-center justify-center relative">
                 <div
-                    class="absolute left-[90px] top-1/2 transform -translate-y-1/2 -translate-x-full text-xs font-semibold -rotate-90 w-[90px]">
+                    class="absolute left-[96px] top-1/2 transform -translate-y-1/2 -translate-x-full text-xs font-semibold -rotate-90 w-[90px]">
                     {{ item.attribute }}</div>
                 <img :src="item.qrCode" alt="QR Code" class="mx-4"
                     :style="{ width: qrStyles.qrCodeSize + 'px', height: qrStyles.qrCodeSize + 'px' }" />
