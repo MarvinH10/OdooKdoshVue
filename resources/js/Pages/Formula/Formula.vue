@@ -69,7 +69,7 @@ const traerProductosFavoritos = async () => {
 
         guardarALocalStorage(productosFavoritos.value);
     } catch (error) {
-        console.error("Error al traer productos favoritos:", error);
+        console.error("Error al traer productos favoritos:", error.response || error.message);
     } finally {
         isLoading.value = false;
     }
