@@ -54,7 +54,7 @@ class FormulariosController extends Controller
                 return response()->json(['error' => 'Usuario no autenticado en Odoo'], 401);
             }
 
-            $dataFavorite = $this->servicioOdoo->traerDatosFasvoritos($usuarioId);
+            $dataFavorite = $this->servicioOdoo->traerDatosFavoritos($usuarioId);
             return response()->json($dataFavorite);
         } catch (Exception $e) {
             Log::error('Error fetching favorite data:', ['message' => $e->getMessage()]);

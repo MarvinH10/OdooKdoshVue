@@ -94,9 +94,9 @@ class ServicioOdoo
         return $this->formularioService->traerProductosFavoritos();
     }
 
-    public function traerDatosFasvoritos($usuarioId)
+    public function traerDatosFavoritos($usuarioId)
     {
-        return $this->formularioService->traerDatosFasvoritos($usuarioId);
+        return $this->formularioService->traerDatosFavoritos($usuarioId);
     }
 
     public function convertirFavoritosANoFavoritos($usuarioId)
@@ -110,7 +110,7 @@ class ServicioOdoo
     {
         return $this->reposicionService->traerDatosReposicion($default_code);
     }
-    
+
     /*FIN REPOSICION SERVICIO*/
 
     /*INICIO BARCODE SERVICIO*/
