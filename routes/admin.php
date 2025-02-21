@@ -30,7 +30,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::controller(ReposicionController::class)->group(function () {
         Route::get('/reposicion', 'index')->name('reposicion');
-        Route::get('/reposicion/data_repo/traer/{default_code}', 'traerDatosReposicion');
+        Route::get('/reposicion/data_repo/traer/referencia/{default_code}', 'traerDatosReposicionxReferencia');
+        Route::get('/reposicion/data_repo/traer/nombre/{name}', 'traerDatosReposicionxName');
     });
 
     Route::controller(BarcodeController::class)->group(function () {

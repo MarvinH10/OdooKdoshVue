@@ -9,17 +9,18 @@ const productosRepo = ref([]);
 const productosConcatenados = ref([]);
 const productosSeleccionados = ref([]);
 const searchQuery = ref("");
+const searchQueryName = ref("");
 const isLoading = ref(false);
 const pageSize = ref(20);
 const currentPage = ref(1);
 const default_code = ref("");
 
-const fetchProductosRepo = async (default_code) => {
-    if (!default_code) {
+const fetchProductosRepo = async (query, type) => {
+    if (!query) {
         return;
     }
 
-    const storedProductos = localStorage.getItem(`productosRepo_${default_code}`);
+    const storedProductos = localStorage.getItem(`productosRepo_${name}`);
     if (storedProductos) {
         productosRepo.value = JSON.parse(storedProductos);
         productosConcatenados.value = productosRepo.value.map((producto) => {
@@ -48,10 +49,11 @@ const fetchProductosRepo = async (default_code) => {
 
     try {
         isLoading.value = true;
-        const response = await axios.get(`/reposicion/data_repo/traer/${default_code}`, {
-            signal: controller.signal,
-        });
+        const url = type === "default_code"
+            ? `/reposicion/data_repo/traer/referencia/${query}`
+            : `/reposicion/data_repo/traer/nombre/${query}`;
 
+        const response = await axios.get(url, { signal: controller.signal });
         productosRepo.value = response.data;
 
         if (productosRepo.value.length === 0) {
@@ -210,32 +212,51 @@ const clearProductosCache = () => {
 };
 
 const handleSearch = () => {
-    default_code.value = searchQuery.value;
-    if (default_code.value) {
-        fetchProductosRepo(default_code.value);
+    if (searchQuery.value) {
+        default_code.value = searchQuery.value;
+        fetchProductosRepo(default_code.value, "default_code");
+    }
+    if (searchQueryName.value) {
+        default_code.value = searchQueryName.value;
+        fetchProductosRepo(default_code.value, "name");
     }
 };
 
 watch(searchQuery, (newValue) => {
     if (!newValue) {
-        productosRepo.value = [];
-        productosConcatenados.value = [];
-        productosSeleccionados.value = [];
-        currentPage.value = 1;
+        resetProductos();
         localStorage.removeItem("searchQuery");
     } else {
         localStorage.setItem("searchQuery", newValue);
     }
 });
 
+watch(searchQueryName, (newValue) => {
+    if (!newValue) {
+        resetProductos();
+        localStorage.removeItem("searchQueryName");
+    } else {
+        localStorage.setItem("searchQueryName", newValue);
+    }
+});
+
+const resetProductos = () => {
+    productosRepo.value = [];
+    productosConcatenados.value = [];
+    productosSeleccionados.value = [];
+    currentPage.value = 1;
+};
+
 onMounted(() => {
     const storedQuery = localStorage.getItem("searchQuery");
     if (storedQuery) {
         searchQuery.value = storedQuery;
-        fetchProductosRepo(storedQuery);
-    } else {
-        productosRepo.value = [];
-        productosConcatenados.value = [];
+        fetchProductosRepo(storedQuery, "default_code");
+    }
+    const storedQueryName = localStorage.getItem("searchQueryName");
+    if (storedQueryName) {
+        searchQueryName.value = storedQueryName;
+        fetchProductosRepo(storedQueryName, "name");
     }
 });
 </script>
@@ -255,9 +276,20 @@ onMounted(() => {
                         <i class="absolute text-gray-500 fas fa-search left-3 top-3"></i>
                         <input v-model="searchQuery" @keyup.enter="handleSearch" type="text"
                             class="w-full p-2 pl-10 border rounded-lg"
-                            placeholder="Buscar producto por nombre o referencia interna..." />
+                            placeholder="Buscar producto por referencia interna" />
                         <button @click="handleSearch"
                             class="flex items-center p-2 ml-2 text-white bg-blue-500 rounded-lg">
+                            <i class="text-white fas fa-search mr-2"></i> Buscar
+                        </button>
+                    </div>
+
+                    <div class="relative flex w-1/2 mx-auto mb-4">
+                        <i class="absolute text-gray-500 fas fa-search left-3 top-3"></i>
+                        <input v-model="searchQueryName" @keyup.enter="handleSearch" type="text"
+                            class="w-full p-2 pl-10 border focus:border-green-500 focus:border-[0.125rem] focus:ring-0 focus:outline-none rounded-lg"
+                            placeholder="Buscar producto por nombre" />
+                        <button @click="handleSearch"
+                            class="flex items-center p-2 ml-2 text-white bg-green-500 rounded-lg">
                             <i class="text-white fas fa-search mr-2"></i> Buscar
                         </button>
                     </div>
@@ -320,7 +352,7 @@ onMounted(() => {
                             </thead>
                             <tbody>
                                 <tr v-for="(
-                                        producto, index
+producto, index
                                     ) in productosSeleccionados" :key="index">
                                     <td class="px-4 py-2 border">
                                         {{ producto.nombreConcatenado }}
