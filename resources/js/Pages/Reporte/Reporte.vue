@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineAsyncComponent, defineComponent, ref, computed, watchEffect } from "vue";
+import { defineAsyncComponent, defineComponent, ref, computed, onMounted, watch } from "vue";
 import { useRoute } from "vue-router";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
@@ -50,10 +50,11 @@ export default defineComponent({
             items.value.reduce((sum, item) => sum + Number(item.count || 0), 0)
         );
 
-        const fetchData = async (id: number) => {
+        const fetchData = async () => {
+            if (!orderId.value) return;
             isLoading.value = true;
             try {
-                const response = await fetch(`/reporte/traer/${id}`);
+                const response = await fetch(`/reporte/traer/${orderId.value}`);
                 if (!response.ok) throw new Error("Error al obtener datos");
 
                 const data = await response.json();
@@ -94,22 +95,30 @@ export default defineComponent({
             }
         };
 
-        watchEffect(() => {
-            const id = route.query.order_id ? Number(route.query.order_id) : undefined;
-            if (id !== undefined && id !== orderId.value) {
+        onMounted(() => {
+            const id = route.query.order_id ? Number(route.query.order_id) : null;
+
+            if (id === null && !sessionStorage.getItem("reloaded")) {
+                sessionStorage.setItem("reloaded", "true");
+                location.reload();
+                return;
+            }
+
+            sessionStorage.removeItem("reloaded");
+
+            if (!isNaN(id)) {
                 orderId.value = id;
-                fetchData(id);
-            } else {
-                report.value = {
-                    id: null,
-                    order_name: "",
-                    date_approve: "",
-                    supplier: "",
-                    partner_ref: "",
-                };
-                items.value = [];
+                fetchData();
             }
         });
+
+        watch(() => route.query.order_id, (newOrderId) => {
+            const id = Number(newOrderId);
+            if (!isNaN(id)) {
+                orderId.value = id;
+                fetchData();
+            }
+        }, { immediate: true });
 
         return {
             report,
@@ -161,7 +170,9 @@ export default defineComponent({
             <div v-if="isLoading" class="text-center my-4 mt-6">
                 <i class="fas fa-spinner fa-spin mr-2"></i> Cargando reporte...
             </div>
-
+            <div v-else-if="items.length === 0" class="text-center my-4 mt-6 text-red-500">
+                No se encontraron reportes con el ID proporcionado.
+            </div>
             <div v-else class="print-area mx-auto max-w-7xl sm:px-6 lg:px-8">
                 <div v-for="(page, pageIndex) in paginatedItems" :key="pageIndex" class="p-6 bg-white page-break">
                     <div class="border-b border-black border-dashed mb-2">
