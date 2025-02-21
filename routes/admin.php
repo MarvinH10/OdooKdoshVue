@@ -4,8 +4,6 @@ use App\Http\Controllers\ProductosController;
 use App\Http\Controllers\FormulariosController;
 use App\Http\Controllers\ReposicionController;
 use App\Http\Controllers\BarcodeController;
-use App\Http\Controllers\DestinoController;
-use App\Http\Controllers\DigitadorController;
 use App\Http\Controllers\ReporteController;
 use Illuminate\Support\Facades\Route;
 
@@ -40,6 +38,7 @@ Route::middleware(['auth'])->group(function () {
     Route::controller(BarcodeController::class)->group(function () {
         Route::get('/barcode', 'index')->name('barcode');
         Route::get('/barcode/traer/{id}', 'traerProductosById');
+        Route::get('/barcode/traer/purchase.order/{id}', 'traerProductosByIdOrdenCompra');
     });
 
     Route::controller(ReporteController::class)->group(function () {

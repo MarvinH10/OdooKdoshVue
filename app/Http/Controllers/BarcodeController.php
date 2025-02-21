@@ -29,4 +29,12 @@ class BarcodeController extends Controller
         $products_Id = $this->servicioOdoo->traerProductosById($productId);
         return response()->json($products_Id);
     }
+
+    public function traerProductosByIdOrdenCompra($order_id)
+    {
+        $this->servicioOdoo->authenticate();
+
+        $orders_Id = $this->servicioOdoo->traerProductosByIdOrdenCompra($order_id);
+        return response()->json($orders_Id);
+    }
 }
