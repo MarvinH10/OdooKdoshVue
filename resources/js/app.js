@@ -43,6 +43,11 @@ const routes = [
         name: 'Barcode',
         component: () => import('@/Pages/Barcode/Barcode.vue'),
     },
+    {
+        path: '/reporte',
+        name: 'Reporte',
+        component: () => import('@/Pages/Reporte/Reporte.vue'),
+    },
 ];
 
 const router = createRouter({
