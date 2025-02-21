@@ -20,7 +20,7 @@ class ReposicionService
         $this->contraseña = $contraseña;
     }
 
-    public function traerDatosReposicion($default_code)
+    public function traerDatosReposicionxReferencia($default_code)
     {
         try {
 
@@ -35,6 +35,73 @@ class ReposicionService
                 ],
                 [
                     'fields' => ['id', 'name', 'default_code', 'product_tmpl_id', 'product_template_attribute_value_ids'],
+                    'limit' => 100,
+                ]
+            );
+
+            foreach ($products as &$product) {
+                if (!empty($product['product_template_attribute_value_ids']) && is_array($product['product_template_attribute_value_ids'])) {
+                    $attributeValues = $this->modelos->execute_kw(
+                        $this->base_datos,
+                        $this->uid,
+                        $this->contraseña,
+                        'product.template.attribute.value',
+                        'search_read',
+                        [
+                            [['id', 'in', $product['product_template_attribute_value_ids']]],
+                        ],
+                        ['fields' => ['id', 'name']]
+                    );
+
+                    if (!empty($attributeValues)) {
+                        $product['attribute_values'] = array_map(function ($attributeValue) {
+                            return $attributeValue['name'];
+                        }, $attributeValues);
+                    }
+                }
+
+                $xmlDato = $this->modelos->execute_kw(
+                    $this->base_datos,
+                    $this->uid,
+                    $this->contraseña,
+                    'ir.model.data',
+                    'search_read',
+                    [
+                        [['model', '=', 'product.product'], ['res_id', '=', $product['id']]],
+                    ],
+                    ['fields' => ['module', 'name']]
+                );
+
+                if (!empty($xmlDato)) {
+                    $product['xml_id'] = $xmlDato[0]['module'] . '.' . $xmlDato[0]['name'];
+                } else {
+                    $product['xml_id'] = null;
+                }
+            }
+
+            return $products;
+        } catch (Exception $e) {
+            Log::error('Error al traer los datos de la reposición:', ['message' => $e->getMessage()]);
+            return null;
+        }
+    }
+
+    public function traerDatosReposicionxName($name)
+    {
+        try {
+
+            $products = $this->modelos->execute_kw(
+                $this->base_datos,
+                $this->uid,
+                $this->contraseña,
+                'product.product',
+                'search_read',
+                [
+                    [['detailed_type', '=', 'product'], ['name', 'ilike', "{$name}%"]],
+                ],
+                [
+                    'fields' => ['id', 'name', 'default_code', 'product_tmpl_id', 'product_template_attribute_value_ids'],
+                    'limit' => 100,
                 ]
             );
 

@@ -106,11 +106,15 @@ class ServicioOdoo
     /*FIN FORMULARIO SERVICIO*/
 
     /*INICIO REPOSICION SERVICIO*/
-    public function traerDatosReposicion($default_code)
+    public function traerDatosReposicionxReferencia($default_code)
     {
-        return $this->reposicionService->traerDatosReposicion($default_code);
+        return $this->reposicionService->traerDatosReposicionxReferencia($default_code);
     }
 
+    public function traerDatosReposicionxName($name)
+    {
+        return $this->reposicionService->traerDatosReposicionxName($name);
+    }
     /*FIN REPOSICION SERVICIO*/
 
     /*INICIO BARCODE SERVICIO*/
