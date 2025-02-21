@@ -20,6 +20,8 @@ const productIdPrueba = ref(24796);
 
 const route = useRoute();
 const productId = ref(route.query.product_id ? parseInt(route.query.product_id, 10) : undefined);
+const modelType = ref(route.query.model ? route.query.model : null);
+const orderIdNumber = ref(route.query.order_id ? parseInt(route.query.order_id, 10) : null);
 const isUploading = ref(false);
 const estaCargando = ref(false);
 
@@ -47,10 +49,14 @@ const selectedButtonIndex = ref(null);
 const showModalCantidad = ref(false);
 const imageItems = ref([]);
 
-const traerDatoProductoSinCache = async (id) => {
+const traerDatoProductoSinCache = async (id, model = null) => {
     isUploading.value = true;
     try {
-        const response = await axios.get(`/barcode/traer/${id}`);
+        let endpoint = model === 'purchase.order'
+            ? `/barcode/traer/purchase.order/${id}`
+            : `/barcode/traer/${id}`;
+
+        const response = await axios.get(endpoint);
         if (response.data && response.data.length > 0) {
             const producto = response.data[0];
 
@@ -105,7 +111,7 @@ const traerDatoProductoSinCache = async (id) => {
     }
 };
 
-const traerDatoProducto = async (id) => {
+const traerDatoProducto = async (id, model = null) => {
     estaCargando.value = true;
     try {
         const storedData = localStorage.getItem(`producto_${id}`);
@@ -119,45 +125,107 @@ const traerDatoProducto = async (id) => {
             return;
         }
 
-        const response = await axios.get(`/barcode/traer/${id}`);
+        let endpoint = model === 'purchase.order'
+            ? `/barcode/traer/purchase.order/${id}`
+            : `/barcode/traer/${id}`;
 
-        if (response.data && response.data.length >= 0) {
-            const producto = response.data[0];
+        const response = await axios.get(endpoint);
+        console.log("Response data:", response.data);
 
-            const promises = producto.variantes.map(async (item) => {
+        if (!response.data || !Array.isArray(response.data) || response.data.length === 0) {
+            console.error("La respuesta de la API no contiene datos válidos.", response.data);
+            toast.error("No se encontró información para este producto.", {
+                autoClose: 3000,
+                position: "bottom-right",
+            });
+            return;
+        }
+
+        const promises = response.data.map(async (producto) => {
+            let categ_id = producto.categ_id ? producto.categ_id[1] : "";
+
+            const isNewStructure = producto.hasOwnProperty("name") && producto.hasOwnProperty("variantes");
+
+            if (model !== "purchase.order" && producto.variantes && producto.variantes.length > 0) {
+                categ_id = producto.variantes[0].categ_id ? producto.variantes[0].categ_id[1] : categ_id;
+            }
+
+            let attributes = "";
+            if (!isNewStructure && producto.product_id && Array.isArray(producto.product_id) && producto.product_id.length > 1) {
+                const match = producto.product_id[1].match(/\(([^)]+)\)$/);
+                if (match) {
+                    attributes = match[1];
+                }
+            }
+
+            let default_code = "";
+            if (!isNewStructure && producto.product_id && Array.isArray(producto.product_id) && producto.product_id.length > 1) {
+                const match = producto.product_id[1].match(/\[([^\]]+)\]/);
+                if (match) {
+                    default_code = match[1];
+                }
+            }
+
+            let description = "";
+            if (!isNewStructure) {
+                if (producto.product_id && Array.isArray(producto.product_id) && producto.product_id.length > 1) {
+                    description = producto.product_id[1]
+                        .replace(/\s*\([^)]+\)$/, "")
+                        .replace(/\s*\[[^\]]+\]\s*/, "")
+                        .trim();
+                }
+            } else {
+                description = producto.name || "";
+            }
+
+            const variantes = isNewStructure ? producto.variantes : [producto];
+
+            return Promise.all(variantes.map(async (item) => {
                 const qrCode = await QRCode.toDataURL(item.barcode || "", { width: 100, margin: 1 });
+
+                let size = "";
+                if (!isNewStructure) {
+                    if (item.product_id && Array.isArray(item.product_id) && item.product_id.length > 1) {
+                        const match = item.product_id[1].match(/\(([^)]+)\)$/);
+                        size = match ? match[1] : "";
+                    }
+                } else {
+                    if (item.product_template_attribute_value_ids && item.product_template_attribute_value_ids.length > 0) {
+                        size = item.product_template_attribute_value_ids.map(attr => attr.name).join(", ");
+                    }
+                }
+
                 return {
-                    categ_id: producto.categ_id ? producto.categ_id[1] : "",
+                    categ_id: model !== "purchase.order" ? (item.categ_id ? item.categ_id[1] : categ_id) : categ_id,
                     code: item.barcode || "",
-                    description: `${producto.name || ""}`,
+                    description: model !== "purchase.order" ? description : description,
                     price: item.lst_price ? item.lst_price.toFixed(2) : "",
-                    attribute: item.atributos
-                        ? item.atributos.map(attr => attr.split(":")[1]?.trim() || attr).join(", ")
-                        : "",
-                    default_code: item.default_code || "",
+                    attribute: model !== "purchase.order"
+                        ? (item.atributos
+                            ? item.atributos.map(attr => attr.split(":")[1]?.trim() || attr).join(", ")
+                            : "")
+                        : attributes,
+                    default_code: model !== "purchase.order" ? item.default_code || "" : default_code,
                     qrCode,
                     status: "activo",
                     quantity: 1,
                 };
-            });
+            }));
+        });
 
-            imageItems.value = await Promise.all(promises);
+        imageItems.value = (await Promise.all(promises)).flat();
 
-            localStorage.setItem(`producto_${id}`, JSON.stringify(imageItems.value));
-            toast.success("Cargo correctamente y ya puedes continuar, selecciona un tipo.", {
-                autoClose: 3000,
-                position: "bottom-right",
-            });
-        } else {
-            console.error("Error al obtener datos del producto.", response.data);
-            toast.error("Error al obtener datos del producto.", {
-                autoClose: 3000,
-                position: "bottom-right",
-            });
-        }
+        console.log("ImageItems después de la carga:", imageItems.value);
+        localStorage.setItem(`producto_${id}`, JSON.stringify(imageItems.value));
+
+        toast.success("Datos cargados correctamente.", {
+            autoClose: 3000,
+            position: "bottom-right",
+        });
+
     } catch (error) {
         console.error("Error al obtener datos del producto:", error);
-        toast.error("El ID del producto que elegiste no es un producto almacenable.", {
+        toast.error("Hubo un problema al recuperar la información.", {
             autoClose: 3000,
             position: "bottom-right",
         });
@@ -167,6 +235,7 @@ const traerDatoProducto = async (id) => {
 };
 
 const filteredItems = computed(() => {
+    console.log("Filtrando elementos:", imageItems.value);
     return selectedButtonIndex.value !== null
         ? imageItems.value.filter(item => item.status === "activo")
         : [];
@@ -328,11 +397,32 @@ watch(
 );
 
 onMounted(() => {
-    if (!productIdPrueba.value) {
-        productIdPrueba.value = 24796;
+    console.log("Query Params:", route.query);
+    console.log("Model:", modelType.value);
+    console.log("Order ID:", orderIdNumber.value);
+
+    if (modelType.value === 'purchase.order' && orderIdNumber.value) {
+        traerDatoProducto(orderIdNumber.value, modelType.value);
+    } else if (productId.value) {
+        traerDatoProducto(productId.value);
     }
-    traerDatoProducto(productIdPrueba.value);
 });
+
+watch(
+    () => route.query,
+    (newQuery) => {
+        console.log("Parámetros actualizados:", newQuery);
+        modelType.value = newQuery.model || null;
+        orderIdNumber.value = newQuery.order_id ? parseInt(newQuery.order_id, 10) : null;
+
+        if (modelType.value === 'purchase.order' && orderIdNumber.value) {
+            traerDatoProducto(orderIdNumber.value, modelType.value);
+        } else if (newQuery.product_id) {
+            traerDatoProducto(newQuery.product_id);
+        }
+    },
+    { deep: true }
+);
 </script>
 
 <template>

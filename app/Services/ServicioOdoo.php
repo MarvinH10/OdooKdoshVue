@@ -125,6 +125,11 @@ class ServicioOdoo
     {
         return $this->barcodeService->traerProductosById($productId);
     }
+
+    public function traerProductosByIdOrdenCompra($order_id)
+    {
+        return $this->barcodeService->traerProductosByIdOrdenCompra($order_id);
+    }
     /*FIN BARCODE SERVICIO*/
 
     /*INICIO BARCODE SERVICIO*/
