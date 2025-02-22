@@ -16,7 +16,7 @@ import QRCode from "qrcode";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 
-const productIdPrueba = ref(24796);
+// const productIdPrueba = ref(24796);
 
 const route = useRoute();
 const productId = ref(route.query.product_id ? parseInt(route.query.product_id, 10) : undefined);
@@ -49,67 +49,67 @@ const selectedButtonIndex = ref(null);
 const showModalCantidad = ref(false);
 const imageItems = ref([]);
 
-const traerDatoProductoSinCache = async (id, model = null) => {
-    isUploading.value = true;
-    try {
-        let endpoint = model === 'purchase.order'
-            ? `/barcode/traer/purchase.order/${id}`
-            : `/barcode/traer/${id}`;
+// const traerDatoProductoSinCache = async (id, model = null) => {
+//     isUploading.value = true;
+//     try {
+//         let endpoint = model === 'purchase.order'
+//             ? `/barcode/traer/purchase.order/${id}`
+//             : `/barcode/traer/${id}`;
 
-        const response = await axios.get(endpoint);
-        if (response.data && response.data.length > 0) {
-            const producto = response.data[0];
+//         const response = await axios.get(endpoint);
+//         if (response.data && response.data.length > 0) {
+//             const producto = response.data[0];
 
-            if (!producto.variantes || !Array.isArray(producto.variantes)) {
-                console.error("El campo 'variantes' no está presente o no es válido:", producto);
-                toast.error("El producto no contiene variantes o no es válido.", {
-                    autoClose: 3000,
-                    position: "bottom-right",
-                });
-                return;
-            }
+//             if (!producto.variantes || !Array.isArray(producto.variantes)) {
+//                 console.error("El campo 'variantes' no está presente o no es válido:", producto);
+//                 toast.error("El producto no contiene variantes o no es válido.", {
+//                     autoClose: 3000,
+//                     position: "bottom-right",
+//                 });
+//                 return;
+//             }
 
-            const promises = producto.variantes.map(async (item) => {
-                const qrCode = await QRCode.toDataURL(item.barcode || "", { width: 100, margin: 1 });
-                return {
-                    categ_id: producto.categ_id ? producto.categ_id[1] : "",
-                    code: item.barcode || "",
-                    description: `${producto.name || ""}`,
-                    price: item.lst_price ? item.lst_price.toFixed(2) : "",
-                    attribute: item.atributos
-                        ? item.atributos.map(attr => attr.split(":")[1]?.trim() || attr).join(", ")
-                        : "",
-                    default_code: item.default_code || "",
-                    qrCode,
-                    status: "activo",
-                    quantity: 1,
-                };
-            });
+//             const promises = producto.variantes.map(async (item) => {
+//                 const qrCode = await QRCode.toDataURL(item.barcode || "", { width: 100, margin: 1 });
+//                 return {
+//                     categ_id: producto.categ_id ? producto.categ_id[1] : "",
+//                     code: item.barcode || "",
+//                     description: `${producto.name || ""}`,
+//                     price: item.lst_price ? item.lst_price.toFixed(2) : "",
+//                     attribute: item.atributos
+//                         ? item.atributos.map(attr => attr.split(":")[1]?.trim() || attr).join(", ")
+//                         : "",
+//                     default_code: item.default_code || "",
+//                     qrCode,
+//                     status: "activo",
+//                     quantity: 1,
+//                 };
+//             });
 
-            imageItems.value = await Promise.all(promises);
+//             imageItems.value = await Promise.all(promises);
 
-            localStorage.setItem(`producto_${id}`, JSON.stringify(imageItems.value));
-            toast.success("Datos cargados correctamente.", {
-                autoClose: 3000,
-                position: "bottom-right",
-            });
-        } else {
-            console.error("La respuesta no contiene datos válidos:", response.data);
-            toast.error("No se pudo obtener información del producto.", {
-                autoClose: 3000,
-                position: "bottom-right",
-            });
-        }
-    } catch (error) {
-        console.error("Error al obtener datos del producto:", error.response || error);
-        toast.error("Ocurrió un error al consultar los datos del producto.", {
-            autoClose: 3000,
-            position: "bottom-right",
-        });
-    } finally {
-        isUploading.value = false;
-    }
-};
+//             localStorage.setItem(`producto_${id}`, JSON.stringify(imageItems.value));
+//             toast.success("Datos cargados correctamente.", {
+//                 autoClose: 3000,
+//                 position: "bottom-right",
+//             });
+//         } else {
+//             console.error("La respuesta no contiene datos válidos:", response.data);
+//             toast.error("No se pudo obtener información del producto.", {
+//                 autoClose: 3000,
+//                 position: "bottom-right",
+//             });
+//         }
+//     } catch (error) {
+//         console.error("Error al obtener datos del producto:", error.response || error);
+//         toast.error("Ocurrió un error al consultar los datos del producto.", {
+//             autoClose: 3000,
+//             position: "bottom-right",
+//         });
+//     } finally {
+//         isUploading.value = false;
+//     }
+// };
 
 const traerDatoProducto = async (id, model = null) => {
     estaCargando.value = true;
@@ -130,7 +130,6 @@ const traerDatoProducto = async (id, model = null) => {
             : `/barcode/traer/${id}`;
 
         const response = await axios.get(endpoint);
-        console.log("Response data:", response.data);
 
         if (!response.data || !Array.isArray(response.data) || response.data.length === 0) {
             console.error("La respuesta de la API no contiene datos válidos.", response.data);
@@ -215,7 +214,6 @@ const traerDatoProducto = async (id, model = null) => {
 
         imageItems.value = (await Promise.all(promises)).flat();
 
-        console.log("ImageItems después de la carga:", imageItems.value);
         localStorage.setItem(`producto_${id}`, JSON.stringify(imageItems.value));
 
         toast.success("Datos cargados correctamente.", {
@@ -235,7 +233,6 @@ const traerDatoProducto = async (id, model = null) => {
 };
 
 const filteredItems = computed(() => {
-    console.log("Filtrando elementos:", imageItems.value);
     return selectedButtonIndex.value !== null
         ? imageItems.value.filter(item => item.status === "activo")
         : [];
@@ -380,8 +377,16 @@ const updateItemQuantities = (updatedItems) => {
             status: "activo",
         }));
     });
+};
 
-    console.log("Quantities updated in imageItems:", imageItems.value);
+const actualizar = () => {
+    Object.keys(localStorage).forEach((key) => {
+        if (key.startsWith("producto_")) {
+            localStorage.removeItem(key);
+        }
+    });
+
+    window.location.replace(window.location.href);
 };
 
 watch(
@@ -397,10 +402,6 @@ watch(
 );
 
 onMounted(() => {
-    console.log("Query Params:", route.query);
-    console.log("Model:", modelType.value);
-    console.log("Order ID:", orderIdNumber.value);
-
     if (modelType.value === 'purchase.order' && orderIdNumber.value) {
         traerDatoProducto(orderIdNumber.value, modelType.value);
     } else if (productId.value) {
@@ -411,7 +412,6 @@ onMounted(() => {
 watch(
     () => route.query,
     (newQuery) => {
-        console.log("Parámetros actualizados:", newQuery);
         modelType.value = newQuery.model || null;
         orderIdNumber.value = newQuery.order_id ? parseInt(newQuery.order_id, 10) : null;
 
@@ -442,7 +442,7 @@ watch(
                     <div v-else>
                         <div class="flex flex-wrap">
                             <div class="sm:w-1/6 lg:w-1/5 xl:w-1/4">
-                                <button v-if="!isUploading" @click="traerDatoProductoSinCache(productId)"
+                                <button v-if="!isUploading" @click="actualizar"
                                     class="flex flex-col-2 bg-green-700 text-white text-sm px-[9.5px] py-[0.5px] mb-1 rounded border text-center items-center justify-center">
                                     <i class="fas fa-sync-alt mr-2"></i> Actualizar
                                 </button>
