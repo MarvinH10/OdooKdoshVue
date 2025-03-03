@@ -37,6 +37,23 @@ class ProductoService
         );
     }
 
+    public function traerCategoriasPDV()
+    {
+        $categorias = $this->modelos->execute_kw(
+            $this->base_datos,
+            $this->uid,
+            $this->contraseña,
+            'pos.category',
+            'search_read',
+            [[]],
+            [
+                'fields' => ['id', 'name'],
+            ]
+        );
+
+        return $categorias;
+    }
+
     public function traerCategorias()
     {
         return $this->modelos->execute_kw(

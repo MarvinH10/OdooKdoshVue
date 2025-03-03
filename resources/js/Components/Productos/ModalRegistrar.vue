@@ -4,6 +4,11 @@ import TagSelect from "./TagSelect.vue";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 
+type CategoriaPDV = {
+    id: number;
+    name: string;
+};
+
 type Categoria = {
     id: number;
     name: string;
@@ -24,6 +29,7 @@ const props = defineProps({
             name: string;
             code: string;
             price: number;
+            categoryPDV: number | null;
             category: number | null;
             subcategory1: number | null;
             subcategory2: number | null;
@@ -41,6 +47,10 @@ const props = defineProps({
     },
     isLoading: {
         type: Object,
+        required: true,
+    },
+    categoriasPDV: {
+        type: Array as () => CategoriaPDV[],
         required: true,
     },
     categorias: {
@@ -67,6 +77,7 @@ const producto = reactive({
     name: "",
     code: "",
     price: 0,
+    categoryPDV: null as number | null,
     category: null as number | null,
     subcategory1: null as number | null,
     subcategory2: null as number | null,
@@ -120,6 +131,7 @@ const resetFormulario = () => {
     producto.name = "";
     producto.code = "";
     producto.price = 0;
+    producto.categoryPDV = null;
     producto.category = null;
     producto.subcategory1 = null;
     producto.subcategory2 = null;
@@ -227,16 +239,16 @@ const submitProduct = () => {
 };
 
 watch(
-  () => props.productoInicial,
-  (nuevoProducto) => {
-    // console.log("Nuevo Producto Inicial en Modal:", nuevoProducto);
-    if (nuevoProducto) {
-      Object.assign(producto, nuevoProducto);
-    } else {
-      resetFormulario();
-    }
-  },
-  { immediate: true }
+    () => props.productoInicial,
+    (nuevoProducto) => {
+        // console.log("Nuevo Producto Inicial en Modal:", nuevoProducto);
+        if (nuevoProducto) {
+            Object.assign(producto, nuevoProducto);
+        } else {
+            resetFormulario();
+        }
+    },
+    { immediate: true }
 );
 
 watch(
@@ -379,6 +391,20 @@ watch(
                                                 </option>
                                             </select>
                                         </div>
+                                    </div>
+
+                                    <div class="flex-1">
+                                        <label for="category" class="block text-gray-700 text-sm font-bold mb-2">
+                                            Categoría de Punto de Venta:
+                                        </label>
+                                        <select id="category" v-model="producto.categoryPDV"
+                                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                            <option value="">Seleccione una opción</option>
+                                            <option v-for="categoriaPDV in categoriasPDV" :key="categoriaPDV.id"
+                                                :value="categoriaPDV.id">
+                                                {{ categoriaPDV.name }}
+                                            </option>
+                                        </select>
                                     </div>
 
                                     <div class="mb-4">

@@ -6,7 +6,7 @@ export default defineComponent({
     props: {
         productos: {
             type: Array as PropType<Array<{
-                id: number; name: string; code: string; price: number; category: string;
+                id: number; name: string; code: string; price: number; categoryPDV: string; category: string;
                 attributes: Array<{
                     attributeId: string;
                     attributeValues: Array<{ id: string; name: string }>;
@@ -15,6 +15,10 @@ export default defineComponent({
                     extraPrice: number;
                 }>;
             }>>,
+            required: true,
+        },
+        categoriasPDV: {
+            type: Array as PropType<Array<{ id: string; name: string }>>,
             required: true,
         },
         categorias: {
@@ -152,6 +156,7 @@ export default defineComponent({
                         <th class="border border-gray-300 px-4 py-2 text-left">ID</th>
                         <th class="border border-gray-300 px-4 py-2 text-left">Nombre</th>
                         <th class="border border-gray-300 px-4 py-2 text-left">Código</th>
+                        <th class="border border-gray-300 px-4 py-2 text-left">Categorías PDV</th>
                         <th class="border border-gray-300 px-4 py-2 text-left">Categorías</th>
                         <th class="border border-gray-300 px-4 py-2 text-left">Precio</th>
                         <th class="border border-gray-300 px-4 py-2 text-left">Atributos</th>
@@ -166,6 +171,12 @@ export default defineComponent({
                         <td class="border border-gray-300 px-4 py-2">{{ producto.id }}</td>
                         <td class="border border-gray-300 px-4 py-2">{{ producto.name }}</td>
                         <td class="border border-gray-300 px-4 py-2">{{ producto.code }}</td>
+                        <td class="border border-gray-300 px-4 py-2">
+                            {{
+                                categoriasPDV.find(categoria => String(categoria.id) === String(producto.categoryPDV))?.name
+                            || "Sin Categoría"
+                            }}
+                        </td>
                         <td class="border border-gray-300 px-4 py-2">{{ getCategoryNameWithSubcategories(producto) }}
                         </td>
                         <td class="border border-gray-300 px-4 py-2">{{ producto.price }}</td>

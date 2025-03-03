@@ -92,6 +92,14 @@ class ProductosController extends Controller
         return response()->json($productosFavoritos);
     }
 
+    public function traerCategoriasPDV()
+    {
+        $this->servicioOdoo->authenticate();
+
+        $categorias = $this->servicioOdoo->traerCategoriasPDV();
+        return response()->json($categorias);
+    }
+
     public function traerCategorias()
     {
         $this->servicioOdoo->authenticate();
@@ -148,7 +156,9 @@ class ProductosController extends Controller
                 $datosProducto = [
                     'priority' =>  '1',
                     'sale_ok' => true,
+                    'available_in_pos' => true,
                     'name' => $producto['name'],
+                    'pos_categ_ids' => [(int) $producto['categoryPDV']],
                     'categ_id' => $producto['category'],
                     'default_code' => $producto['code'],
                     'list_price' => $producto['price'],
