@@ -16,6 +16,7 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/productos/actualizar/{id}', 'actualizar');
         Route::delete('/productos/eliminar/{id}', 'quitar');
         Route::get('/productos_favoritos/traer', 'traerProductosFavoritos');
+        Route::get('/categoriaspdv/traer', 'traerCategoriasPDV');
         Route::get('/categorias/traer', 'traerCategorias');
         Route::get('/subcategorias/traer/{id}', 'traerSubcategorias');
         Route::get('/atributos/traer', 'traerAtributos');

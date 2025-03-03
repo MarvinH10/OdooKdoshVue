@@ -14,6 +14,7 @@ const productos = ref<Array<{
     name: string;
     code: string;
     price: number;
+    categoryPDV: string;
     category: string;
     attributes: Array<{
         attributeId: string;
@@ -27,6 +28,7 @@ const productos = ref<Array<{
 const productoEditado = ref(null);
 
 const isUploading = ref(false);
+const categoriasPDV = ref([]);
 const categorias = ref([]);
 const subcategorias = reactive<{ [key: number]: any[] }>({});
 const subcategoriasMap = ref<{ [key: number]: string }>({});
@@ -50,6 +52,23 @@ const idProductoRegistrado = ref([]);
 
 const cerrarLinkModal = (): void => {
     showLinksModal.value = false;
+};
+
+const traerCategoriasPDV = async () => {
+    try {
+        const categoriasPDVCacheadas = localStorage.getItem("categoriasPDV");
+        if (categoriasPDVCacheadas) {
+            categoriasPDV.value = JSON.parse(categoriasPDVCacheadas);
+            return;
+        }
+
+        const respuesta = await axios.get(`/categoriaspdv/traer`);
+        categoriasPDV.value = respuesta.data;
+
+        localStorage.setItem("categoriasPDV", JSON.stringify(respuesta.data));
+    } catch (error) {
+        console.error("Error al traer las categorías del PDV:", error);
+    }
 };
 
 const traerCategorias = async () => {
@@ -321,6 +340,7 @@ const eliminarProducto = (id: number) => {
 };
 
 onMounted(() => {
+    traerCategoriasPDV();
     traerCategorias();
     traerAtributos();
 });
@@ -339,7 +359,7 @@ onMounted(() => {
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
                     <ProductoTabla @cerrarLinkModal="cerrarLinkModal" :idProductoRegistrado="idProductoRegistrado"
                         :baseUrl="baseUrl" :showLinksModal="showLinksModal" :isUploading="isUploading"
-                        :productos="productos" :categorias="categorias" :subcategorias-map="subcategoriasMap"
+                        :productos="productos" :categoriasPDV="categoriasPDV" :categorias="categorias" :subcategorias-map="subcategoriasMap"
                         :atributos="atributos" @agregar="(producto) => openModal('agregar', producto)" @registrar="registrarProductos"
                         @duplicar="duplicarProducto" @eliminar="eliminarProducto" @editar="(producto) => openModal('editar', producto)" />
                 </div>
@@ -347,7 +367,7 @@ onMounted(() => {
         </div>
 
         <ModalRegistrar :show="showModal" @close="closeModal" @submit="agregarProducto" @update="actualizarProducto"
-            :productoInicial="productoEditado" :isLoading="isLoading" :categorias="categorias"
+            :productoInicial="productoEditado" :isLoading="isLoading" :categoriasPDV="categoriasPDV" :categorias="categorias"
             :subcategorias="subcategorias" :atributos="atributos" :valores_atributos="valores_atributos"
             @cambiarCategoriaPrincipal="alCambiarCategoriaPrincipal" @cambiarSubcategoria="alCambiarSubcategoria"
             @cambiarAtributo="traerValoresAtributos" />

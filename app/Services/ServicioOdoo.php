@@ -60,6 +60,11 @@ class ServicioOdoo
     }
 
     /*INICIO PRODUCTO SERVICIO*/
+    public function traerCategoriasPDV()
+    {
+        return $this->productoService->traerCategoriasPDV();
+    }
+
     public function traerCategorias()
     {
         return $this->productoService->traerCategorias();
