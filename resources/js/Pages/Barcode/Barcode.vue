@@ -326,7 +326,7 @@ const printSelectedContent = () => {
                 <style>
                     body {
                         font-family: Arial, sans-serif;
-                        padding: 20px;
+                        margin-top: -5px;
                         background-color: #f9f9f9;
                     }
                 </style>
