@@ -35,7 +35,7 @@ class ReporteService
                     [['id', '=', $parametro]]
                 ],
                 [
-                    'fields' => ['name', 'date_approve', 'partner_id', 'partner_ref', 'order_line'],
+                    'fields' => ['name', 'date_order', 'partner_id', 'partner_ref', 'order_line'],
                     'limit' => 1
                 ]
             );
@@ -46,7 +46,7 @@ class ReporteService
 
             $order = $purchase_order_info[0];
             $order_name = $order['name'] ?? '';
-            $order_date = $order['date_approve'] ?? '';
+            $order_date = $order['date_order'] ?? '';
             $partner_name = $order['partner_id'][1] ?? '';
             $partner_ref = $order['partner_ref'] ?? '';
             $order_line_ids = $order['order_line'] ?? [];
@@ -54,7 +54,7 @@ class ReporteService
             if (empty($order_line_ids)) {
                 return [
                     'order_id' => $order_name,
-                    'date_approve' => $order_date,
+                    'date_order' => $order_date,
                     'supplier' => $partner_name,
                     'partner_ref' => $partner_ref,
                     'products' => []
@@ -85,7 +85,7 @@ class ReporteService
             return [
                 'order_id' => $parametro,
                 'order_name' => $order_name,
-                'date_approve' => $order_date,
+                'date_order' => $order_date,
                 'supplier' => $partner_name,
                 'partner_ref' => $partner_ref,
                 'products' => $products

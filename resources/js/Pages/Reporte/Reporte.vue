@@ -32,7 +32,7 @@ export default defineComponent({
         const report = ref<any>({
             id: null,
             order_name: "",
-            date_approve: "",
+            date_order: "",
             supplier: "",
             partner_ref: "",
         });
@@ -65,7 +65,7 @@ export default defineComponent({
                 report.value = {
                     id: data.order_id,
                     order_name: data.order_name,
-                    date_approve: data.date_approve,
+                    date_order: data.date_order,
                     supplier: data.supplier,
                     partner_ref: data.partner_ref,
                 };
@@ -85,7 +85,7 @@ export default defineComponent({
                 report.value = {
                     id: null,
                     order_name: "",
-                    date_approve: "",
+                    date_order: "",
                     supplier: "",
                     partner_ref: "",
                 };
@@ -177,7 +177,7 @@ export default defineComponent({
                 <div v-for="(page, pageIndex) in paginatedItems" :key="pageIndex" class="p-6 bg-white page-break">
                     <div class="border-b border-black border-dashed mb-2">
                         <h2 class="text-lg font-bold mb-4">
-                            <span>{{ report.order_name }}</span> | <span>{{ report.date_approve }}</span>
+                            <span>{{ report.order_name }}</span> | <span>{{ report.date_order }}</span>
                         </h2>
                         <div v-if="pageIndex === 0">
                             <div class="uppercase mb-4 text-sm">
@@ -233,7 +233,7 @@ export default defineComponent({
                         </div>
                     </div>
 
-                    <table class="w-full border border-collapse border-gray-400 text-left">
+                    <table class="w-full border border-collapse border-gray-400 text-left text-[10px]">
                         <thead>
                             <tr class="bg-white">
                                 <th class="border border-gray-600 px-2 py-1">DESCRIPCIÓN</th>
@@ -256,7 +256,7 @@ export default defineComponent({
                         </tbody>
                     </table>
 
-                    <div class="text-center mt-4 font-semibold">
+                    <div class="text-center mt-4 font-semibold text-[10px]">
                         Página {{ pageIndex + 1 }} de {{ paginatedItems.length }}
                     </div>
                 </div>
