@@ -28,5 +28,13 @@ class UsuariosSeeder extends Seeder
             'token' => env('USER2_TOKEN'),
             'password' => Hash::make(env('USER2_PASSWORD')),
         ]);
+
+        User::create([
+            'name' => env('USER3_NAME'),
+            'odoo_uid' => env('USER3_ODOO_UID'),
+            'email' => env('USER3_EMAIL'),
+            'token' => env('USER3_TOKEN'),
+            'password' => Hash::make(env('USER3_PASSWORD')),
+        ]);
     }
 }
