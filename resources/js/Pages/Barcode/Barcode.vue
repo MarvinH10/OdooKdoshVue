@@ -207,12 +207,28 @@ const traerDatoProducto = async (id, model = null) => {
                     default_code: model !== "purchase.order" ? item.default_code || "" : default_code,
                     qrCode,
                     status: "activo",
-                    quantity: 1,
+                    quantity: model !== "purchase.order" ? 1 : item.product_qty,
                 };
             }));
         });
 
-        imageItems.value = (await Promise.all(promises)).flat();
+        let fetchedItems = (await Promise.all(promises)).flat();
+
+        const hasDifferentQuantity = fetchedItems.some(item => item.quantity > 1);
+        if (hasDifferentQuantity) {
+            imageItems.value = fetchedItems.flatMap((updatedItem) => {
+                if (updatedItem.quantity === 0) {
+                    return { ...updatedItem, status: "inactivo" };
+                }
+
+                return Array.from({ length: updatedItem.quantity }, () => ({
+                    ...updatedItem,
+                    status: "activo",
+                }));
+            });
+        } else {
+            imageItems.value = fetchedItems;
+        }
 
         localStorage.setItem(`producto_${id}`, JSON.stringify(imageItems.value));
 

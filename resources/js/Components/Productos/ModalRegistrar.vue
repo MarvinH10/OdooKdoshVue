@@ -182,6 +182,7 @@ const añadirAtributo = () => {
         referencesInternal: {},
         extraPrice: 0,
     });
+    camposBloqueados.codeInput = true;
 };
 
 const removerAtributo = (index: number) => {
@@ -267,6 +268,18 @@ watch(
     (newVal) => {
         if (newVal.trim()) {
             camposBloqueados.codeInput = true;
+        } else {
+            camposBloqueados.codeInput = false;
+        }
+    }
+);
+
+watch(
+    () => producto.attributes.length,
+    (newLength) => {
+        if (newLength > 0) {
+            camposBloqueados.codeInput = true;
+            producto.code = "";
         } else {
             camposBloqueados.codeInput = false;
         }

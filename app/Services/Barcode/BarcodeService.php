@@ -116,7 +116,7 @@ class BarcodeService
                 [
                     [['order_id', '=', $order_id]]
                 ],
-                ['fields' => ['product_id']]
+                ['fields' => ['product_id', 'product_qty']]
             );
 
             if (empty($productos)) {
@@ -140,6 +140,7 @@ class BarcodeService
             $resultados = array_map(function ($producto) use ($productos) {
                 $product = current(array_filter($productos, fn($p) => $p['product_id'][0] === $producto['id']));
                 $producto['product_id'] = $product['product_id'];
+                $producto['product_qty'] = $product['product_qty'];
                 return $producto;
             }, $categorias);
 

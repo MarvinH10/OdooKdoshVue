@@ -8,7 +8,7 @@ const props = defineProps({
     },
 });
 
-const emit = defineEmits(["close"]);
+const emit = defineEmits(["close", "updateQuantities"]);
 
 const items = ref([]);
 const initialItems = ref([]);
@@ -59,7 +59,6 @@ const acceptChanges = () => {
     emit("updateQuantities", updatedItems);
     closeModal();
 };
-
 
 watch(items, (newItems) => {
     newItems.forEach((item) => {
