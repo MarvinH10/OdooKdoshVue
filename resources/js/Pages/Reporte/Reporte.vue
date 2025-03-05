@@ -233,7 +233,7 @@ export default defineComponent({
                         </div>
                     </div>
 
-                    <table class="w-full border border-collapse border-gray-400 text-left text-[10px]">
+                    <table class="w-full border border-collapse border-gray-400 text-left text-[12px]">
                         <thead>
                             <tr class="bg-white">
                                 <th class="border border-gray-600 px-2 py-1">DESCRIPCIÓN</th>
