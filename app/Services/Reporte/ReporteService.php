@@ -78,7 +78,7 @@ class ReporteService
                     'id' => $item['id'],
                     'name' => $item['name'],
                     'product_qty' => $item['product_qty'],
-                    'brand' => $this->extractBrand($item['name']),
+                    'brand' => '',
                 ];
             }, $purchase_order_lines);
 
