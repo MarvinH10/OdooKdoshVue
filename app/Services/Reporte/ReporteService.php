@@ -78,7 +78,7 @@ class ReporteService
                     'id' => $item['id'],
                     'name' => $item['name'],
                     'product_qty' => $item['product_qty'],
-                    'brand' => $this->extractBrand($item['name'])
+                    'brand' => $this->extractBrand($item['name']),
                 ];
             }, $purchase_order_lines);
 
@@ -98,7 +98,7 @@ class ReporteService
 
     private function extractBrand($name)
     {
-        if (preg_match('/-\s+([^()]+)\s*\(/i', $name, $matches)) {
+        if (preg_match('/.* - ([^()]+)/', $name, $matches)) {
             return trim($matches[1]);
         }
 
